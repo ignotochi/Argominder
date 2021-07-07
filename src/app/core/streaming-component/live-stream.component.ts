@@ -39,7 +39,6 @@ export class LiveStreamComponent implements OnInit, AfterViewInit {
   getCamList() {
     this.pageService.zmCamsList(this.localToken).subscribe((result) => {
       this.datasource.monitors = result.monitors;
-      //this.changeRef.markForCheck();
     }, (err: Error) => {
       console.log(err);
     });

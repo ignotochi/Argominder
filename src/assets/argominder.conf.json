@@ -1,0 +1,11 @@
+{
+    "protocol" : "https://", 
+    "baseUrl" : "fetchtec.com/zm/api/",
+    "streamUrl1": "centos.fetchtec.com",
+    "streamUrl2": "rwt.fetchtec.com",
+    "streamUrl3": "",
+    "streamUrl4": "",
+    "scale": "50",
+    "maxfps": "5",
+    "buffer": "1000"  
+}

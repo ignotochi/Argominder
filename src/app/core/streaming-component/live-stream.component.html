@@ -1,0 +1,9 @@
+<div id="streamBlock">
+  <mat-grid-list cols="4" rowHeight="1.55:1">
+    <mat-grid-tile *ngFor="let item of datasource.monitors; let i = index ">
+      <div class="{{ getClassStream(item.Monitor_Status.Status) }}">
+        <img *ngIf="showStream(item.Monitor_Status.Status);" style="width:100%;" src="{{ getStream(item.Monitor.Id, i+1) }}">
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>

@@ -1,0 +1,57 @@
+<div *ngIf="userIsLogged === true; then showApp else showLogin"></div>
+
+<ng-template #showApp>
+  <div>
+    <mat-tab-group [selectedIndex]="selectedTab">
+
+      <mat-tab label="Informations">
+        <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
+        <p class="info-p"><b>token di accesso: </b>{{ login.refresh_token }}</p>
+        <p class="info-p"><b>api version: </b> {{ login.apiversion }}</p>
+        <p class="info-p"><b>credenziali: </b> {{ login.credentials }}</p>
+        <p class="info-p"><b>cadenza token: </b> {{ login.refresh_token_expires }}</p>
+      </mat-tab>
+
+      <mat-tab label="Live Stream">
+        <live-stream *ngIf="loadStream" [localToken]="localToken"></live-stream>
+      </mat-tab>
+
+      <mat-tab label="Events"> 
+        <events></events>
+      </mat-tab>
+
+      <mat-tab label="Settings">
+        <config></config>
+      </mat-tab>
+
+
+      <mat-tab label="Logout">
+        <div class="row">
+          <button id="logout-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Logout' }}</button>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+  </div>
+</ng-template>
+
+<ng-template #showLogin>
+<div id="login-main">
+  <div id="login-block">
+    <h3 id="login-title">Login in Argominder</h3>
+    <form class="example-form">
+      <mat-form-field class="input-login" appearance="fill">
+        <mat-label>zm username</mat-label>
+        <input matInput placeholder="username" [(ngModel)]="zmUsername" type="text" name="username">
+      </mat-form-field>
+      <mat-form-field class="password-login" appearance="fill">
+        <mat-label>zm password</mat-label>
+        <input matInput placeholder="password" [(ngModel)]="zmPassword" type="password" name="password">
+      </mat-form-field>
+    </form>
+    <button mat-raised-button color="primary" (click)="logInZm()">{{ 'Login' }}</button>
+    <p *ngIf="errorLogin">{{ 'Errore di autenticazione' }}</p>
+  </div>
+</div>
+
+</ng-template>

@@ -1,0 +1,48 @@
+<table mat-table [dataSource]="datasource.events" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="EventID">
+        <th mat-header-cell *matHeaderCellDef> EventID </th>
+        <td mat-cell *matCellDef="let element">
+            <a style="text-decoration: underline;" mat-flat-button href="#"> {{element.Event.Id}} </a>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Cause">
+        <th mat-header-cell *matHeaderCellDef> Cause </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.Cause}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="MonitorId">
+        <th mat-header-cell *matHeaderCellDef> MonitorId </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.MonitorId}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="StartTime">
+        <th mat-header-cell *matHeaderCellDef> StartTime </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.StartTime}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="EndTime">
+        <th mat-header-cell *matHeaderCellDef> EndTime </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.EndTime}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Length">
+        <th mat-header-cell *matHeaderCellDef> Length </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.Length}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Frames">
+        <th mat-header-cell *matHeaderCellDef> Frames </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.Frames}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="MaxScore">
+        <th mat-header-cell *matHeaderCellDef> MaxScore </th>
+        <td mat-cell *matCellDef="let element"> {{element.Event.MaxScore}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+<mat-paginator [length]="datasource.pagination.pageCount" [pageSize]="datasource.pagination.current" [pageSizeOptions]="[25, 50, 100, 500]"></mat-paginator>

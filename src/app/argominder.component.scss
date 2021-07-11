@@ -1,3 +1,6 @@
+#login-main {
+    background: #1c183d;
+}
 .btn-login {
     min-height: 25px;
 }
@@ -10,6 +13,7 @@
     height: 100%;
     background-image: url("img/argominder-background-login-min-2.jpeg");
     background-repeat: no-repeat;
+    background-position: center;
     background-size: 100%;
 }
 #login-block {
@@ -23,10 +27,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-#logout-btn {
-    display: flex;
-    margin: 8px auto;
-}
+
 .info-h3 {
     text-align: center;
     border-bottom: 1px solid #e0e0e0;
@@ -35,4 +36,14 @@
 .info-p {
     text-align: left;
     padding: 5px 15px;
+}
+
+#actions-block {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+#start-btn, #stop-btn, #restart-btn, #logout-btn{
+    margin: 0 8px;
 }

@@ -2,7 +2,7 @@
 
 <ng-template #showApp>
   <div>
-    <mat-tab-group [selectedIndex]="selectedTab">
+    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab">
 
       <mat-tab label="Informations">
         <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
@@ -13,11 +13,11 @@
       </mat-tab>
 
       <mat-tab label="Live Stream">
-        <live-stream *ngIf="loadStream" [localToken]="localToken"></live-stream>
+        <live-stream [localToken]="localToken"></live-stream>
       </mat-tab>
 
-      <mat-tab label="Events"> 
-        <events></events>
+      <mat-tab label="Events">
+        <events [localToken]="localToken"></events>
       </mat-tab>
 
       <mat-tab label="Settings">
@@ -25,8 +25,11 @@
       </mat-tab>
 
 
-      <mat-tab label="Logout">
-        <div class="row">
+      <mat-tab label="actions">
+        <div class="row" id="actions-block">
+          <button id="start-btn" mat-raised-button color="primary" (click)="logOutZm()">{{ 'Start' }}</button>
+          <button id="stop-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Stop' }}</button>
+          <button id="restart-btn" mat-raised-button color="accent" (click)="logOutZm()">{{ 'Restart' }}</button>
           <button id="logout-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Logout' }}</button>
         </div>
       </mat-tab>
@@ -36,22 +39,22 @@
 </ng-template>
 
 <ng-template #showLogin>
-<div id="login-main">
-  <div id="login-block">
-    <h3 id="login-title">Login in Argominder</h3>
-    <form class="example-form">
-      <mat-form-field class="input-login" appearance="fill">
-        <mat-label>zm username</mat-label>
-        <input matInput placeholder="username" [(ngModel)]="zmUsername" type="text" name="username">
-      </mat-form-field>
-      <mat-form-field class="password-login" appearance="fill">
-        <mat-label>zm password</mat-label>
-        <input matInput placeholder="password" [(ngModel)]="zmPassword" type="password" name="password">
-      </mat-form-field>
-    </form>
-    <button mat-raised-button color="primary" (click)="logInZm()">{{ 'Login' }}</button>
-    <p *ngIf="errorLogin">{{ 'Errore di autenticazione' }}</p>
+  <div id="login-main">
+    <div id="login-block">
+      <h3 id="login-title">Login in Argominder</h3>
+      <form class="example-form">
+        <mat-form-field class="input-login" appearance="fill">
+          <mat-label>zm username</mat-label>
+          <input matInput placeholder="username" [(ngModel)]="zmUsername" type="text" name="username">
+        </mat-form-field>
+        <mat-form-field class="password-login" appearance="fill">
+          <mat-label>zm password</mat-label>
+          <input matInput placeholder="password" [(ngModel)]="zmPassword" type="password" name="password">
+        </mat-form-field>
+      </form>
+      <button mat-raised-button color="primary" (click)="logInZm()">{{ 'Login' }}</button>
+      <p *ngIf="errorLogin">{{ 'Errore di autenticazione' }}</p>
+    </div>
   </div>
-</div>
 
 </ng-template>

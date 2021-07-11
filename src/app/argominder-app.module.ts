@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ConfigService } from './services/zm.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LiveStreamComponent } from './core/streaming-component/live-stream.component';
+import { LiveStreamComponent } from './components/streaming/live-stream.component';
 
 //Angular Material Components
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -40,9 +40,11 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
-import { EventsComponent } from './core/events-component/events.component';
-import { ConfigComponent } from './core/config-component/config.component';
-;
+import { EventsComponent } from './components/events/events.component';
+import { ConfigComponent } from './components/config/config.component';
+import { MatNativeDateModule } from '@angular/material/core';
+
+
 
 @NgModule({
   declarations: [
@@ -88,7 +90,9 @@ import { ConfigComponent } from './core/config-component/config.component';
     MatSnackBarModule,
     MatTableModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatNativeDateModule
+
 
   ],
   providers: [ConfigService],

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ILogin } from '../interfaces/Ilogin';
 import { IMonitors } from '../interfaces/IMonitors';
 import { IConf } from '../interfaces/Iconf';
+import { CamEvents } from '../interfaces/camEvent';
 
 @Injectable()
 
@@ -65,6 +66,21 @@ export class ConfigService {
       this.buffer + '&monitor=' +
       cam + '&token=' + token;
     return buildedUrl;
+  }
+
+  getCamEVents(token: string) {
+    const buildedUrl = this.protocol + this.baseUrl + 
+    'events/index/StartTime%20>=:' + 
+    '2021-07-09'+
+    '%20' + 
+    '00:00:00' + 
+    '/EndTime%20<=:' + 
+    '2021-07-09' + 
+    '%20' + 
+    '23:59:00' + 
+    '.json?' + 'token=' + token;
+
+    return this.http.get<CamEvents>(buildedUrl);
   }
 
 }

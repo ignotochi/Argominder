@@ -19,6 +19,8 @@ export class ConfigService {
   streamLimt2: number = 12;
   streamLimt3: number = 18;
   streamLimt4: number = 24;
+  previewScale: string;
+  previewMaxfps: string;
   scale: string;
   maxfps: string;
   buffer: string;
@@ -41,6 +43,8 @@ export class ConfigService {
     this.streamUrl2 = conf.streamUrl2;
     this.streamUrl3 = conf.streamUrl3;
     this.streamUrl4 = conf.streamUrl4;
+    this.previewScale = conf.previewScale;
+    this.previewMaxfps = conf.previewMaxfps;
   }
 
   zmLogin(username: string, password: string) {
@@ -63,6 +67,16 @@ export class ConfigService {
       this.protocol + streamUrl + '/zm/cgi-bin/nph-zms?scale=' +
       this.scale + '&mode=jpeg&maxfps=' +
       this.maxfps + '&buffer=' +
+      this.buffer + '&monitor=' +
+      cam + '&token=' + token;
+    return buildedUrl;
+  }
+
+  getZmPreviewStream(cam: string, token: string) {
+    const buildedUrl =
+      this.protocol + this.streamUrl1 + '/zm/cgi-bin/nph-zms?scale=' +
+      this.previewScale + '&mode=jpeg&maxfps=' +
+      this.previewMaxfps + '&buffer=' +
       this.buffer + '&monitor=' +
       cam + '&token=' + token;
     return buildedUrl;

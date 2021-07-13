@@ -7,5 +7,7 @@
     "streamUrl4": "",
     "scale": "25",
     "maxfps": "3",
-    "buffer": "1000"  
+    "buffer": "1000",  
+    "previewScale": "100",
+    "previewMaxfps": "5"
 }

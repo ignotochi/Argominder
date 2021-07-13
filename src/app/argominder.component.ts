@@ -13,9 +13,8 @@ import { ConfigService } from './services/zm.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArgoMinderComponent implements OnInit, AfterViewInit {
-
   login: ILogin = (<ILogin>{ login: {} });
-  userIsLogged: boolean;
+  userIsLogged: boolean = false;
   errorLogin: string;
   zmUsername: string = '';
   zmPassword: string = '';

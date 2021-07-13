@@ -4,10 +4,12 @@ import {
   Component, ComponentFactoryResolver, ContentChildren, ElementRef, Input, OnInit,
   QueryList, Renderer2, ViewChild, ViewChildren
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
+import { SharedService } from 'src/app/services/shared.service';
 import { ConfigService } from '../../services/zm.service';
+import { StreamPreview } from '../preview/stream-preview.component';
 
 @Component({
   selector: 'live-stream',
@@ -18,14 +20,17 @@ import { ConfigService } from '../../services/zm.service';
 export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentInit {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) stream: QueryList<ElementRef<HTMLImageElement>>;
+  @ViewChildren('showStream', { read: ElementRef }) showStream: QueryList<ElementRef>;
 
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
+  public preview: { enabled: boolean, stream: string } = { enabled: false, stream: '' };
+  public showPreview: boolean = false;
 
-  constructor(private pageService: ConfigService, private changeRef: ChangeDetectorRef) {
+  constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
   }
 
   ngAfterContentInit() {
@@ -35,7 +40,7 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   }
 
   ngAfterViewInit() {
-    this.getCamList();  
+    this.getCamList();
   }
 
   alignSpinners(camId: string, loadStatus: boolean) {
@@ -44,7 +49,11 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   }
 
   getStream(cam: string, index: number) {
-    return this.pageService.getZmStream(cam, this.localToken, index);  
+    return this.pageService.getZmStream(cam, this.localToken, index);
+  }
+
+  getStreamPreview(cam: string) {
+    return this.pageService.getZmPreviewStream(cam, this.localToken);
   }
 
   getCamList() {
@@ -94,9 +103,20 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
     })
   }
 
-  resetStream() {
-    this.stopStream();
-    setTimeout(() => { this.startStream(); }, 200);
+  setPreview(value: boolean, stream: string) {
+    this.preview = { enabled: value, stream: stream };
+    this.showPreview = true;
+    this.sharedService.streamUrl = this.preview.stream;
+    this.stopStream(); this.loadPreview();
+  }
+
+  loadPreview(): void {
+    this.dialog.open(StreamPreview);
+    const dialogRef = this.dialog.open(StreamPreview);
+    dialogRef.afterClosed().subscribe(() => {
+      this.showPreview = false;
+      this.startStream();
+    });
   }
 
 }

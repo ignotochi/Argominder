@@ -7,5 +7,7 @@ export interface IConf {
     streamUrl4: string,
     scale: string,
     maxfps: string,
-    buffer: string
+    buffer: string,
+    previewScale: string,
+    previewMaxfps: string
 }

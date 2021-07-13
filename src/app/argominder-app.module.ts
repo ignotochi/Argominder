@@ -43,15 +43,16 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import { EventsComponent } from './components/events/events.component';
 import { ConfigComponent } from './components/config/config.component';
 import { MatNativeDateModule } from '@angular/material/core';
-
-
+import { StreamPreview } from './components/preview/stream-preview.component';
+import { SharedService } from './services/shared.service';
 
 @NgModule({
   declarations: [
     ArgoMinderComponent,
     LiveStreamComponent,
     EventsComponent,
-    ConfigComponent
+    ConfigComponent,
+    StreamPreview
   ],
   imports: [
     BrowserModule,
@@ -95,7 +96,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 
   ],
-  providers: [ConfigService],
+  providers: [ConfigService, SharedService],
   bootstrap: [ArgoMinderComponent]
 })
 export class ArgoMinderModule { }

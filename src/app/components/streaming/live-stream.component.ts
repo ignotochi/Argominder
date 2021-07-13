@@ -19,7 +19,9 @@ import { StreamPreview } from '../preview/stream-preview.component';
 })
 export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentInit {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('stream', { read: ElementRef }) stream: QueryList<ElementRef<HTMLImageElement>>;
+  @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
+  @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
+
 
   @Input()
   public set localToken(input: string) { this._localToken = input; }
@@ -28,28 +30,43 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public preview: { enabled: boolean, stream: string } = { enabled: false, stream: '' };
   public showPreview: boolean = false;
+  public showExpand: boolean = false;
 
   constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
-    console.log('const')
   }
 
   ngAfterContentInit() {
   }
 
   ngOnInit() {
-    console.log('ongInit')
   }
 
   ngAfterViewInit() {
     this.getCamList();
   }
 
-  alignSpinners(camId: string, loadStatus: boolean) {
-    const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
-    if (loadStatus === true) { matchedEle.nativeElement.classList.add('hidden'); } 
+  showExpands(camId: string, loadStatus: boolean) {
+    const matchedEle = this.expands.map(expand => expand.nativeElement);
+    if (loadStatus === true) matchedEle.forEach(ele => { if(ele.getAttribute('camId') === camId) ele.classList.remove('hidden'); }); 
   }
 
-  getStream(cam: string, index: number) { 
+  hideExpands() {
+    const matchedEle = this.expands.map(expand => expand.nativeElement);
+    matchedEle.forEach(ele => { ele.classList.add('hidden'); });
+  }
+
+  hideSpinners(camId: string, loadStatus: boolean) {
+    const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
+    if (loadStatus === true) matchedEle.nativeElement.classList.add('hidden');
+  }
+
+  showSpinners() {
+    this.spinners.forEach(spinner => {
+      if (spinner.nativeElement.className.includes('hidden')) spinner.nativeElement.classList.remove('hidden');
+    });
+  }
+
+  getStream(cam: string, index: number) {
     return this.pageService.getZmStream(cam, this.localToken, index);
   }
 
@@ -65,15 +82,6 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
     });
   }
 
-  getClassStream(status: string) {
-    if (status === StreamStatus.NotRunning) {
-      return StreamStatus.NotRunning;
-    }
-    if (status === StreamStatus.Running) {
-      return StreamStatus.Running;
-    }
-  }
-
   viewStream(status: string) {
     return status === StreamStatus.Running;
   }
@@ -84,19 +92,20 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
       const height = evt.target.naturalHeight;
       const status = evt.target.complete;
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
-      this.alignSpinners(camId, isLoaded);
+      this.showExpands(camId, isLoaded); this.hideSpinners(camId, isLoaded);
     }
   }
 
   stopStream() {
-    this.stream.forEach(stream => {
+    this.streams.forEach(stream => {
       stream.nativeElement.classList.add('hidden');
       stream.nativeElement.src = null;
     })
+    this.hideExpands();
   }
 
   startStream() {
-    this.stream.forEach((stream, index) => {
+    this.streams.forEach((stream, index) => {
       const camId = stream.nativeElement.getAttribute('camId');
       const streamUrl = this.getStream(camId, index + 1);
       stream.nativeElement.src = streamUrl;
@@ -107,18 +116,15 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   setPreview(value: boolean, stream: string) {
     this.preview = { enabled: value, stream: stream };
     this.sharedService.streamUrl = this.preview.stream;
-    this.stopStream(); 
-    this.loadPreview(this.showPreview);
+    this.stopStream(); this.loadPreview(this.showPreview);
   }
 
   loadPreview(preview: boolean): void {
     let dialogRef: MatDialogRef<StreamPreview>;
-    if(preview === false) {
-      dialogRef = this.dialog.open(StreamPreview);
-    }
+    if (preview === false) dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
       this.showPreview = false;
-      this.startStream();
+      this.showSpinners(); this.startStream();
     });
   }
 

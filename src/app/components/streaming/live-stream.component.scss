@@ -5,10 +5,12 @@
   height: 100%;
   width: 100%;
 }
+
 .Connected {
   width: 100%;
   display: block;
 }
+
 .NotRunning {
   width: 100%;
   height: 100%;
@@ -20,7 +22,7 @@
   background-size: 100% 100%;
 }
 
-.expand-stream{
+.expand-stream {
   cursor: pointer;
   display: block;
   width: 35px;
@@ -44,3 +46,11 @@
   display: none;
 }
 
+.load-error {
+  display: block;
+  position: relative;
+  text-align: center;
+  margin: auto;
+  top: 50%;
+  color: white;
+}

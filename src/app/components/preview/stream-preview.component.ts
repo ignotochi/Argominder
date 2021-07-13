@@ -27,7 +27,7 @@ import { SharedService } from "src/app/services/shared.service";
       this.streaming.nativeElement.src = null;
     }
 
-    alignSpinners(loadStatus: boolean) {
+    hideSpinners(loadStatus: boolean) {
       if (loadStatus === true) { this.spinner.nativeElement.classList.add('hidden'); } 
     }
 
@@ -37,7 +37,7 @@ import { SharedService } from "src/app/services/shared.service";
         const height = evt.target.naturalHeight;
         const status = evt.target.complete;
         const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
-        this.alignSpinners(isLoaded);
+        this.hideSpinners(isLoaded);
       }
     }
 

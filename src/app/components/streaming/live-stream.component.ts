@@ -4,7 +4,7 @@ import {
   Component, ComponentFactoryResolver, ContentChildren, ElementRef, Input, OnInit,
   QueryList, Renderer2, ViewChild, ViewChildren
 } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
@@ -20,7 +20,6 @@ import { StreamPreview } from '../preview/stream-preview.component';
 export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentInit {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) stream: QueryList<ElementRef<HTMLImageElement>>;
-  @ViewChildren('showStream', { read: ElementRef }) showStream: QueryList<ElementRef>;
 
   @Input()
   public set localToken(input: string) { this._localToken = input; }
@@ -31,12 +30,14 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   public showPreview: boolean = false;
 
   constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
+    console.log('const')
   }
 
   ngAfterContentInit() {
   }
 
   ngOnInit() {
+    console.log('ongInit')
   }
 
   ngAfterViewInit() {
@@ -45,10 +46,10 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
 
   alignSpinners(camId: string, loadStatus: boolean) {
     const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
-    if (loadStatus === true) { matchedEle.nativeElement.classList.add('hidden'); }
+    if (loadStatus === true) { matchedEle.nativeElement.classList.add('hidden'); } 
   }
 
-  getStream(cam: string, index: number) {
+  getStream(cam: string, index: number) { 
     return this.pageService.getZmStream(cam, this.localToken, index);
   }
 
@@ -105,14 +106,16 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
 
   setPreview(value: boolean, stream: string) {
     this.preview = { enabled: value, stream: stream };
-    this.showPreview = true;
     this.sharedService.streamUrl = this.preview.stream;
-    this.stopStream(); this.loadPreview();
+    this.stopStream(); 
+    this.loadPreview(this.showPreview);
   }
 
-  loadPreview(): void {
-    this.dialog.open(StreamPreview);
-    const dialogRef = this.dialog.open(StreamPreview);
+  loadPreview(preview: boolean): void {
+    let dialogRef: MatDialogRef<StreamPreview>;
+    if(preview === false) {
+      dialogRef = this.dialog.open(StreamPreview);
+    }
     dialogRef.afterClosed().subscribe(() => {
       this.showPreview = false;
       this.startStream();

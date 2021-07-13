@@ -1,0 +1,9 @@
+<mat-dialog-content class="mat-typography">
+    <mat-spinner class="spinnerCam" diameter="50" #spinner></mat-spinner>
+    <img id="preview" style="width:100%;" src="{{ streamUrl }}"  (load)="onImageLoad($event);"#streaming> 
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-flat-button color="primary" mat-dialog-close (click)="stopStreaming();">Close</button>
+</mat-dialog-actions>
+

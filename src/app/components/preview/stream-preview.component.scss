@@ -1,0 +1,16 @@
+.mat-dialog-content {
+  min-height: 20vh;
+  min-width: 20vh;
+  max-height: 100vh !important;
+}
+.hidden {
+  display: none;
+}
+.spinnerCam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}

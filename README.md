@@ -1,7 +1,7 @@
 # Argominder
 A simple user interface for zoneminder In Angular12. 
 
-# What argominder will do?
+# What Argominder will do?
 
 - see up to 12 simultaneous streaming
 - see events

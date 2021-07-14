@@ -1,4 +1,5 @@
 export enum StreamStatus {
-    Running = 'Connected',
+    Connected = 'Connected',
+    Running = 'Running',
     NotRunning = 'NotRunning'
 }

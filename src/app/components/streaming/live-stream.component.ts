@@ -66,8 +66,9 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
     });
   }
 
-  getStream(cam: string, index: number) {
-    return this.pageService.getZmStream(cam, this.localToken, index);
+  getStream(cam: string, index: number, status: string) {
+    if(status === StreamStatus.NotRunning) return 'assets/img/broken.jpg';
+    if(status === StreamStatus.Connected || StreamStatus.Running) return this.pageService.getZmStream(cam, this.localToken, index); 
   }
 
   getStreamPreview(cam: string) {
@@ -83,7 +84,7 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   }
 
   viewStream(status: string) {
-    return status === StreamStatus.Running;
+    return status === StreamStatus.Connected;
   }
 
   onImageLoad(evt: any, camId: string) {
@@ -107,7 +108,8 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   startStream() {
     this.streams.forEach((stream, index) => {
       const camId = stream.nativeElement.getAttribute('camId');
-      const streamUrl = this.getStream(camId, index + 1);
+      const camObject = this.datasource.monitors.find(cam => (cam.Monitor.Id === camId));
+      const streamUrl = this.getStream(camId, index + 1, camObject.Monitor_Status.Status);
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
     })

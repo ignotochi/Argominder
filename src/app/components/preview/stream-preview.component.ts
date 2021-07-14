@@ -21,6 +21,7 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     ngAfterViewInit() {
+      console.log(this.sharedService.streamUrl);
     }
 
     stopStreaming(): void {

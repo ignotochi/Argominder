@@ -5,6 +5,7 @@ import {
   QueryList, Renderer2, ViewChild, ViewChildren
 } from '@angular/core';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { BasePreviewDetail } from 'src/app/core/base-preview-component';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
@@ -17,7 +18,7 @@ import { StreamPreview } from '../preview/stream-preview.component';
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentInit {
+export class LiveStreamComponent extends BasePreviewDetail implements OnInit, AfterViewInit, AfterContentInit {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
   @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
@@ -33,6 +34,7 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
   public showExpand: boolean = false;
 
   constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
+    super();
   }
 
   ngAfterContentInit() {
@@ -123,8 +125,10 @@ export class LiveStreamComponent implements OnInit, AfterViewInit, AfterContentI
 
   loadPreview(preview: boolean): void {
     let dialogRef: MatDialogRef<StreamPreview>;
-    if (preview === false) dialogRef = this.dialog.open(StreamPreview);
-    dialogRef.afterClosed().subscribe(() => {
+    if (preview === false) { 
+      //this.showPreview = true;  //ci entra 2 volte
+      dialogRef = this.dialog.open(StreamPreview); }
+      dialogRef.afterClosed().subscribe(() => {
       this.showPreview = false;
       this.showSpinners(); this.startStream();
     });

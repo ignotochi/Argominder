@@ -1,3 +1,16 @@
 table {
-    width: 100%;
-  }
+  width: 100%;
+}
+
+#preview-block {
+  position: absolute;
+  max-width: 1400px;
+  background: white;
+  border-bottom: 3px solid #673ab7;
+  padding: 25px;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 9;
+}

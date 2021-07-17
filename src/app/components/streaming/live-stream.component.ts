@@ -1,11 +1,8 @@
 import {
-  AfterContentInit,
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, ComponentFactoryResolver, ContentChildren, ElementRef, Input, OnInit,
-  QueryList, Renderer2, ViewChild, ViewChildren
+  ChangeDetectionStrategy, Component, ElementRef, Input, QueryList, ViewChildren
 } from '@angular/core';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { BasePreviewDetail } from 'src/app/core/base-preview-component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
@@ -18,7 +15,7 @@ import { StreamPreview } from '../preview/stream-preview.component';
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class LiveStreamComponent extends BasePreviewDetail implements OnInit, AfterViewInit, AfterContentInit {
+export class LiveStreamComponent implements BasePreviewDetail {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
   @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
@@ -31,13 +28,15 @@ export class LiveStreamComponent extends BasePreviewDetail implements OnInit, Af
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public preview: { enabled: boolean, stream: string } = { enabled: false, stream: '' };
   public showPreview: boolean = false;
-  public showExpand: boolean = false;
 
   constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
-    super();
+    this.previewStatus();
   }
 
   ngAfterContentInit() {
+  }
+
+  ngOnDestroy() {
   }
 
   ngOnInit() {
@@ -49,7 +48,7 @@ export class LiveStreamComponent extends BasePreviewDetail implements OnInit, Af
 
   showExpands(camId: string, loadStatus: boolean) {
     const matchedEle = this.expands.map(expand => expand.nativeElement);
-    if (loadStatus === true) matchedEle.forEach(ele => { if(ele.getAttribute('camId') === camId) ele.classList.remove('hidden'); }); 
+    if (loadStatus === true) matchedEle.forEach(ele => { if (ele.getAttribute('camId') === camId) ele.classList.remove('hidden'); });
   }
 
   hideExpands() {
@@ -69,8 +68,8 @@ export class LiveStreamComponent extends BasePreviewDetail implements OnInit, Af
   }
 
   getStream(cam: string, index: number, status: string) {
-    if(status === StreamStatus.NotRunning) return 'assets/img/broken.jpg';
-    if(status === StreamStatus.Connected || StreamStatus.Running) return this.pageService.getZmStream(cam, this.localToken, index); 
+    if (status === StreamStatus.NotRunning) return 'assets/img/broken.jpg';
+    if (status === StreamStatus.Connected || StreamStatus.Running) return this.pageService.getZmStream(cam, this.localToken, index);
   }
 
   getStreamPreview(cam: string) {
@@ -120,18 +119,25 @@ export class LiveStreamComponent extends BasePreviewDetail implements OnInit, Af
   setPreview(value: boolean, stream: string) {
     this.preview = { enabled: value, stream: stream };
     this.sharedService.streamUrl = this.preview.stream;
-    this.stopStream(); this.loadPreview(this.showPreview);
+    this.sharedService.previewIsActive = true;
+    this.loadPreview();
   }
 
-  loadPreview(preview: boolean): void {
+  loadPreview(): void {
     let dialogRef: MatDialogRef<StreamPreview>;
-    if (preview === false) { 
-      //this.showPreview = true;  //ci entra 2 volte
-      dialogRef = this.dialog.open(StreamPreview); }
-      dialogRef.afterClosed().subscribe(() => {
-      this.showPreview = false;
-      this.showSpinners(); this.startStream();
+    dialogRef = this.dialog.open(StreamPreview);
+    dialogRef.afterClosed().subscribe(() => {
+      this.showSpinners(); 
+      this.sharedService.streamUrl = '';
+      this.sharedService.previewIsActive = false;
     });
+  }
+
+  previewStatus() {
+     this.sharedService.getPreviewStatus().subscribe(result => {
+      if (result ===  true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
+      else if (result ===  false) { if (this.streams && this.streams.length > 0) this.startStream(); }
+    })
   }
 
 }

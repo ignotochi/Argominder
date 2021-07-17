@@ -4,20 +4,19 @@
 
     <mat-grid-tile *ngFor="let item of datasource.monitors; let i = index">
 
-        <div class="cam-block">
-          <mat-spinner class="spinnerCam" [id]="'camSpinner-' + item.Monitor.Id" diameter="50" #spinner></mat-spinner>
+      <div class="cam-block">
+        <mat-spinner class="spinnerCam" [id]="'camSpinner-' + item.Monitor.Id" diameter="50" #spinner></mat-spinner>
 
-          <img [attr.camId]="item.Monitor.Id" style="width:100%;" src="{{ getStream(item.Monitor.Id, i+1, item.Monitor_Status.Status) }}"
-            (load)="onImageLoad($event, item.Monitor.Id);" #stream>
+        <img [attr.camId]="item.Monitor.Id" style="width:100%;"
+          src="{{ getStream(item.Monitor.Id, i+1, item.Monitor_Status.Status) }}"
+          (load)="onImageLoad($event, item.Monitor.Id);" #stream>
 
-          <mat-icon [attr.camId]="item.Monitor.Id" class="expand-stream hidden" aria-hidden="false" aria-label="icon"
-            (click)="setPreview(true, getStreamPreview(item.Monitor.Id));" #expand></mat-icon>
-        </div>
+        <mat-icon [attr.camId]="item.Monitor.Id" class="expand-stream hidden" aria-hidden="false" aria-label="icon"
+          (click)="setPreview(true, getStreamPreview(item.Monitor.Id));" #expand></mat-icon>
+      </div>
 
     </mat-grid-tile>
 
   </mat-grid-list>
-
-  <stream-preview *ngIf="showPreview" id="preview-block"></stream-preview>
 
 </div>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Injectable, Input, OnInit, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, Injectable, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { SharedService } from "src/app/services/shared.service";
 
 @Injectable()
@@ -11,21 +11,24 @@ import { SharedService } from "src/app/services/shared.service";
   export class StreamPreview implements OnInit, AfterViewInit {
     @ViewChild('streaming', { static: false }) streaming: ElementRef<HTMLImageElement>;
     @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
-    streamUrl: string;
+     streamUrl: string;
+     previewActive: boolean;
 
     constructor(private sharedService: SharedService) {
       this.streamUrl = this.sharedService.streamUrl;
+      this.previewActive = this.sharedService.previewIsActive;
     }
 
     ngOnInit() {
     }
 
     ngAfterViewInit() {
-      console.log(this.sharedService.streamUrl);
+      this.sharedService.previewStatus.next(true);
     }
 
     stopStreaming(): void {
       this.streaming.nativeElement.src = null;
+      this.sharedService.previewStatus.next(false);
     }
 
     hideSpinners(loadStatus: boolean) {

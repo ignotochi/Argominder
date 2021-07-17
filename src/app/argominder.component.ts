@@ -15,7 +15,7 @@ import { ConfigService } from './services/zm.service';
 export class ArgoMinderComponent implements OnInit, AfterViewInit {
   login: ILogin = (<ILogin>{ login: {} });
   userIsLogged: boolean = false;
-  errorLogin: string;
+  errorLogin: string = '';
   zmUsername: string = '';
   zmPassword: string = '';
   localToken: string = '';

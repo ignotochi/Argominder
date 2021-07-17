@@ -5,6 +5,8 @@ import {
 }
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { take } from 'rxjs/operators';
+import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { CamEvents } from 'src/app/interfaces/camEvent';
 import { SharedService } from 'src/app/services/shared.service';
 import { ConfigService } from '../../services/zm.service';
@@ -17,19 +19,19 @@ import { StreamPreview } from '../preview/stream-preview.component';
   styleUrls: ['./events.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class EventsComponent implements OnInit, AfterViewInit {
+export class EventsComponent implements BasePreviewDetail {
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
-  public showPreview: boolean = false;
-  displayedColumns: string[] = ['EventID', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
-
-
-
+  public showPreview: boolean;
+  public displayedColumns: string[] = ['EventID', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
   public datasource: CamEvents = (<CamEvents>{ events: [], pagination: {} });
 
+  public streamUrl: string;
+
   constructor(private pageService: ConfigService, private dialog: MatDialog, public sharedService: SharedService) {
+    this.showPreview = false;
   }
 
   ngOnInit() {
@@ -39,6 +41,9 @@ export class EventsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
+  ngOnDestroy() {
+
+  }
 
   getEvents() {
     this.pageService.getCamEVents(this.localToken).subscribe(result => {
@@ -52,18 +57,22 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
   setPreview(eventId: string) {
     this.sharedService.streamUrl = this.getStreamPreview(eventId);
-    this.loadPreview(this.showPreview);
+    this.loadPreview();
   }
 
-  loadPreview(preview: boolean): void {
-    let dialogRef: MatDialogRef<StreamPreview>;
-    if (preview === false) {
-      this.showPreview = true; //ci entra 2 volte
-      dialogRef = this.dialog.open(StreamPreview);
-    }
+  loadPreview(): void {
+    const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      //this.showPreview = false;
+      this.sharedService.streamUrl = '';
     });
+  }
+
+  stopStream() {
+
+  }
+
+  startStream() {
+
   }
 
 

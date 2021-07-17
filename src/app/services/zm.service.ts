@@ -83,21 +83,18 @@ export class ConfigService {
   }
 
   getEventPreview(eventId: string, token: string) {
-
-    //https://yourserver/zm/cgi-bin/nph-zms?mode=jpeg&frame=1&replay=none&source=event&event=293820&connkey=77493&token=ew<deleted>
-    const buildedUrl =
-    this.protocol + this.streamUrl1 + '/zm/cgi-bin/nph-zms?sacle=15&mode=jpeg&frame=1&replay=none&source=event&event=' + eventId + '&token=' + token;
+    const buildedUrl = this.protocol + this.streamUrl1 + '/zm/cgi-bin/nph-zms?sacle=15&mode=jpeg&frame=1&replay=none&source=event&event=' + eventId + '&token=' + token;
     return buildedUrl;
   }
 
   getCamEVents(token: string) {
     const buildedUrl = this.protocol + this.baseUrl + 
     'events/index/StartTime%20>=:' + 
-    '2021-07-09'+
+    '2021-07-17'+
     '%20' + 
     '00:00:00' + 
     '/EndTime%20<=:' + 
-    '2021-07-09' + 
+    '2021-07-17' + 
     '%20' + 
     '23:59:00' + 
     '.json?' + 'token=' + token;

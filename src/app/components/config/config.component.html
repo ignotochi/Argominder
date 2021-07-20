@@ -3,10 +3,10 @@
     <mat-expansion-panel hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                General settings
+                Impostazione generali
             </mat-panel-title>
             <mat-panel-description>
-                {{ 'Set general settings' }}
+                {{ 'Impostazione generali' }}
             </mat-panel-description>
         </mat-expansion-panel-header>
         <p>Set json</p>
@@ -15,10 +15,10 @@
     <mat-expansion-panel hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                {{ 'Streaming Quality'}}
+                {{ 'Qualità streaming'}}
             </mat-panel-title>
             <mat-panel-description>
-                {{ 'Set streaming quality' }}
+                {{ 'Imposta la qualità dello streaming' }}
             </mat-panel-description>
         </mat-expansion-panel-header>
         <mat-slider aria-label="unit(s)"></mat-slider>
@@ -29,10 +29,10 @@
     <mat-expansion-panel hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Events range
+                Filtro eventi
             </mat-panel-title>
             <mat-panel-description>
-                {{ 'Set events range' }}
+                {{ 'Filtra eventi per data e orario' }}
             </mat-panel-description>
         </mat-expansion-panel-header>
 
@@ -45,7 +45,8 @@
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
-
+        <button id="setDateRange-btn" mat-raised-button color="primary" (click)="setDateRange()">{{ 'Filtra' }}</button>
     </mat-expansion-panel>
+
 
 </mat-accordion>

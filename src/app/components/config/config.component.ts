@@ -28,7 +28,6 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-
   }
 
   converDateFormat(date: Date) {
@@ -39,8 +38,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   }
 
   setDateRange() {
-    this.sharedService.dateEventsRange.startDate = this.converDateFormat(this.dateRange.startDate);
-    this.sharedService.dateEventsRange.endDate = this.converDateFormat(this.dateRange.endDate);
+    this.sharedService.eventsFilterSearch.next({startDate: this.converDateFormat(this.dateRange.startDate), endDate: this.converDateFormat(this.dateRange.endDate)});
   }
 
 }

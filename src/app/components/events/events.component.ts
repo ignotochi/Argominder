@@ -5,7 +5,7 @@ import {
 }
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { SharedService } from 'src/app/services/shared.service';
@@ -45,9 +45,14 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getEvents() {
-    this.zmService.getEventsList(this.localToken, this.sharedService.dateEventsRange.startDate, this.sharedService.dateEventsRange.endDate).subscribe(result => {
+    this.sharedService.getEventSearchConf().pipe(
+      switchMap((dataRange) => {
+        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate)
+      })
+    ).subscribe(result => {
       this.datasource = result;
-    });
+    })
+    
   }
 
   getStreamPreview(eventId: string) {

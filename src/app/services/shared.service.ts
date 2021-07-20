@@ -8,16 +8,21 @@ import { ICamRegistry } from '../interfaces/ICamRegistry';
 export class SharedService {
 
   streamProperties: { streamUrl: string, camId: string} = {streamUrl: null, camId: null};
+  camsRegistry: ICamRegistry[] = [];
   previewIsActive: boolean = false;
   previewStatus = new BehaviorSubject(this.previewIsActive);
-  camsRegistry: ICamRegistry[] = [];
   dateEventsRange: {startDate: string, endDate: string} = {startDate: null, endDate: null};
+  eventsFilterSearch = new BehaviorSubject(this.dateEventsRange);
 
   constructor() {
   }
 
   getPreviewStatus(): Observable<boolean> {
     return this.previewStatus;
+  }
+
+  getEventSearchConf(): Observable<{startDate: string, endDate: string}> {
+    return this.eventsFilterSearch;
   }
 
   getPreviewInfo(camId: string, isDetail: boolean) {

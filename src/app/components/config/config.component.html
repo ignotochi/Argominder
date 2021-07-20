@@ -37,17 +37,13 @@
         </mat-expansion-panel-header>
 
         <mat-form-field appearance="fill">
-            <mat-label>Events date From</mat-label>
-            <input matInput [matDatepicker]="picker1">
-            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-            <mat-datepicker #picker1></mat-datepicker>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-            <mat-label>Events date To</mat-label>
-            <input matInput [matDatepicker]="picker2">
-            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-            <mat-datepicker #picker2></mat-datepicker>
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate placeholder="Start date" [(ngModel)]="dateRange.startDate">
+                <input matEndDate placeholder="End date" [(ngModel)]="dateRange.endDate">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
 
     </mat-expansion-panel>

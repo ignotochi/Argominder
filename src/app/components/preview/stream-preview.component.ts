@@ -13,9 +13,10 @@ import { SharedService } from "src/app/services/shared.service";
     @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
      streamUrl: string;
      previewActive: boolean;
+     showInfoDetail: boolean =  false;
 
     constructor(private sharedService: SharedService) {
-      this.streamUrl = this.sharedService.streamUrl;
+      this.streamUrl = this.sharedService.streamProperties.streamUrl;
       this.previewActive = this.sharedService.previewIsActive;
     }
 
@@ -42,7 +43,12 @@ import { SharedService } from "src/app/services/shared.service";
         const status = evt.target.complete;
         const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
         this.hideSpinners(isLoaded);
+        this.showInfoDetail = true;
       }
+    }
+
+    getPreviewInfo() {
+      return this.sharedService.getPreviewInfo(this.sharedService.streamProperties.camId, true);
     }
 
   }

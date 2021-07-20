@@ -10,6 +10,11 @@
             </td>
         </ng-container>
 
+        <ng-container matColumnDef="Name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let element"> {{getCamName(element.Event.MonitorId)}} </td>
+        </ng-container>
+
         <ng-container matColumnDef="Cause">
             <th mat-header-cell *matHeaderCellDef> Cause </th>
             <td mat-cell *matCellDef="let element"> {{element.Event.Cause}} </td>

@@ -4,9 +4,10 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { StreamStatus } from 'src/app/enums/stream-enum';
+import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
-import { ConfigService } from '../../services/zm.service';
+import { zmService } from '../../services/zm.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
 @Component({
@@ -28,8 +29,9 @@ export class LiveStreamComponent implements BasePreviewDetail {
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public preview: { enabled: boolean, stream: string } = { enabled: false, stream: '' };
   public showPreview: boolean = false;
+  public showPreviewDetail: boolean;
 
-  constructor(private pageService: ConfigService, public sharedService: SharedService, private dialog: MatDialog) {
+  constructor(private zmService: zmService, public sharedService: SharedService, private dialog: MatDialog) {
     this.previewStatus();
   }
 
@@ -44,6 +46,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
 
   ngAfterViewInit() {
     this.getCamList();
+    this.showPreviewDetail = true;
   }
 
   showExpands(camId: string, loadStatus: boolean) {
@@ -69,16 +72,33 @@ export class LiveStreamComponent implements BasePreviewDetail {
 
   getStream(cam: string, index: number, status: string) {
     if (status === StreamStatus.NotRunning) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected || StreamStatus.Running) return this.pageService.getZmStream(cam, this.localToken, index);
+    if (status === StreamStatus.Connected || StreamStatus.Running) return this.zmService.getLiveStream(cam, this.localToken, index);
   }
 
   getStreamPreview(cam: string) {
-    return this.pageService.getZmPreviewStream(cam, this.localToken);
+    return this.zmService.getCamDetailStreamPreview(cam, this.localToken);
   }
 
   getCamList() {
-    this.pageService.zmCamsList(this.localToken).subscribe((result) => {
+    this.zmService.getCamListInfo(this.localToken).subscribe((result) => {
       this.datasource.monitors = result.monitors;
+
+      result.monitors.forEach(result => {
+        const registry: ICamRegistry = {
+          Name: result.Monitor.Name,
+          Id: result.Monitor.Id,
+          DayEvents: result.Monitor.DayEvents,
+          MonthEvents: result.Monitor.MonthEvents,
+          TotalEvents: result.Monitor.TotalEvents,
+          Function: result.Monitor.Function,
+          MaxFPS: result.Monitor.MaxFPS,
+          Path: result.Monitor.Path,
+          Type: result.Monitor.Type,
+          Width: result.Monitor.Width,
+          Height: result.Monitor.Height,
+        }
+        this.sharedService.camsRegistry.push(registry)
+      })
     }, (err: Error) => {
       console.log(err);
     });
@@ -94,7 +114,9 @@ export class LiveStreamComponent implements BasePreviewDetail {
       const height = evt.target.naturalHeight;
       const status = evt.target.complete;
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
-      this.showExpands(camId, isLoaded); this.hideSpinners(camId, isLoaded);
+      this.showExpands(camId, isLoaded); 
+      this.hideSpinners(camId, isLoaded);
+
     }
   }
 
@@ -114,12 +136,15 @@ export class LiveStreamComponent implements BasePreviewDetail {
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
     })
+    this.showPreviewDetail = true;
   }
 
-  setPreview(value: boolean, stream: string) {
+  setPreview(value: boolean, stream: string, camId: string) {
     this.preview = { enabled: value, stream: stream };
-    this.sharedService.streamUrl = this.preview.stream;
+    this.sharedService.streamProperties.streamUrl = this.preview.stream;
+    this.sharedService.streamProperties.camId = camId;
     this.sharedService.previewIsActive = true;
+    this.showPreviewDetail = false;
     this.loadPreview();
   }
 
@@ -127,17 +152,21 @@ export class LiveStreamComponent implements BasePreviewDetail {
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.showSpinners(); 
-      this.sharedService.streamUrl = '';
+      this.showSpinners();
+      this.sharedService.streamProperties.streamUrl = '';
       this.sharedService.previewIsActive = false;
     });
   }
 
   previewStatus() {
-     this.sharedService.getPreviewStatus().subscribe(result => {
-      if (result ===  true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
-      else if (result ===  false) { if (this.streams && this.streams.length > 0) this.startStream(); }
+    this.sharedService.getPreviewStatus().subscribe(result => {
+      if (result === true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
+      else if (result === false) { if (this.streams && this.streams.length > 0) this.startStream(); }
     })
+  }
+
+  getPreviewInfo(camId: string) {
+  return this.sharedService.getPreviewInfo(camId, false);
   }
 
 }

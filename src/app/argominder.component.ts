@@ -2,9 +2,9 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
-import { IConf } from './interfaces/Iconf';
-import { ILogin } from './interfaces/Ilogin';
-import { ConfigService } from './services/zm.service';
+import { IConf } from './interfaces/IConf';
+import { ILogin } from './interfaces/ILogin';
+import { zmService } from './services/zm.service';
 
 @Component({
   selector: 'argominder',
@@ -22,7 +22,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   selectedTab: number;
   loadStream: boolean;
 
-  constructor(private pageService: ConfigService, private changeRef: ChangeDetectorRef) {
+  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef) {
     if(this.retrieveSession() === true) {
       this.selectedTab = 1;
       this.userIsLogged = true;
@@ -37,10 +37,10 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   }
 
   logInZm(isRetrieved: boolean) {
-    return this.pageService.getConfigurationFile().pipe(
+    return this.zmService.getConfigurationFile().pipe(
       switchMap((conf: IConf) => {
-        this.pageService.configurationFileMapping(conf);
-        return this.pageService.zmLogin(this.zmUsername, this.zmPassword);
+        this.zmService.configurationFileMapping(conf);
+        return this.zmService.zmLogin(this.zmUsername, this.zmPassword);
       })
     ).subscribe((login: ILogin) => {
       this.login = login;

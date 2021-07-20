@@ -7,9 +7,9 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
-import { CamEvents } from 'src/app/interfaces/camEvent';
+import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { SharedService } from 'src/app/services/shared.service';
-import { ConfigService } from '../../services/zm.service';
+import { zmService } from '../../services/zm.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
 
@@ -25,12 +25,11 @@ export class EventsComponent implements BasePreviewDetail {
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public showPreview: boolean;
-  public displayedColumns: string[] = ['EventID', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
-  public datasource: CamEvents = (<CamEvents>{ events: [], pagination: {} });
-
+  public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
+  public datasource: ICamEvents = (<ICamEvents>{ events: [], pagination: {} });
   public streamUrl: string;
 
-  constructor(private pageService: ConfigService, private dialog: MatDialog, public sharedService: SharedService) {
+  constructor(private zmService: zmService, private dialog: MatDialog, public sharedService: SharedService) {
     this.showPreview = false;
   }
 
@@ -46,25 +45,29 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getEvents() {
-    this.pageService.getCamEVents(this.localToken).subscribe(result => {
+    this.zmService.getEventsList(this.localToken, this.sharedService.dateEventsRange.startDate, this.sharedService.dateEventsRange.endDate).subscribe(result => {
       this.datasource = result;
     });
   }
 
   getStreamPreview(eventId: string) {
-    return this.pageService.getEventPreview(eventId, this.localToken);
+    return this.zmService.getEventPreview(eventId, this.localToken);
   }
 
   setPreview(eventId: string) {
-    this.sharedService.streamUrl = this.getStreamPreview(eventId);
+    this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
     this.loadPreview();
   }
 
   loadPreview(): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.streamUrl = '';
+      this.sharedService.streamProperties.streamUrl = '';
     });
+  }
+
+  getCamName(camId: string) {
+    return this.sharedService.camsRegistry.find(cam => cam.Id === camId).Name;
   }
 
   stopStream() {

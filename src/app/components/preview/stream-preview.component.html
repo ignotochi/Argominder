@@ -1,6 +1,7 @@
 <mat-dialog-content class="mat-typography">
     <mat-spinner class="spinnerCam" diameter="50" #spinner></mat-spinner>
     <img id="preview" style="width:100%;" src="{{ streamUrl }}" (load)="onImageLoad($event);" #streaming>
+    <p *ngIf="showInfoDetail" class="preview-info-detail">{{ getPreviewInfo() }}</p>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

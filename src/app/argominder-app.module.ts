@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './argominder-routing.module';
 import { ArgoMinderComponent } from './argominder.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ConfigService } from './services/zm.service';
+import { zmService } from './services/zm.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LiveStreamComponent } from './components/streaming/live-stream.component';
@@ -96,7 +96,7 @@ import { SharedService } from './services/shared.service';
 
 
   ],
-  providers: [ConfigService, SharedService],
+  providers: [zmService, SharedService],
   bootstrap: [ArgoMinderComponent]
 })
 export class ArgoMinderModule { }

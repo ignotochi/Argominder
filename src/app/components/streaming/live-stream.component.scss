@@ -9,6 +9,7 @@
 .cam-block {
   width: 100%;
   display: block;
+  position: relative;
 }
 
 .expand-stream {
@@ -19,8 +20,8 @@
   position: absolute;
   background-image: url("../../../assets/icons/twotone_panorama.png");
   background-size: 35px 35px;
-  bottom: 22px;
-  right: 5px;
+  bottom: 0;
+  right: 1px;
 }
 
 .spinnerCam {
@@ -42,5 +43,20 @@
   text-align: center;
   margin: auto;
   top: 50%;
+  color: white;
+}
+
+.preview-info {
+  display: block;
+  position: absolute;
+  margin: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 70%;
+  text-align: center;
+  font-size: 13px;
+  background: #00000085;
+  padding: 3px 8px;
   color: white;
 }

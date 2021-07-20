@@ -1,5 +1,5 @@
-import { ICam } from "./Icam";
-import { ICamStatus } from "./icam-status";
+import { ICam } from "./ICam";
+import { ICamStatus } from "./ICamStatus";
 
 export interface IMonitor {
 Monitor?: ICam;

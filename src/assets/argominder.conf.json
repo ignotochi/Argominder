@@ -8,6 +8,6 @@
     "scale": "30",
     "maxfps": "3",
     "buffer": "1000",
-    "previewScale": "100",
-    "previewMaxfps": "5"
+    "previewScale": "25",
+    "previewMaxfps": "2"
 }

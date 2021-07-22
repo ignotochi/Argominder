@@ -63,7 +63,7 @@ export class zmService {
 
   getEventPreview(eventId: string, token: string) {
     const buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
-      'sacle=15' +
+      'scale=35' +
       '&mode=jpeg' +
       '&frame=1' +
       '&replay=none&source=event&event=' +
@@ -74,9 +74,9 @@ export class zmService {
   getEventsList(token: string, startDate: string, endDate: string) {
     const buildedUrl = this.conf.protocol + this.conf.baseUrl + 'events/index/StartTime%20>=:' +
       startDate + '%20' +
-      '00:00:00' + '/EndTime%20<=:' +
+      '10:00:00' + '/EndTime%20<=:' +
       endDate + '%20' +
-      '23:59:00' + '.json?' + 'token=' + token;
+      '14:00:00' + '.json?' + 'token=' + token;
     return this.http.get<ICamEvents>(buildedUrl);
   }
 

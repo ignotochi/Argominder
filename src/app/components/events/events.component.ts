@@ -5,6 +5,9 @@ import {
 }
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
@@ -12,13 +15,13 @@ import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from '../../services/zm.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
-
 @Component({
   selector: 'events',
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
+
 export class EventsComponent implements BasePreviewDetail {
   @Input()
   public set localToken(input: string) { this._localToken = input; }
@@ -28,6 +31,10 @@ export class EventsComponent implements BasePreviewDetail {
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
   public datasource: ICamEvents = (<ICamEvents>{ events: [], pagination: {} });
   public streamUrl: string;
+  public dataGrid: MatTableDataSource<object>;
+  
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private zmService: zmService, private dialog: MatDialog, public sharedService: SharedService) {
     this.showPreview = false;
@@ -50,6 +57,9 @@ export class EventsComponent implements BasePreviewDetail {
         return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate)
       })
     ).subscribe(result => {
+      this.dataGrid = new MatTableDataSource(result.events.map(data => data.Event));
+      this.dataGrid.sort = this.sort;
+      this.dataGrid.paginator = this.paginator;
       this.datasource = result;
     })
     

@@ -1,59 +1,69 @@
 <div id="event-main-block">
 
-    <table mat-table [dataSource]="datasource.events" class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataGrid" class="mat-elevation-z8" matSort>
 
-        <ng-container matColumnDef="EventID">
+
+
+        <!-- <ng-container matColumnDef="EventID">
             <th mat-header-cell *matHeaderCellDef> EventID </th>
             <td mat-cell *matCellDef="let element">
                 <button style="text-decoration: underline;" mat-flat-button href="#" (click)="setPreview(element.Event.Id)">
                     {{element.Event.Id}} </button>
             </td>
+        </ng-container> -->
+
+
+        <ng-container matColumnDef="EventID">
+            <th mat-header-cell *matHeaderCellDef> EventID </th>
+            <td mat-cell *matCellDef="let element">
+                <button style="text-decoration: underline;" mat-flat-button href="#" (click)="setPreview(element.Id)">
+                    {{element.Id}} </button>
+            </td>
         </ng-container>
 
         <ng-container matColumnDef="Name">
             <th mat-header-cell *matHeaderCellDef> Name </th>
-            <td mat-cell *matCellDef="let element"> {{getCamName(element.Event.MonitorId)}} </td>
+            <td mat-cell *matCellDef="let element"> {{getCamName(element.MonitorId)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Cause">
-            <th mat-header-cell *matHeaderCellDef> Cause </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.Cause}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cause </th>
+            <td mat-cell *matCellDef="let element"> {{element.Cause}} </td>
         </ng-container>
 
         <ng-container matColumnDef="MonitorId">
-            <th mat-header-cell *matHeaderCellDef> MonitorId </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.MonitorId}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> MonitorId </th>
+            <td mat-cell *matCellDef="let element"> {{element.MonitorId}} </td>
         </ng-container>
 
         <ng-container matColumnDef="StartTime">
-            <th mat-header-cell *matHeaderCellDef> StartTime </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.StartTime}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> StartTime </th>
+            <td mat-cell *matCellDef="let element"> {{element.StartTime}} </td>
         </ng-container>
 
         <ng-container matColumnDef="EndTime">
-            <th mat-header-cell *matHeaderCellDef> EndTime </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.EndTime}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> EndTime </th>
+            <td mat-cell *matCellDef="let element"> {{element.EndTime}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Length">
-            <th mat-header-cell *matHeaderCellDef> Length </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.Length}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Length </th>
+            <td mat-cell *matCellDef="let element"> {{element.Length}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Frames">
-            <th mat-header-cell *matHeaderCellDef> Frames </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.Frames}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Frames </th>
+            <td mat-cell *matCellDef="let element"> {{element.Frames}} </td>
         </ng-container>
 
         <ng-container matColumnDef="MaxScore">
-            <th mat-header-cell *matHeaderCellDef> MaxScore </th>
-            <td mat-cell *matCellDef="let element"> {{element.Event.MaxScore}} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> MaxScore </th>
+            <td mat-cell *matCellDef="let element"> {{element.MaxScore}} </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [length]="datasource.pagination.pageCount" [pageSize]="datasource.pagination.current"
-        [pageSizeOptions]="[25, 50, 100, 500]"></mat-paginator>
 
+    <mat-paginator [pageSizeOptions]="[25, 50, 100, 500]" showFirstLastButtons></mat-paginator>
 </div>

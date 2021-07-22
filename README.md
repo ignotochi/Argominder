@@ -7,7 +7,7 @@ Current state of development
 # What Argominder will do?
 
 - see up to 12 simultaneous streaming
-- see events
+- see events and apply filters
 - set streaming quality
 - trig alarms
 

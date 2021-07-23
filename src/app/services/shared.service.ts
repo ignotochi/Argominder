@@ -2,6 +2,7 @@ import { ObserversModule } from '@angular/cdk/observers';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, observable, Observable } from 'rxjs';
 import { ICamRegistry } from '../interfaces/ICamRegistry';
+import { IDateTimeFilter } from '../interfaces/IDateTimeFilter';
 
 @Injectable()
 
@@ -11,7 +12,7 @@ export class SharedService {
   camsRegistry: ICamRegistry[] = [];
   previewIsActive: boolean = false;
   previewStatus = new BehaviorSubject(this.previewIsActive);
-  dateEventsRange: {startDate: string, endDate: string} = {startDate: null, endDate: null};
+  dateEventsRange: IDateTimeFilter = {startDate: null, endDate: null, startTime: null, endTime: null};
   eventsFilterSearch = new BehaviorSubject(this.dateEventsRange);
 
   constructor() {
@@ -21,7 +22,7 @@ export class SharedService {
     return this.previewStatus;
   }
 
-  getEventSearchConf(): Observable<{startDate: string, endDate: string}> {
+  getEventFiltersConf(): Observable<IDateTimeFilter> {
     return this.eventsFilterSearch;
   }
 
@@ -32,7 +33,6 @@ export class SharedService {
     const camHeigth = this.camsRegistry.find(cam => cam.Id === camId).Height;
     const dayEvents = this.camsRegistry.find(cam => cam.Id === camId).DayEvents;
     const functionMode = this.camsRegistry.find(cam => cam.Id === camId).Function;
-    const typeMode = this.camsRegistry.find(cam => cam.Id === camId).Type;
     if (!isDetail) return camName + ' | ' + camMaxFps + ' fps' + ' | ' + camWidth + ' px' + ' | ' + camHeigth + ' px';
     if (isDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;
   }

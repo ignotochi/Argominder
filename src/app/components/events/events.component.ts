@@ -6,7 +6,7 @@ import {
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
@@ -45,6 +45,7 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   ngAfterViewInit() {
+    this.sort.sort(({ id: 'StartTime', start: 'desc'}) as MatSortable);
   }
 
   ngOnDestroy() {
@@ -52,9 +53,9 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getEvents() {
-    this.sharedService.getEventSearchConf().pipe(
+    this.sharedService.getEventFiltersConf().pipe(
       switchMap((dataRange) => {
-        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate)
+        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate, dataRange.startTime, dataRange.endTime)
       })
     ).subscribe(result => {
       this.dataGrid = new MatTableDataSource(result.events.map(data => data.Event));
@@ -69,8 +70,9 @@ export class EventsComponent implements BasePreviewDetail {
     return this.zmService.getEventPreview(eventId, this.localToken);
   }
 
-  setPreview(eventId: string) {
+  setPreview(eventId: string, camId: string) {
     this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
+    this.sharedService.streamProperties.camId = camId;
     this.loadPreview();
   }
 

@@ -27,6 +27,9 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel hideToggle>
+
+        <mat-spinner *ngIf="showDateRangeSpinner" id="spinnerConf" diameter="50" #spinner></mat-spinner>
+
         <mat-expansion-panel-header>
             <mat-panel-title>
                 Filtro eventi
@@ -36,17 +39,35 @@
             </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <mat-form-field appearance="fill">
-            <mat-label>Enter a date range</mat-label>
-            <mat-date-range-input [rangePicker]="picker">
-                <input matStartDate placeholder="Start date" [(ngModel)]="dateRange.startDate">
-                <input matEndDate placeholder="End date" [(ngModel)]="dateRange.endDate">
-            </mat-date-range-input>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-        </mat-form-field>
-        <button id="setDateRange-btn" mat-raised-button color="primary" (click)="setDateRange()">{{ 'Filtra' }}</button>
-    </mat-expansion-panel>
+        <form class="example-form">
+            <mat-form-field appearance="fill" class="example-form-field">
+                <mat-label>Choose a date</mat-label>
+                <input matInput [matDatepicker]="datepicker" placeholder="Start date" [(ngModel)]="startDateFilter"
+                    name="startDate">
+                <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+                <mat-datepicker #datepicker>
+                    <mat-datepicker-actions>
+                        <button mat-button matDatepickerCancel>Cancel</button>
+                        <button mat-raised-button color="primary" matDatepickerApply>Search</button>
+                    </mat-datepicker-actions>
+                </mat-datepicker>
+            </mat-form-field>
 
+            <mat-form-field class="filter-start-time" appearance="fill">
+                <mat-label>Select Start time</mat-label>
+                <input matInput placeholder="00:00:00" value="00:00:00" type="time" name="startTime"
+                    [(ngModel)]="dateRange.startTime">
+            </mat-form-field>
+
+            <mat-form-field class="filter-end-time" appearance="fill">
+                <mat-label>Select End time</mat-label>
+                <input matInput placeholder="23:59:00" value="00:00:00" type="time" name="endTime"
+                    [(ngModel)]="dateRange.endTime">
+            </mat-form-field>
+
+            <button id="setDateRange-btn" mat-raised-button color="primary" (click)="setDateRange(false);">{{ 'Filtra' }}</button>
+        </form>
+
+    </mat-expansion-panel>
 
 </mat-accordion>

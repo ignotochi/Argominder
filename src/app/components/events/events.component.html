@@ -2,21 +2,10 @@
 
     <table mat-table [dataSource]="dataGrid" class="mat-elevation-z8" matSort>
 
-
-
-        <!-- <ng-container matColumnDef="EventID">
-            <th mat-header-cell *matHeaderCellDef> EventID </th>
-            <td mat-cell *matCellDef="let element">
-                <button style="text-decoration: underline;" mat-flat-button href="#" (click)="setPreview(element.Event.Id)">
-                    {{element.Event.Id}} </button>
-            </td>
-        </ng-container> -->
-
-
         <ng-container matColumnDef="EventID">
             <th mat-header-cell *matHeaderCellDef> EventID </th>
             <td mat-cell *matCellDef="let element">
-                <button style="text-decoration: underline;" mat-flat-button href="#" (click)="setPreview(element.Id)">
+                <button style="text-decoration: underline;" mat-flat-button href="#" (click)="setPreview(element.Id, element.MonitorId)">
                     {{element.Id}} </button>
             </td>
         </ng-container>

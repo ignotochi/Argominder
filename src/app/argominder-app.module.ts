@@ -92,8 +92,7 @@ import { SharedService } from './services/shared.service';
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
-    MatNativeDateModule
-
+    MatNativeDateModule,
 
   ],
   providers: [zmService, SharedService],

@@ -27,10 +27,22 @@
 
       <mat-tab label="actions">
         <div class="row" id="actions-block">
-          <button id="start-btn" mat-raised-button color="primary" (click)="logOutZm()">{{ 'Start' }}</button>
-          <button id="stop-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Stop' }}</button>
-          <button id="restart-btn" mat-raised-button color="accent" (click)="logOutZm()">{{ 'Restart' }}</button>
-          <button id="logout-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Logout' }}</button>
+          <div class="row-action">
+            <p>{{ 'Avvia Zoneminder' }}</p>
+            <button id="start-btn" mat-raised-button color="primary" (click)="logOutZm()">{{ 'Start' }}</button>
+          </div>
+          <div class="row-action">
+            <p>{{ 'Stop Zoneminder' }}</p>
+            <button id="stop-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Stop' }}</button>
+          </div>
+          <div class="row-action">
+            <p>{{ 'Riavvia Zoneminder' }}</p>
+            <button id="restart-btn" mat-raised-button color="accent" (click)="logOutZm()">{{ 'Restart' }}</button>
+          </div>
+          <div class="row-action">
+            <p>{{ 'Logut Zoneminder' }}</p>
+            <button id="logout-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Logout' }}</button>
+          </div>
         </div>
       </mat-tab>
     </mat-tab-group>

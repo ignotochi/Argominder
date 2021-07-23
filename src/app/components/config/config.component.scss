@@ -1,7 +1,15 @@
 #setDateRange-btn {
-    display: block;
-  }
+  display: block;
+}
 
-  .mat-expansion-panel-header-title, .mat-expansion-panel-header-description {
-    max-width: 35%;
+.mat-expansion-panel-header-title,
+.mat-expansion-panel-header-description {
+  max-width: 50%;
+}
+
+#spinnerConf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
 }

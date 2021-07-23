@@ -1,6 +1,7 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, Component, Input, OnInit, ViewChild,
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild,
 } from '@angular/core';
+import { IDateTimeFilter } from 'src/app/interfaces/IDateTimeFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
 
@@ -18,16 +19,28 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public panelOpenState = false;
-  public dateRange: { startDate: Date, endDate: Date } = {startDate: new Date(), endDate: new Date()};
+  public dateRange: IDateTimeFilter = { startDate: null, endDate: null, startTime: null, endTime: null };
+  public showDateRangeSpinner: boolean = false;
+  public startDateFilter: Date = new Date();
+  public endtDateFIlter: Date = null;
 
-  constructor(public sharedService: SharedService) {
+  constructor(public sharedService: SharedService, private changeRef: ChangeDetectorRef) {
+    this.setDefaultTime();
   }
 
   ngOnInit() {
-    this.setDateRange();
+    this.setDateRange(true);
   }
 
   ngAfterViewInit() {
+  }
+
+  setDefaultTime () {
+    const timeNow = new Date();
+    const defaulHour = timeNow.getHours();
+    const defaultMinute = timeNow.getMinutes();
+    this.dateRange.startTime = (defaulHour - 1).toString() + ':' + defaultMinute.toString();
+    this.dateRange.endTime = (defaulHour).toString() + ':' + defaultMinute.toString();
   }
 
   converDateFormat(date: Date) {
@@ -37,8 +50,24 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     return [year, month, day].join('-');
   }
 
-  setDateRange() {
-    this.sharedService.eventsFilterSearch.next({startDate: this.converDateFormat(this.dateRange.startDate), endDate: this.converDateFormat(this.dateRange.endDate)});
+  setDateRange(isOnLoad: boolean) {
+    this.endtDateFIlter = this.startDateFilter;
+    this.sharedService.eventsFilterSearch.next(
+      { 
+        startDate: this.converDateFormat(this.startDateFilter), 
+        endDate: this.converDateFormat(this.endtDateFIlter),
+        startTime: this.dateRange.startTime,
+        endTime: this.dateRange.endTime, 
+      });
+    if(!isOnLoad) {
+      this.showDateRangeSpinner = true;
+      this.sharedService.getEventFiltersConf().subscribe(result => {
+        setTimeout(() => {
+          if (result) { this.showDateRangeSpinner = false; this.changeRef.markForCheck();
+          }
+        }, 1500);
+      })
+    }
   }
 
 }

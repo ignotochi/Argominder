@@ -59,20 +59,15 @@ export class LiveStreamComponent implements BasePreviewDetail {
     matchedEle.forEach(ele => { ele.classList.add('hidden'); });
   }
 
-  hideSpinners(camId: string, loadStatus: boolean) {
+  ShowOrhideSpinners(camId: string, loadStatus: boolean) {
     const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
     if (loadStatus === true) matchedEle.nativeElement.classList.add('hidden');
-  }
-
-  showSpinners() {
-    this.spinners.forEach(spinner => {
-      if (spinner.nativeElement.className.includes('hidden')) spinner.nativeElement.classList.remove('hidden');
-    });
+    if (loadStatus === false) matchedEle.nativeElement.classList.remove('hidden');
   }
 
   getStream(cam: string, index: number, status: string) {
-    if (status === StreamStatus.NotRunning) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected || StreamStatus.Running) return this.zmService.getLiveStream(cam, this.localToken, index);
+    if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
+    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.localToken, index);
   }
 
   getStreamPreview(cam: string) {
@@ -114,8 +109,8 @@ export class LiveStreamComponent implements BasePreviewDetail {
       const height = evt.target.naturalHeight;
       const status = evt.target.complete;
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
-      this.showExpands(camId, isLoaded); 
-      this.hideSpinners(camId, isLoaded);
+      this.showExpands(camId, isLoaded);
+      this.ShowOrhideSpinners(camId, isLoaded);
 
     }
   }
@@ -132,9 +127,12 @@ export class LiveStreamComponent implements BasePreviewDetail {
     this.streams.forEach((stream, index) => {
       const camId = stream.nativeElement.getAttribute('camId');
       const camObject = this.datasource.monitors.find(cam => (cam.Monitor.Id === camId));
+      const hideSpinner = camObject.Monitor_Status.Status === StreamStatus.Connected ? false : true;
+      this.ShowOrhideSpinners(camId, hideSpinner);
       const streamUrl = this.getStream(camId, index + 1, camObject.Monitor_Status.Status);
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
+
     })
     this.showPreviewDetail = true;
   }
@@ -152,8 +150,8 @@ export class LiveStreamComponent implements BasePreviewDetail {
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.showSpinners();
-      this.sharedService.streamProperties.streamUrl = '';
+      this.sharedService.streamProperties.streamUrl = null;
+      this.sharedService.streamProperties.camId = null;
       this.sharedService.previewIsActive = false;
     });
   }
@@ -166,7 +164,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   }
 
   getPreviewInfo(camId: string) {
-  return this.sharedService.getPreviewInfo(camId, false);
+    return this.sharedService.getPreviewInfo(camId, false);
   }
 
 }

@@ -47,3 +47,12 @@
 #start-btn, #stop-btn, #restart-btn, #logout-btn{
     margin: 0 8px;
 }
+
+.row-action {
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    background: whitesmoke;
+    margin: 0 25px;
+    padding: 25px 0 50px;
+}

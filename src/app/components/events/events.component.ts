@@ -10,6 +10,7 @@ import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
+import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from '../../services/zm.service';
@@ -70,21 +71,33 @@ export class EventsComponent implements BasePreviewDetail {
     return this.zmService.getEventPreview(eventId, this.localToken);
   }
 
-  setPreview(eventId: string, camId: string) {
+  setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string) {
+    this.sharedService.streamProperties.previewType = previewType.eventDetail;
     this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
     this.sharedService.streamProperties.camId = camId;
+    this.sharedService.camsRegistry.find(cam => {
+      if(cam.Id === camId) {
+        cam.StartTime = startTime;
+        cam.Length = length;
+        cam.MaxScore = maxScore;
+      }
+    })
     this.loadPreview();
   }
 
   loadPreview(): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.streamProperties.streamUrl = '';
+      this.sharedService.streamProperties.previewType = null;
+      this.sharedService.streamProperties.streamUrl = null;
+      this.sharedService.streamProperties.camId = null;
     });
   }
 
   getCamName(camId: string) {
-    return this.sharedService.camsRegistry.find(cam => cam.Id === camId).Name;
+    if (this.sharedService.camsRegistry.find(cam => (cam.Id === camId))) {
+      return this.sharedService.camsRegistry.find(cam => cam.Id === camId).Name;
+    }
   }
 
   stopStream() {

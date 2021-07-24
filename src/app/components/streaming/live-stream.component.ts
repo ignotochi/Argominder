@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
+import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
@@ -139,6 +140,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
 
   setPreview(value: boolean, stream: string, camId: string) {
     this.preview = { enabled: value, stream: stream };
+    this.sharedService.streamProperties.previewType = previewType.streamingDetail;
     this.sharedService.streamProperties.streamUrl = this.preview.stream;
     this.sharedService.streamProperties.camId = camId;
     this.sharedService.previewIsActive = true;
@@ -150,6 +152,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
+      this.sharedService.streamProperties.previewType = null;
       this.sharedService.streamProperties.streamUrl = null;
       this.sharedService.streamProperties.camId = null;
       this.sharedService.previewIsActive = false;
@@ -164,7 +167,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   }
 
   getPreviewInfo(camId: string) {
-    return this.sharedService.getPreviewInfo(camId, false);
+    return this.sharedService.getPreviewInfo(camId, previewType.streaming);
   }
 
 }

@@ -35,7 +35,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
-  setDefaultTime () {
+  setDefaultTime() {
     const timeNow = new Date();
     const defaulHour = timeNow.getHours();
     const defaultMinute = timeNow.getMinutes();
@@ -53,17 +53,18 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   setDateRange(isOnLoad: boolean) {
     this.endtDateFIlter = this.startDateFilter;
     this.sharedService.eventsFilterSearch.next(
-      { 
-        startDate: this.converDateFormat(this.startDateFilter), 
+      {
+        startDate: this.converDateFormat(this.startDateFilter),
         endDate: this.converDateFormat(this.endtDateFIlter),
         startTime: this.dateRange.startTime,
-        endTime: this.dateRange.endTime, 
+        endTime: this.dateRange.endTime,
       });
-    if(!isOnLoad) {
+    if (!isOnLoad) {
       this.showDateRangeSpinner = true;
       this.sharedService.getEventFiltersConf().subscribe(result => {
         setTimeout(() => {
-          if (result) { this.showDateRangeSpinner = false; this.changeRef.markForCheck();
+          if (result) {
+            this.showDateRangeSpinner = false; this.changeRef.markForCheck();
           }
         }, 1500);
       })

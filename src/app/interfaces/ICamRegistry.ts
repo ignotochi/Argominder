@@ -10,4 +10,8 @@ export interface ICamRegistry {
     Type?: string;
     Width?: string;
     Height?: string;
+    StartTime?: string;
+    MaxScore?: string;
+    Length?: string;
+
 }

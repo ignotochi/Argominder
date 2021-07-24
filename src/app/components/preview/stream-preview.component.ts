@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Injectable, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { previewType } from "src/app/enums/preview-enum";
 import { SharedService } from "src/app/services/shared.service";
 
 @Injectable()
@@ -48,7 +49,7 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     getPreviewInfo() {
-      return this.sharedService.getPreviewInfo(this.sharedService.streamProperties.camId, true);
+      return this.sharedService.getPreviewInfo(this.sharedService.streamProperties.camId, this.sharedService.streamProperties.previewType);
     }
 
   }

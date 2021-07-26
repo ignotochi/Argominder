@@ -61,13 +61,23 @@ export class zmService {
     return buildedUrl;
   }
 
-  getEventPreview(eventId: string, token: string) {
-    const buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
-      'scale=100' +
-      '&mode=jpeg' +
-      '&frame=5' +
-      '&replay=none&source=event&event=' +
-      eventId + '&token=' + token;
+  getEventPreview(eventId: string, token: string, mode: string) {
+    let buildedUrl: string;
+    if (mode === 'jpeg') {
+      buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
+        'scale=100' +
+        '&mode=jpeg' +
+        '&frame=5' +
+        '&replay=none&source=event&event=' +
+        eventId + '&token=' + token;
+    }
+    if (mode === 'video') {
+      buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/index.php?' +
+        'view=view_video&eid=' +
+        eventId +
+        '&token=' +
+        token
+    }
     return buildedUrl;
   }
 

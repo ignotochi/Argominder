@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Injectable, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
 import { SharedService } from "src/app/services/shared.service";
 
@@ -15,6 +16,7 @@ import { SharedService } from "src/app/services/shared.service";
      streamUrl: string;
      previewActive: boolean;
      showInfoDetail: boolean =  false;
+     showInVideoElement: boolean;
 
     constructor(private sharedService: SharedService) {
       this.streamUrl = this.sharedService.streamProperties.streamUrl;
@@ -22,14 +24,16 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     ngOnInit() {
+      this.showInVideoElement = this.sharedService.streamProperties.previewType === previewType.eventDetail ? true : false;
     }
 
     ngAfterViewInit() {
       this.sharedService.previewStatus.next(true);
+      
     }
 
     stopStreaming(): void {
-      this.streaming.nativeElement.src = null;
+      if (this.streaming) this.streaming.nativeElement.src = null;
       this.sharedService.previewStatus.next(false);
     }
 

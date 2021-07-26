@@ -14,9 +14,19 @@
   bottom: 0;
   margin: auto;
 }
-
 .preview-info-detail {
+  display: block;
+  position: absolute;
+  bottom: 35px;
   text-align: center;
   font-size: 18px;
-  font-weight: 300;
+  font-weight: 400;
+}
+#videoEvent {
+  display: block;
+  width: 100%;
+}
+#preview {
+  display: block;
+  width: 100%;
 }

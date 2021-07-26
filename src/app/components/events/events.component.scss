@@ -15,3 +15,10 @@ table {
   z-index: 9;
 }
 
+tr.mat-row.cdk-row:hover {
+  background: #673ab7ab;
+}
+
+.eventShown {
+  background: green;
+}

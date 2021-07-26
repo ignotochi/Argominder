@@ -10,6 +10,7 @@ import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
+import { streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { SharedService } from 'src/app/services/shared.service';
@@ -33,6 +34,7 @@ export class EventsComponent implements BasePreviewDetail {
   public datasource: ICamEvents = (<ICamEvents>{ events: [], pagination: {} });
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
+  public streamingMode: streamingEventMode;
   
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -68,7 +70,8 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getStreamPreview(eventId: string) {
-    return this.zmService.getEventPreview(eventId, this.localToken);
+    this.streamingMode = streamingEventMode.video;
+    return this.zmService.getEventPreview(eventId, this.localToken, this.streamingMode);
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string) {

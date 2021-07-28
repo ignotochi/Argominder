@@ -21,7 +21,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
     }
 
-    abstract loadPreview(preview: boolean): void;
+    abstract loadPreview(target?: HTMLElement): void;
 
     abstract startStream(): void;
 

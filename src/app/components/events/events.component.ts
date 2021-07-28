@@ -35,7 +35,7 @@ export class EventsComponent implements BasePreviewDetail {
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
   public streamingMode: streamingEventMode;
-  
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -48,7 +48,7 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   ngAfterViewInit() {
-    this.sort.sort(({ id: 'StartTime', start: 'desc'}) as MatSortable);
+    this.sort.sort(({ id: 'StartTime', start: 'desc' }) as MatSortable);
   }
 
   ngOnDestroy() {
@@ -66,7 +66,7 @@ export class EventsComponent implements BasePreviewDetail {
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
     })
-    
+
   }
 
   getStreamPreview(eventId: string) {
@@ -74,26 +74,27 @@ export class EventsComponent implements BasePreviewDetail {
     return this.zmService.getEventPreview(eventId, this.localToken, this.streamingMode);
   }
 
-  setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string) {
+  setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
     this.sharedService.streamProperties.previewType = previewType.eventDetail;
     this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
     this.sharedService.streamProperties.camId = camId;
     this.sharedService.camsRegistry.find(cam => {
-      if(cam.Id === camId) {
+      if (cam.Id === camId) {
         cam.StartTime = startTime;
         cam.Length = length;
         cam.MaxScore = maxScore;
       }
     })
-    this.loadPreview();
+    this.loadPreview(target);
   }
 
-  loadPreview(): void {
+  loadPreview(target: HTMLElement): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
       this.sharedService.streamProperties.previewType = null;
       this.sharedService.streamProperties.streamUrl = null;
       this.sharedService.streamProperties.camId = null;
+      this.markEvent(target);
     });
   }
 
@@ -110,6 +111,12 @@ export class EventsComponent implements BasePreviewDetail {
   startStream() {
 
   }
+
+  markEvent(target: HTMLElement) {
+    if (!target.className.includes('eventShown')) target.classList.add('eventShown');
+  }
+
+
 
 
 }

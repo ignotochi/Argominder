@@ -1,42 +1,51 @@
 import { ObserversModule } from '@angular/cdk/observers';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, observable, Observable } from 'rxjs';
+import { streamingEventMode } from '../enums/enums';
 import { previewType } from '../enums/preview-enum';
 import { ICamRegistry } from '../interfaces/ICamRegistry';
-import { IDateTimeFilter } from '../interfaces/IDateTimeFilter';
+import { IEventsFilter } from '../interfaces/IEventsFilter';
+import { IStreamProperties } from '../interfaces/IStreamProperties';
 
 @Injectable()
 
 export class SharedService {
 
-  streamProperties: { streamUrl: string, camId: string, previewType: previewType} = {streamUrl: null, camId: null, previewType: null};
-  camsRegistry: ICamRegistry[] = [{StartTime: null, Length: null, MaxScore: null}];
+  streamProperties: IStreamProperties = {} as IStreamProperties;
+  
   previewIsActive: boolean = false;
+  camSpecializedInfo: ICamRegistry[] = [{}];
+  dateEventsRange: IEventsFilter = {} as IEventsFilter;
+  
   previewStatus = new BehaviorSubject(this.previewIsActive);
-  dateEventsRange: IDateTimeFilter = {startDate: null, endDate: null, startTime: null, endTime: null};
+  camDiapason = new BehaviorSubject(this.camSpecializedInfo);
   eventsFilterSearch = new BehaviorSubject(this.dateEventsRange);
 
   constructor() {
+  }
+
+  getCamRegistry(): Observable<ICamRegistry[]> {
+    return this.camDiapason;
   }
 
   getPreviewStatus(): Observable<boolean> {
     return this.previewStatus;
   }
 
-  getEventFiltersConf(): Observable<IDateTimeFilter> {
+  getEventFiltersConf(): Observable<IEventsFilter> {
     return this.eventsFilterSearch;
   }
 
   getPreviewInfo(camId: string, detail: previewType) {
-    const camName = this.camsRegistry.find(cam => cam.Id === camId).Name;
-    const camMaxFps = this.camsRegistry.find(cam => cam.Id === camId).MaxFPS;
-    const camWidth = this.camsRegistry.find(cam => cam.Id === camId).Width;
-    const camHeigth = this.camsRegistry.find(cam => cam.Id === camId).Height;
-    const dayEvents = this.camsRegistry.find(cam => cam.Id === camId).DayEvents;
-    const functionMode = this.camsRegistry.find(cam => cam.Id === camId).Function;
-    const starTime = this.camsRegistry.find(cam => cam.Id === camId).StartTime;
-    const score = this.camsRegistry.find(cam => cam.Id === camId).MaxScore;
-    const length = this.camsRegistry.find(cam => cam.Id === camId).Length;
+    const camName = this.camSpecializedInfo.find(cam => cam.Id === camId).Name;
+    const camMaxFps = this.camSpecializedInfo.find(cam => cam.Id === camId).MaxFPS;
+    const camWidth = this.camSpecializedInfo.find(cam => cam.Id === camId).Width;
+    const camHeigth = this.camSpecializedInfo.find(cam => cam.Id === camId).Height;
+    const dayEvents = this.camSpecializedInfo.find(cam => cam.Id === camId).DayEvents;
+    const functionMode = this.camSpecializedInfo.find(cam => cam.Id === camId).Function;
+    const starTime = this.camSpecializedInfo.find(cam => cam.Id === camId).StartTime;
+    const score = this.camSpecializedInfo.find(cam => cam.Id === camId).MaxScore;
+    const length = this.camSpecializedInfo.find(cam => cam.Id === camId).Length;
 
     if (detail === previewType.streaming) return camName + ' | ' + camMaxFps + ' fps' + ' | ' + camWidth + ' px' + ' | ' + camHeigth + ' px';
     if (detail === previewType.streamingDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;

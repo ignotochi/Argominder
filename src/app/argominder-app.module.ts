@@ -93,7 +93,6 @@ import { SharedService } from './services/shared.service';
     MatSortModule,
     MatPaginatorModule,
     MatNativeDateModule,
-
   ],
   providers: [zmService, SharedService],
   bootstrap: [ArgoMinderComponent]

@@ -38,10 +38,10 @@ export class zmService {
 
   getLiveStream(cam: string, token: string, index: number) {
     let streamUrl: string;
-    if (index <= this.streamLimt1) { streamUrl = this.conf.streamUrl1; }
-    else if (index <= this.streamLimt2) { streamUrl = this.conf.streamUrl2; }
-    else if (index <= this.streamLimt3) { streamUrl = this.conf.streamUrl3; }
-    else if (index <= this.streamLimt4) { streamUrl = this.conf.streamUrl4; }
+    if (index <= this.streamLimt1) streamUrl = this.conf.streamUrl1; 
+    else if (index <= this.streamLimt2)  streamUrl = this.conf.streamUrl2; 
+    else if (index <= this.streamLimt3)  streamUrl = this.conf.streamUrl3; 
+    else if (index <= this.streamLimt4)  streamUrl = this.conf.streamUrl4; 
     const buildedUrl =
       this.conf.protocol + streamUrl + '/zm/cgi-bin/nph-zms?scale=' +
       this.conf.scale + '&mode=jpeg&maxfps=' +
@@ -63,30 +63,33 @@ export class zmService {
 
   getEventPreview(eventId: string, token: string, mode: string) {
     let buildedUrl: string;
-    if (mode === 'jpeg') {
+    if (mode === 'jpeg')
       buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
         'scale=100' +
         '&mode=jpeg' +
         '&frame=5' +
         '&replay=none&source=event&event=' +
         eventId + '&token=' + token;
-    }
-    if (mode === 'video') {
+
+    else if (mode === 'video')
       buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/index.php?' +
         'view=view_video&eid=' +
         eventId +
         '&token=' +
         token
-    }
+
     return buildedUrl;
   }
 
-  getEventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string) {
-    const buildedUrl = this.conf.protocol + this.conf.baseUrl + 'events/index/StartTime%20>=:' +
+  getEventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string) {
+    const searchFor = (camId !== null ? 'MonitorId:' + camId + '/StartTime%20>=:' : 'StartTime%20>=:');
+    const buildedUrl = this.conf.protocol + this.conf.baseUrl + 'events/index/' +
+      searchFor +
       startDate + '%20' +
       startTime + '/EndTime%20<=:' +
       endDate + '%20' +
       endTime + '.json?' + 'token=' + token;
+
     return this.http.get<ICamEvents>(buildedUrl);
   }
 

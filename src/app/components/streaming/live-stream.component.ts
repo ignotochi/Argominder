@@ -28,7 +28,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
-  public preview: { enabled: boolean, stream: string } = { enabled: false, stream: '' };
+  public preview: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showPreview: boolean = false;
   public showPreviewDetail: boolean;
 
@@ -93,7 +93,8 @@ export class LiveStreamComponent implements BasePreviewDetail {
           Width: result.Monitor.Width,
           Height: result.Monitor.Height,
         }
-        this.sharedService.camsRegistry.push(registry)
+        this.sharedService.camSpecializedInfo.push(registry);
+        this.sharedService.camDiapason.next([registry]);
       })
     }, (err: Error) => {
       console.log(err);

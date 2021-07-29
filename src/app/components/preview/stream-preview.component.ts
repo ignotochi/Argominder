@@ -24,7 +24,9 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     ngOnInit() {
-      this.showInVideoElement = this.sharedService.streamProperties.previewType === previewType.eventDetail ? true : false;
+      this.showInVideoElement = 
+      this.sharedService.streamProperties.previewType === previewType.eventDetail && 
+      this.sharedService.streamProperties.streamingMode === streamingEventMode.video ? true : false;
     }
 
     ngAfterViewInit() {

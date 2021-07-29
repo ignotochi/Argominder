@@ -1,4 +1,4 @@
-#setDateRange-btn {
+#setEventsFilters-btn {
   display: block;
 }
 
@@ -12,4 +12,17 @@
   left: 0;
   right: 0;
   margin: auto;
+}
+
+.mat-form-field {
+  margin: 0 5px;
+}
+
+.row-btn {
+  width: 100%;
+  display: flex;
+}
+
+#EventsFilters-btn {
+  margin: 0 5px;
 }

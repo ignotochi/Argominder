@@ -58,7 +58,7 @@ export class EventsComponent implements BasePreviewDetail {
   getEvents() {
     this.sharedService.getEventFiltersConf().pipe(
       switchMap((dataRange) => {
-        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate, dataRange.startTime, dataRange.endTime)
+        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate, dataRange.startTime, dataRange.endTime, dataRange.cam)
       })
     ).subscribe(result => {
       this.dataGrid = new MatTableDataSource(result.events.map(data => data.Event));
@@ -75,10 +75,12 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
-    this.sharedService.streamProperties.previewType = previewType.eventDetail;
     this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
+    this.sharedService.streamProperties.previewType = previewType.eventDetail;
+    this.sharedService.streamProperties.streamingMode = this.streamingMode;
     this.sharedService.streamProperties.camId = camId;
-    this.sharedService.camsRegistry.find(cam => {
+    
+    this.sharedService.camSpecializedInfo.find(cam => {
       if (cam.Id === camId) {
         cam.StartTime = startTime;
         cam.Length = length;
@@ -99,8 +101,8 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getCamName(camId: string) {
-    if (this.sharedService.camsRegistry.find(cam => (cam.Id === camId))) {
-      return this.sharedService.camsRegistry.find(cam => cam.Id === camId).Name;
+    if (this.sharedService.camSpecializedInfo.find(cam => (cam.Id === camId))) {
+      return this.sharedService.camSpecializedInfo.find(cam => cam.Id === camId).Name;
     }
   }
 

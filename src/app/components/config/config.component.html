@@ -65,7 +65,18 @@
                     [(ngModel)]="dateRange.endTime">
             </mat-form-field>
 
-            <button id="setDateRange-btn" mat-raised-button color="primary" (click)="setDateRange(false);">{{ 'Filtra' }}</button>
+            <mat-form-field appearance="fill">
+                <mat-label>Cam filter</mat-label>
+                <mat-select [(value)]="selectedCam">
+                    <mat-option [value]="{ name: null, id: null }">None</mat-option>
+                    <mat-option *ngFor="let cam of camsList" [value]="cam">{{ cam.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div class="row-btn">
+                <button id="EventsFilters-btn" mat-raised-button color="primary" (click)="setEventsFIlters(false)">{{'Filtra' }}</button>
+                <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset filters' }}</button>
+            </div>
         </form>
 
     </mat-expansion-panel>

@@ -11,4 +11,5 @@ export interface IConf {
     buffer: string;
     previewScale: string;
     previewMaxfps: string;
+    defaultEventStreamingMode: string;
 }

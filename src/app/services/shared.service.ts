@@ -1,6 +1,5 @@
-import { ObserversModule } from '@angular/cdk/observers';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, observable, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { streamingEventMode } from '../enums/enums';
 import { previewType } from '../enums/preview-enum';
 import { ICamRegistry } from '../interfaces/ICamRegistry';
@@ -12,6 +11,7 @@ import { IStreamProperties } from '../interfaces/IStreamProperties';
 export class SharedService {
 
   streamProperties: IStreamProperties = {} as IStreamProperties;
+  eventStreamingMode: streamingEventMode;
   
   previewIsActive: boolean = false;
   camSpecializedInfo: ICamRegistry[] = [{}];
@@ -34,6 +34,17 @@ export class SharedService {
 
   getEventFiltersConf(): Observable<IEventsFilter> {
     return this.eventsFilterSearch;
+  }
+
+  setStreamProperties(previewType: previewType, streamUrl: string, camId: string, streamingMode: streamingEventMode) {
+    this.streamProperties.previewType = previewType;
+    this.streamProperties.streamUrl = streamUrl;
+    this.streamProperties.camId = camId;
+    this.streamProperties.streamingMode = streamingMode;
+  }
+
+  flushStreamProperties() {
+    this.streamProperties = {} as IStreamProperties;
   }
 
   getPreviewInfo(camId: string, detail: previewType) {

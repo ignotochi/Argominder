@@ -72,7 +72,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   }
 
   getStreamPreview(cam: string) {
-    return this.zmService.getCamDetailStreamPreview(cam, this.localToken);
+    return this.zmService.getLiveStreamDetail(cam, this.localToken);
   }
 
   getCamList() {
@@ -134,16 +134,13 @@ export class LiveStreamComponent implements BasePreviewDetail {
       const streamUrl = this.getStream(camId, index + 1, camObject.Monitor_Status.Status);
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
-
     })
     this.showPreviewDetail = true;
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
     this.preview = { enabled: value, stream: stream };
-    this.sharedService.streamProperties.previewType = previewType.streamingDetail;
-    this.sharedService.streamProperties.streamUrl = this.preview.stream;
-    this.sharedService.streamProperties.camId = camId;
+    this.sharedService.setStreamProperties(previewType.streamingDetail, this.preview.stream, camId, null),
     this.sharedService.previewIsActive = true;
     this.showPreviewDetail = false;
     this.loadPreview();
@@ -153,9 +150,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.streamProperties.previewType = null;
-      this.sharedService.streamProperties.streamUrl = null;
-      this.sharedService.streamProperties.camId = null;
+      this.sharedService.flushStreamProperties();
       this.sharedService.previewIsActive = false;
     });
   }

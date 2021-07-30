@@ -1,10 +1,12 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild,
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { streamingEventMode } from 'src/app/enums/enums';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
+import { zmService } from 'src/app/services/zm.service';
 
 
 @Component({
@@ -27,14 +29,31 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   public camSelection = new FormControl();
   public camsList: { name: string, id: string }[] = [];
   public selectedCam: { name: string, id: string } = { name: null, id: null };
+  public eventStreamMode: { name: string, value: streamingEventMode}[] = [];
+  public selectedEventMode: streamingEventMode;
 
 
-  constructor(public sharedService: SharedService, private changeRef: ChangeDetectorRef) {
+  constructor(public sharedService: SharedService, public zmService: zmService, private changeRef: ChangeDetectorRef) {
     this.setDefaultTime();
+    
+    const streamModes = Object.keys(streamingEventMode);
+    streamModes.forEach(mode => {
+      this.eventStreamMode.push({name: mode, value: streamingEventMode[mode]})
+    })
+    this.setDefaulEventStreamingConf(streamModes)
+    this.selectedEventMode = this.sharedService.eventStreamingMode;
+
+
+  }
+
+  setDefaulEventStreamingConf(streamModes: string[]) {
+    const defaultEventStreamMode = this.zmService.conf.defaultEventStreamingMode;
+    const defaultModeToEnum = streamingEventMode[streamModes.find(mode => (mode === defaultEventStreamMode))];
+    this.sharedService.eventStreamingMode = defaultModeToEnum;
   }
 
   ngOnInit() {
-    this.setEventsFIlters(true);
+    this.setEventsFilters(true);
     this.sharedService.getCamRegistry().subscribe(result => {
       result.forEach(ele => {
         if (ele.Name && ele.Id) {
@@ -62,7 +81,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     return [year, month, day].join('-');
   }
 
-  setEventsFIlters(isOnLoad: boolean) {
+  setEventsFilters(isOnLoad: boolean) {
     this.endtDateFIlter = this.startDateFilter;
     this.sharedService.eventsFilterSearch.next({
       startDate: this.converDateFormat(this.startDateFilter),
@@ -85,10 +104,6 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // setCamSelection(camSelection: { name: string, id: string }) {
-  //   this.selectedCam = camSelection;
-  // }
-
   resetFilters() {
     this.setDefaultTime();
     const currentDate = new Date();
@@ -101,6 +116,10 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     });
     this.startDateFilter = currentDate;
     this.selectedCam = { name: null, id: null };
+  }
+
+  changeEventStreamingMode(mode: streamingEventMode) {
+    this.sharedService.eventStreamingMode = mode;
   }
 
 }

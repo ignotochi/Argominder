@@ -1,7 +1,5 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, ComponentFactoryResolver, ElementRef, Input, OnInit,
-  ViewChild, ViewChildren
+  ChangeDetectionStrategy, Component, Input, ViewChild
 }
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -70,16 +68,12 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getStreamPreview(eventId: string) {
-    this.streamingMode = streamingEventMode.video;
-    return this.zmService.getEventPreview(eventId, this.localToken, this.streamingMode);
+    this.streamingMode = this.sharedService.eventStreamingMode;
+    return this.zmService.getEventStreamDetail(eventId, this.localToken, this.streamingMode);
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
-    this.sharedService.streamProperties.streamUrl = this.getStreamPreview(eventId);
-    this.sharedService.streamProperties.previewType = previewType.eventDetail;
-    this.sharedService.streamProperties.streamingMode = this.streamingMode;
-    this.sharedService.streamProperties.camId = camId;
-    
+    this.sharedService.setStreamProperties(previewType.eventDetail, this.getStreamPreview(eventId), camId, this.streamingMode),    
     this.sharedService.camSpecializedInfo.find(cam => {
       if (cam.Id === camId) {
         cam.StartTime = startTime;
@@ -93,9 +87,7 @@ export class EventsComponent implements BasePreviewDetail {
   loadPreview(target: HTMLElement): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.streamProperties.previewType = null;
-      this.sharedService.streamProperties.streamUrl = null;
-      this.sharedService.streamProperties.camId = null;
+      this.sharedService.flushStreamProperties();
       this.markEvent(target);
     });
   }

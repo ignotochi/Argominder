@@ -9,7 +9,14 @@
                 {{ 'Impostazione generali' }}
             </mat-panel-description>
         </mat-expansion-panel-header>
-        <p>Set json</p>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Event Streaming Mode</mat-label>
+            <mat-select [(value)]="selectedEventMode">
+                <mat-option *ngFor="let mode of eventStreamMode" [value]="mode.value" (click)="changeEventStreamingMode(mode.value)">{{ mode.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        
     </mat-expansion-panel>
 
     <mat-expansion-panel hideToggle>
@@ -74,7 +81,7 @@
             </mat-form-field>
 
             <div class="row-btn">
-                <button id="EventsFilters-btn" mat-raised-button color="primary" (click)="setEventsFIlters(false)">{{'Filtra' }}</button>
+                <button id="EventsFilters-btn" mat-raised-button color="primary" (click)="setEventsFilters(false)">{{'Filtra' }}</button>
                 <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset filters' }}</button>
             </div>
         </form>

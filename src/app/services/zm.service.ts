@@ -38,10 +38,10 @@ export class zmService {
 
   getLiveStream(cam: string, token: string, index: number) {
     let streamUrl: string;
-    if (index <= this.streamLimt1) streamUrl = this.conf.streamUrl1; 
-    else if (index <= this.streamLimt2)  streamUrl = this.conf.streamUrl2; 
-    else if (index <= this.streamLimt3)  streamUrl = this.conf.streamUrl3; 
-    else if (index <= this.streamLimt4)  streamUrl = this.conf.streamUrl4; 
+    if (index <= this.streamLimt1) streamUrl = this.conf.streamUrl1;
+    else if (index <= this.streamLimt2) streamUrl = this.conf.streamUrl2;
+    else if (index <= this.streamLimt3) streamUrl = this.conf.streamUrl3;
+    else if (index <= this.streamLimt4) streamUrl = this.conf.streamUrl4;
     const buildedUrl =
       this.conf.protocol + streamUrl + '/zm/cgi-bin/nph-zms?scale=' +
       this.conf.scale + '&mode=jpeg&maxfps=' +
@@ -51,7 +51,7 @@ export class zmService {
     return buildedUrl;
   }
 
-  getCamDetailStreamPreview(cam: string, token: string) {
+  getLiveStreamDetail(cam: string, token: string) {
     const buildedUrl =
       this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?scale=' +
       this.conf.previewScale + '&mode=jpeg&maxfps=' +
@@ -61,11 +61,12 @@ export class zmService {
     return buildedUrl;
   }
 
-  getEventPreview(eventId: string, token: string, mode: string) {
+  getEventStreamDetail(eventId: string, token: string, mode: string) {
     let buildedUrl: string;
     if (mode === 'jpeg')
       buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
-        'scale=100' +
+        'scale=' +
+        this.conf.scale +
         '&mode=jpeg' +
         '&frame=5' +
         '&replay=none&source=event&event=' +

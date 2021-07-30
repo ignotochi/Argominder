@@ -5,9 +5,10 @@
     "streamUrl2": "rwt.fetchtec.com",
     "streamUrl3": "",
     "streamUrl4": "",
-    "scale": "35",
-    "maxfps": "3",
+    "scale": "30",
+    "maxfps": "1",
     "buffer": "1000",
-    "previewScale": "100",
-    "previewMaxfps": "5"
+    "previewScale": "30",
+    "previewMaxfps": "3",
+    "defaultEventStreamingMode": "video" 
 }

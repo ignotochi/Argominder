@@ -1,9 +1,7 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Injectable, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
 import { SharedService } from "src/app/services/shared.service";
-
-@Injectable()
 
 @Component({
     selector: 'stream-preview',

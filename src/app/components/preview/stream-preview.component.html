@@ -2,16 +2,16 @@
 
     <div *ngIf="!showInVideoElement">
         <mat-spinner class="spinnerCam" diameter="50" #spinner></mat-spinner>
-        <img id="preview" style="width:100%;" src="{{ streamUrl }}" (load)="onImageLoad($event);" #streaming>
+        <img id="preview" style="width:100%;" [src]="streamUrl" (load)="onImageLoad($event);" #streaming>
     </div>
 
-    <video id="videoEvent" *ngIf="showInVideoElement" controls autoplay muted >
-        <source src="{{ streamUrl }}" type="video/mp4">
+    <video id="videoEvent" *ngIf="showInVideoElement" controls autoplay muted>
+        <source [src]="streamUrl" type="video/mp4">
     </video>
 
-    <p *ngIf="showInfoDetail" class="preview-info-detail">{{ getPreviewInfo() }}</p>
+    <p class="preview-info-detail" #detailInfoPreview></p>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-flat-button color="primary" mat-dialog-close (click)="stopStreaming();">Close</button>
+    <button id="close-detail" mat-flat-button color="primary" mat-dialog-close (click)="stopStreaming();">Close</button>
 </mat-dialog-actions>

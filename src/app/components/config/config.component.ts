@@ -31,6 +31,13 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   public selectedCam: { name: string, id: string } = { name: null, id: null };
   public eventStreamMode: { name: string, value: streamingEventMode}[] = [];
   public selectedEventMode: streamingEventMode;
+  public liveStreamingMax = 100;
+  public liveStreamingMin = 5;
+  public selectedLiveStreamingScale: number;
+
+  public detailStreamingMax = 100;
+  public detailStreamingMin = 5;
+  public selectedDetailStreamingScale: number;
 
 
   constructor(public sharedService: SharedService, public zmService: zmService, private changeRef: ChangeDetectorRef) {
@@ -42,8 +49,8 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     })
     this.setDefaulEventStreamingConf(streamModes)
     this.selectedEventMode = this.sharedService.eventStreamingMode;
-
-
+    this.selectedLiveStreamingScale = parseInt(this.zmService.conf.liveStreamingScale);
+    this.selectedDetailStreamingScale = parseInt(this.zmService.conf.detailStreamingScale);
   }
 
   setDefaulEventStreamingConf(streamModes: string[]) {
@@ -120,6 +127,21 @@ export class ConfigComponent implements OnInit, AfterViewInit {
 
   changeEventStreamingMode(mode: streamingEventMode) {
     this.sharedService.eventStreamingMode = mode;
+  }
+
+  setLiveStreamingScale() {
+    this.zmService.conf.liveStreamingScale = this.selectedLiveStreamingScale.toString();
+    this.relaodLiveStreaming();
+  }
+
+  setDetailStreamingScale() {
+    this.zmService.conf.detailStreamingScale = this.selectedDetailStreamingScale.toString();
+    this.relaodLiveStreaming();
+  }
+
+  relaodLiveStreaming() {
+    this.sharedService.previewStatus.next(true);
+    this.sharedService.previewStatus.next(false);
   }
 
 }

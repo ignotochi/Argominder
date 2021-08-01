@@ -44,8 +44,8 @@ export class zmService {
     else if (index <= this.streamLimt4) streamUrl = this.conf.streamUrl4;
     const buildedUrl =
       this.conf.protocol + streamUrl + '/zm/cgi-bin/nph-zms?scale=' +
-      this.conf.scale + '&mode=jpeg&maxfps=' +
-      this.conf.maxfps + '&buffer=' +
+      this.conf.liveStreamingScale + '&mode=jpeg&maxfps=' +
+      this.conf.liveStreamingMaxFps + '&buffer=' +
       this.conf.buffer + '&monitor=' +
       cam + '&token=' + token;
     return buildedUrl;
@@ -54,8 +54,8 @@ export class zmService {
   getLiveStreamDetail(cam: string, token: string) {
     const buildedUrl =
       this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?scale=' +
-      this.conf.previewScale + '&mode=jpeg&maxfps=' +
-      this.conf.previewMaxfps + '&buffer=' +
+      this.conf.detailStreamingScale + '&mode=jpeg&maxfps=' +
+      this.conf.detailStreamingMaxfps + '&buffer=' +
       this.conf.buffer + '&monitor=' +
       cam + '&token=' + token;
     return buildedUrl;
@@ -66,7 +66,7 @@ export class zmService {
     if (mode === 'jpeg')
       buildedUrl = this.conf.protocol + this.conf.streamUrl1 + '/zm/cgi-bin/nph-zms?' +
         'scale=' +
-        this.conf.scale +
+        this.conf.liveStreamingScale +
         '&mode=jpeg' +
         '&frame=5' +
         '&replay=none&source=event&event=' +

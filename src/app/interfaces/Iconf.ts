@@ -6,10 +6,10 @@ export interface IConf {
     streamUrl2: string;
     streamUrl3: string;
     streamUrl4: string;
-    scale: string;
-    maxfps: string;
+    liveStreamingScale: string;
+    liveStreamingMaxFps: string;
     buffer: string;
-    previewScale: string;
-    previewMaxfps: string;
+    detailStreamingScale: string;
+    detailStreamingMaxfps: string;
     defaultEventStreamingMode: string;
 }

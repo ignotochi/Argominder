@@ -13,10 +13,11 @@
         <mat-form-field appearance="fill">
             <mat-label>Event Streaming Mode</mat-label>
             <mat-select [(value)]="selectedEventMode">
-                <mat-option *ngFor="let mode of eventStreamMode" [value]="mode.value" (click)="changeEventStreamingMode(mode.value)">{{ mode.name}}</mat-option>
+                <mat-option *ngFor="let mode of eventStreamMode" [value]="mode.value"
+                    (click)="changeEventStreamingMode(mode.value)">{{ mode.name}}</mat-option>
             </mat-select>
         </mat-form-field>
-        
+
     </mat-expansion-panel>
 
     <mat-expansion-panel hideToggle>
@@ -28,9 +29,23 @@
                 {{ 'Imposta la qualità dello streaming' }}
             </mat-panel-description>
         </mat-expansion-panel-header>
-        <mat-slider aria-label="unit(s)"></mat-slider>
-        <mat-slider aria-label="unit(s)"></mat-slider>
-        <mat-slider aria-label="unit(s)"></mat-slider>
+
+        <div class="liveStreamingQlty-slider">
+            <label>{{ 'Live streaming: ' }}</label>
+            <label class="liveStreamingQlty">{{ selectedLiveStreamingScale }}</label>
+        </div>
+        <mat-slider [disabled]="false" [max]="liveStreamingMax" [min]="liveStreamingMin"  [(ngModel)]="selectedLiveStreamingScale" (click)="setLiveStreamingScale()"
+        [thumbLabel]="true" [tickInterval]="1">
+        </mat-slider>
+
+        <div class="detailStreamingQlty-slider">
+            <label>{{ 'Detail streaming: ' }}</label>
+            <label class="detailStreamingQlty">{{ selectedDetailStreamingScale }}</label>
+        </div>
+        <mat-slider [disabled]="false" [max]="detailStreamingMax" [min]="detailStreamingMin"  [(ngModel)]="selectedDetailStreamingScale" (click)="setDetailStreamingScale()"
+        [thumbLabel]="true" [tickInterval]="1">
+        </mat-slider>
+
     </mat-expansion-panel>
 
     <mat-expansion-panel hideToggle>
@@ -81,7 +96,8 @@
             </mat-form-field>
 
             <div class="row-btn">
-                <button id="EventsFilters-btn" mat-raised-button color="primary" (click)="setEventsFilters(false)">{{'Filtra' }}</button>
+                <button id="EventsFilters-btn" mat-raised-button color="primary"
+                    (click)="setEventsFilters(false)">{{'Filtra' }}</button>
                 <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset filters' }}</button>
             </div>
         </form>

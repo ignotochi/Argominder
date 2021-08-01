@@ -14,14 +14,17 @@
 
 .expand-stream {
   cursor: pointer;
+  background: white;
   display: block;
-  width: 35px;
-  height: 35px;
+  width: 37px;
+  height: 27px;
+  border-radius: 5px;
   position: absolute;
   background-image: url("../../../assets/icons/twotone_panorama.png");
-  background-size: 35px 35px;
-  bottom: 0;
-  right: 1px;
+  background-size: 40px 40px;
+  background-position: center;
+  bottom: 5px;
+  right: 2px;
 }
 
 .spinnerCam {
@@ -49,14 +52,13 @@
 .preview-info {
   display: block;
   position: absolute;
+  max-width: 70%;
   margin: auto;
-  bottom: 0;
+  bottom: 4px;
   left: 0;
   right: 0;
-  max-width: 70%;
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   background: #00000085;
-  padding: 3px 8px;
   color: white;
 }

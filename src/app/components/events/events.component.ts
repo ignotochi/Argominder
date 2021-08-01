@@ -59,7 +59,10 @@ export class EventsComponent implements BasePreviewDetail {
         return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate, dataRange.startTime, dataRange.endTime, dataRange.cam)
       })
     ).subscribe(result => {
-      this.dataGrid = new MatTableDataSource(result.events.map(data => data.Event));
+      this.dataGrid = new MatTableDataSource(result.events.map(data => {
+        data.Event.Name = this.getCamName(data.Event.MonitorId);
+        return data.Event;
+      }));
       this.dataGrid.sort = this.sort;
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
@@ -73,14 +76,14 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
-    this.sharedService.setStreamProperties(previewType.eventDetail, this.getStreamPreview(eventId), camId, this.streamingMode),    
-    this.sharedService.camSpecializedInfo.find(cam => {
-      if (cam.Id === camId) {
-        cam.StartTime = startTime;
-        cam.Length = length;
-        cam.MaxScore = maxScore;
-      }
-    })
+    this.sharedService.setStreamProperties(previewType.eventDetail, this.getStreamPreview(eventId), camId, this.streamingMode),
+      this.sharedService.camSpecializedInfo.find(cam => {
+        if (cam.Id === camId) {
+          cam.StartTime = startTime;
+          cam.Length = length;
+          cam.MaxScore = maxScore;
+        }
+      })
     this.loadPreview(target);
   }
 

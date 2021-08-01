@@ -21,6 +21,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
   @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
 
 
   @Input()
@@ -28,9 +29,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
-  public preview: { enabled: boolean, stream: string } = { enabled: false, stream: null };
-  public showPreview: boolean = false;
-  public showPreviewDetail: boolean;
+  public detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
 
   constructor(private zmService: zmService, public sharedService: SharedService, private dialog: MatDialog) {
     this.previewStatus();
@@ -47,7 +46,9 @@ export class LiveStreamComponent implements BasePreviewDetail {
 
   ngAfterViewInit() {
     this.getCamList();
-    this.showPreviewDetail = true;
+    this.streams.changes.subscribe((result) => {
+      if (result.length > 0) { this.startStream(); } 
+    });    
   }
 
   showExpands(camId: string, loadStatus: boolean) {
@@ -64,6 +65,12 @@ export class LiveStreamComponent implements BasePreviewDetail {
     const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
     if (loadStatus === true) matchedEle.nativeElement.classList.add('hidden');
     if (loadStatus === false) matchedEle.nativeElement.classList.remove('hidden');
+  }
+
+  loadDetailStreamInfo(camId: string) {
+    this.detailInfo.forEach(detail => { if (detail.nativeElement.getAttribute('id') === camId) {
+      detail.nativeElement.innerText = this.getPreviewInfo(camId);
+    }});
   }
 
   getStream(cam: string, index: number, status: string) {
@@ -113,7 +120,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
       this.showExpands(camId, isLoaded);
       this.ShowOrhideSpinners(camId, isLoaded);
-
+      this.loadDetailStreamInfo(camId);
     }
   }
 
@@ -135,14 +142,12 @@ export class LiveStreamComponent implements BasePreviewDetail {
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
     })
-    this.showPreviewDetail = true;
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
-    this.preview = { enabled: value, stream: stream };
-    this.sharedService.setStreamProperties(previewType.streamingDetail, this.preview.stream, camId, null),
+    this.detail = { enabled: value, stream: stream };
+    this.sharedService.setStreamProperties(previewType.streamingDetail, this.detail.stream, camId, null),
     this.sharedService.previewIsActive = true;
-    this.showPreviewDetail = false;
     this.loadPreview();
   }
 

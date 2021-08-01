@@ -11,9 +11,10 @@ import { SharedService } from "src/app/services/shared.service";
   export class StreamPreview implements OnInit, AfterViewInit {
     @ViewChild('streaming', { static: false }) streaming: ElementRef<HTMLImageElement>;
     @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
+    @ViewChild('detailInfoPreview', { read: ElementRef }) detailInfoPreview: ElementRef<HTMLElement>;
+
      streamUrl: string;
      previewActive: boolean;
-     showInfoDetail: boolean =  false;
      showInVideoElement: boolean;
 
     constructor(private sharedService: SharedService) {
@@ -48,8 +49,12 @@ import { SharedService } from "src/app/services/shared.service";
         const status = evt.target.complete;
         const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
         this.hideSpinners(isLoaded);
-        this.showInfoDetail = true;
+        this.loadDetailStreamInfo();
       }
+    }
+
+    loadDetailStreamInfo() {
+      this.detailInfoPreview.nativeElement.innerText = this.getPreviewInfo();
     }
 
     getPreviewInfo() {

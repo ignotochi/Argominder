@@ -6,48 +6,48 @@
             <th mat-header-cell *matHeaderCellDef> EventID </th>
             <td mat-cell *matCellDef="let element">
                 <button style="text-decoration: underline;" mat-flat-button href="#" class="evntPreview-btn"
-                (click)="setPreview(element.Id, element.MonitorId, element.StartTime, element.Length, element.MaxScore, $event.currentTarget);">{{element.Id}} </button>
+                (click)="setPreview(element.Id, element.MonitorId, element.StartTime, element.Length, element.MaxScore, $event.currentTarget);">{{ element.Id }} </button>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="Name">
             <th mat-header-cell *matHeaderCellDef> Name </th>
-            <td mat-cell *matCellDef="let element"> {{getCamName(element.MonitorId)}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.Name }} </td>
         </ng-container>
 
         <ng-container matColumnDef="Cause">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Cause </th>
-            <td mat-cell *matCellDef="let element"> {{element.Cause}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.Cause }} </td>
         </ng-container>
 
         <ng-container matColumnDef="MonitorId">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> MonitorId </th>
-            <td mat-cell *matCellDef="let element"> {{element.MonitorId}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.MonitorId }} </td>
         </ng-container>
 
         <ng-container matColumnDef="StartTime">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> StartTime </th>
-            <td mat-cell *matCellDef="let element"> {{element.StartTime}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.StartTime }} </td>
         </ng-container>
 
         <ng-container matColumnDef="EndTime">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> EndTime </th>
-            <td mat-cell *matCellDef="let element"> {{element.EndTime}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.EndTime }} </td>
         </ng-container>
 
         <ng-container matColumnDef="Length">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Length </th>
-            <td mat-cell *matCellDef="let element"> {{element.Length}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.Length }} </td>
         </ng-container>
 
         <ng-container matColumnDef="Frames">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Frames </th>
-            <td mat-cell *matCellDef="let element"> {{element.Frames}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.Frames }} </td>
         </ng-container>
 
         <ng-container matColumnDef="MaxScore">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> MaxScore </th>
-            <td mat-cell *matCellDef="let element"> {{element.MaxScore}} </td>
+            <td mat-cell *matCellDef="let element"> {{ element.MaxScore }} </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

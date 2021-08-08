@@ -29,5 +29,16 @@
 
 mat-slider {
   margin-top: 25px;
+  width: 100%;
+}
+
+.confStreaming {
+  display: flex;
+  border-top: 1px solid #dadada;
+  padding-top: 25px;
+}
+
+.sliderBlock {
   width: 25%;
+  text-align: center;
 }

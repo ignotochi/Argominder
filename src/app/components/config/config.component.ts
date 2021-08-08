@@ -2,7 +2,9 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { streamingEventMode } from 'src/app/enums/enums';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { streamingConf, streamingEventMode } from 'src/app/enums/enums';
+import { IConfigStreaming } from 'src/app/interfaces/IConfStreaming';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { SharedService } from 'src/app/services/shared.service';
@@ -29,28 +31,43 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   public camSelection = new FormControl();
   public camsList: { name: string, id: string }[] = [];
   public selectedCam: { name: string, id: string } = { name: null, id: null };
-  public eventStreamMode: { name: string, value: streamingEventMode}[] = [];
+  public eventStreamMode: { name: string, value: streamingEventMode }[] = [];
   public selectedEventMode: streamingEventMode;
-  public liveStreamingMax = 100;
-  public liveStreamingMin = 5;
+
+  public liveStreamingMaxScale = 100;
+  public liveStreamingMinScale = 5;
   public selectedLiveStreamingScale: number;
 
-  public detailStreamingMax = 100;
-  public detailStreamingMin = 5;
+  public detailStreamingMaxScale = 100;
+  public detailStreamingMinScale = 5;
   public selectedDetailStreamingScale: number;
+
+  public liveStreamingMaxFps = 10;
+  public liveStreamingMinFps = 1;
+  public selectedLiveStreamingFps: number;
+
+  public detailStreamingMaxFps = 10;
+  public detailStreamingMinFps = 1;
+  public selectedDetailStreamingFps: number;
+
+  public newStreamingParametrs: IConfigStreaming[] = [{}] as IConfigStreaming[];
+  public streamingConfChanges = new BehaviorSubject(this.newStreamingParametrs);
 
 
   constructor(public sharedService: SharedService, public zmService: zmService, private changeRef: ChangeDetectorRef) {
     this.setDefaultTime();
-    
+
     const streamModes = Object.keys(streamingEventMode);
     streamModes.forEach(mode => {
-      this.eventStreamMode.push({name: mode, value: streamingEventMode[mode]})
+      this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
     })
     this.setDefaulEventStreamingConf(streamModes)
     this.selectedEventMode = this.sharedService.eventStreamingMode;
     this.selectedLiveStreamingScale = parseInt(this.zmService.conf.liveStreamingScale);
     this.selectedDetailStreamingScale = parseInt(this.zmService.conf.detailStreamingScale);
+    this.selectedLiveStreamingFps = parseInt(this.zmService.conf.liveStreamingMaxFps);
+    this.selectedDetailStreamingFps = parseInt(this.zmService.conf.detailStreamingMaxfps);
+    this.ifNewStreamingConf();
   }
 
   setDefaulEventStreamingConf(streamModes: string[]) {
@@ -71,6 +88,38 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+  }
+
+  getStreamingConf(): Observable<IConfigStreaming[]> {
+    return this.streamingConfChanges;
+  }
+
+  applyNefStreamingConf(value: number, type: string) {
+    const streamConf = Object.keys(streamingConf);
+    streamConf.forEach(conf => {
+      if (conf === type) {
+        this.streamingConfChanges.next([{ value: value, type: streamingConf[type] }]);
+      }
+    })
+  }
+
+  ifNewStreamingConf() {
+    this.getStreamingConf().subscribe(result => {
+      result.map(data => {
+        if (data.type === streamingConf.liveStreaming) {
+          this.setLiveStreamingScale(data.value);
+        };
+        if (data.type === streamingConf.maxLiveFps) {
+          this.setLiveStreamingFps(data.value);
+        };
+        if (data.type === streamingConf.detailStreaming) {
+          this.setDetailStreamingScale(data.value);
+        };
+        if (data.type === streamingConf.maxDetailFps) {
+          this.setDetailStreamingFps(data.value);
+        };
+      })
+    })
   }
 
   setDefaultTime() {
@@ -103,7 +152,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
       this.sharedService.getEventFiltersConf().subscribe(result => {
         setTimeout(() => {
           if (result) {
-            this.showDateRangeSpinner = false; 
+            this.showDateRangeSpinner = false;
             this.changeRef.markForCheck();
           }
         }, 1500);
@@ -129,19 +178,29 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     this.sharedService.eventStreamingMode = mode;
   }
 
-  setLiveStreamingScale() {
-    this.zmService.conf.liveStreamingScale = this.selectedLiveStreamingScale.toString();
-    this.relaodLiveStreaming();
-  }
-
-  setDetailStreamingScale() {
-    this.zmService.conf.detailStreamingScale = this.selectedDetailStreamingScale.toString();
-    this.relaodLiveStreaming();
-  }
-
   relaodLiveStreaming() {
     this.sharedService.previewStatus.next(true);
     this.sharedService.previewStatus.next(false);
+  }
+
+  setLiveStreamingScale(value: number) {
+    this.zmService.conf.liveStreamingScale = value.toString();
+    this.relaodLiveStreaming();
+  }
+
+  setDetailStreamingScale(value: number) {
+    this.zmService.conf.detailStreamingScale = value.toString();
+    this.relaodLiveStreaming();
+  }
+
+  setLiveStreamingFps(value: number) {
+    this.zmService.conf.liveStreamingMaxFps = value.toString();
+    this.relaodLiveStreaming();
+  }
+
+  setDetailStreamingFps(value: number) {
+    this.zmService.conf.detailStreamingMaxfps = value.toString();
+    this.relaodLiveStreaming();
   }
 
 }

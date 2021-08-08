@@ -30,6 +30,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
+  public showInfoDetail: boolean = false;
 
   constructor(private zmService: zmService, public sharedService: SharedService, private dialog: MatDialog) {
     this.previewStatus();
@@ -141,10 +142,12 @@ export class LiveStreamComponent implements BasePreviewDetail {
       const streamUrl = this.getStream(camId, index + 1, camObject.Monitor_Status.Status);
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
+      this.showInfoDetail = true;
     })
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
+    this.showInfoDetail = false;
     this.detail = { enabled: value, stream: stream };
     this.sharedService.setStreamProperties(previewType.streamingDetail, this.detail.stream, camId, null),
     this.sharedService.previewIsActive = true;

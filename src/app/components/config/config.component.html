@@ -30,21 +30,49 @@
             </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <div class="liveStreamingQlty-slider">
-            <label>{{ 'Live streaming: ' }}</label>
-            <label class="liveStreamingQlty">{{ selectedLiveStreamingScale }}</label>
-        </div>
-        <mat-slider [disabled]="false" [max]="liveStreamingMax" [min]="liveStreamingMin"  [(ngModel)]="selectedLiveStreamingScale" (click)="setLiveStreamingScale()"
-        [thumbLabel]="true" [tickInterval]="1">
-        </mat-slider>
+        <div class="confStreaming">
+            <div class="sliderBlock">
+                <div class="confStreamingLabel">
+                    <label>{{ 'Live streaming: ' }}</label>
+                    <label class="liveStreamingQlty">{{ selectedLiveStreamingScale }}</label>
+                </div>
+                <mat-slider [disabled]="false" [max]="liveStreamingMaxScale" [min]="liveStreamingMinScale"
+                    [(ngModel)]="selectedLiveStreamingScale" [thumbLabel]="true" [tickInterval]="5" (click)="applyNefStreamingConf(selectedLiveStreamingScale, 'liveStreaming');">
+                </mat-slider>
+            </div>
 
-        <div class="detailStreamingQlty-slider">
-            <label>{{ 'Detail streaming: ' }}</label>
-            <label class="detailStreamingQlty">{{ selectedDetailStreamingScale }}</label>
+            <div class="sliderBlock">
+                <div class="liveStreamingFps-slider">
+                    <label>{{ 'Live FPS: ' }}</label>
+                    <label class="liveStreamingQlty">{{ selectedLiveStreamingFps }}</label>
+                </div>
+                <mat-slider [disabled]="false" [max]="liveStreamingMaxFps" [min]="liveStreamingMinFps"
+                    [(ngModel)]="selectedLiveStreamingFps" [thumbLabel]="true" [tickInterval]="1" (click)="applyNefStreamingConf(selectedLiveStreamingFps, 'maxLiveFps');">
+                </mat-slider>
+            </div>
         </div>
-        <mat-slider [disabled]="false" [max]="detailStreamingMax" [min]="detailStreamingMin"  [(ngModel)]="selectedDetailStreamingScale" (click)="setDetailStreamingScale()"
-        [thumbLabel]="true" [tickInterval]="1">
-        </mat-slider>
+
+        <div class="confStreaming">
+            <div class="sliderBlock">
+                <div class="confStreamingLabel">
+                    <label>{{ 'Detail streaming: ' }}</label>
+                    <label class="detailStreamingQlty">{{ selectedDetailStreamingScale }}</label>
+                </div>
+                <mat-slider [disabled]="false" [max]="detailStreamingMaxScale" [min]="detailStreamingMinScale"
+                    [(ngModel)]="selectedDetailStreamingScale" [thumbLabel]="true" [tickInterval]="5" (click)="applyNefStreamingConf(selectedDetailStreamingScale, 'detailStreaming');">
+                </mat-slider>
+            </div>
+
+            <div class="sliderBlock">
+                <div class="liveStreamingFps-slider">
+                    <label>{{ 'Detail FPS: ' }}</label>
+                    <label class="liveStreamingQlty">{{ selectedDetailStreamingFps }}</label>
+                </div>
+                <mat-slider [disabled]="false" [max]="detailStreamingMaxFps" [min]="detailStreamingMinFps"
+                    [(ngModel)]="selectedDetailStreamingFps" [thumbLabel]="true" [tickInterval]="1" (click)="applyNefStreamingConf(selectedDetailStreamingFps, 'maxDetailFps');">
+                </mat-slider>
+            </div>
+        </div>
 
     </mat-expansion-panel>
 

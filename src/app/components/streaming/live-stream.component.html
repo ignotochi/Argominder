@@ -9,7 +9,7 @@
 
         <img [attr.camId]="item.Monitor.Id" style="width:100%;" src="#" (load)="onImageLoad($event, item.Monitor.Id);" #stream>
 
-          <p [id]="item.Monitor.Id" class="preview-info" #detailInfo></p>
+          <p *ngIf="showInfoDetail" [id]="item.Monitor.Id" class="preview-info" #detailInfo></p>
 
         <mat-icon [attr.camId]="item.Monitor.Id" class="expand-stream hidden" aria-hidden="false" aria-label="icon"
           (click)="setPreview(true, getStreamPreview(item.Monitor.Id), item.Monitor.Id);" #expand></mat-icon>

@@ -42,3 +42,16 @@ mat-slider {
   width: 25%;
   text-align: center;
 }
+
+#settings-loaded-from {
+  text-align: left;
+  padding: 0 25px;
+  color: #03a9f4;
+}
+
+#settings-actions {
+  width: 100%;
+  display: flex;
+  padding-top: 25px;
+  justify-content: center;
+}

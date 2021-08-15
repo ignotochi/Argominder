@@ -1,5 +1,4 @@
 <mat-accordion>
-
     <mat-expansion-panel hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
@@ -17,6 +16,70 @@
                     (click)="changeEventStreamingMode(mode.value)">{{ mode.name}}</mat-option>
             </mat-select>
         </mat-form-field>
+
+        <div class="settingsFromJson">
+            <!-- <p>{{ 'Default settings loaded from json file' }}</p> -->
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'Protocol' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.protocol">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'Base Url' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.baseUrl">
+            </mat-form-field>
+
+            <mat-form-field *ngIf="zmService.conf.streamUrl1.length > 0" appearance="fill">
+                <mat-label>{{ 'streamUrl 1' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.streamUrl1">
+            </mat-form-field>
+
+            <mat-form-field *ngIf="zmService.conf.streamUrl2.length > 0" appearance="fill">
+                <mat-label>{{ 'streamUrl 2' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.streamUrl2">
+            </mat-form-field>
+
+            <mat-form-field *ngIf="zmService.conf.streamUrl3.length > 0" appearance="fill">
+                <mat-label>{{ 'streamUrl 3' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.streamUrl3">
+            </mat-form-field>
+
+            <mat-form-field *ngIf="zmService.conf.streamUrl4.length > 0" appearance="fill">
+                <mat-label>{{ 'streamUrl 4' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.streamUrl4">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'liveStreamingScale' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.liveStreamingScale">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'liveStreamingMaxFps' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.liveStreamingMaxFps">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'buffer' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.buffer">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'detailStreamingScale' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.detailStreamingScale">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'detailStreamingMaxfps' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.detailStreamingMaxfps">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ 'defaultEventStreamingMode' }}</mat-label>
+                <input [disabled]="true" matInput [value]="zmService.conf.defaultEventStreamingMode">
+            </mat-form-field>
+        </div>
 
     </mat-expansion-panel>
 
@@ -37,7 +100,8 @@
                     <label class="liveStreamingQlty">{{ selectedLiveStreamingScale }}</label>
                 </div>
                 <mat-slider [disabled]="false" [max]="liveStreamingMaxScale" [min]="liveStreamingMinScale"
-                    [(ngModel)]="selectedLiveStreamingScale" [thumbLabel]="true" [tickInterval]="5" (click)="applyNefStreamingConf(selectedLiveStreamingScale, 'liveStreaming');">
+                    [(ngModel)]="selectedLiveStreamingScale" [thumbLabel]="true" [tickInterval]="5"
+                    (click)="applyNewStreamingConf(selectedLiveStreamingScale, 'liveStreaming');">
                 </mat-slider>
             </div>
 
@@ -47,7 +111,8 @@
                     <label class="liveStreamingQlty">{{ selectedLiveStreamingFps }}</label>
                 </div>
                 <mat-slider [disabled]="false" [max]="liveStreamingMaxFps" [min]="liveStreamingMinFps"
-                    [(ngModel)]="selectedLiveStreamingFps" [thumbLabel]="true" [tickInterval]="1" (click)="applyNefStreamingConf(selectedLiveStreamingFps, 'maxLiveFps');">
+                    [(ngModel)]="selectedLiveStreamingFps" [thumbLabel]="true" [tickInterval]="1"
+                    (click)="applyNewStreamingConf(selectedLiveStreamingFps, 'maxLiveFps');">
                 </mat-slider>
             </div>
         </div>
@@ -59,7 +124,8 @@
                     <label class="detailStreamingQlty">{{ selectedDetailStreamingScale }}</label>
                 </div>
                 <mat-slider [disabled]="false" [max]="detailStreamingMaxScale" [min]="detailStreamingMinScale"
-                    [(ngModel)]="selectedDetailStreamingScale" [thumbLabel]="true" [tickInterval]="5" (click)="applyNefStreamingConf(selectedDetailStreamingScale, 'detailStreaming');">
+                    [(ngModel)]="selectedDetailStreamingScale" [thumbLabel]="true" [tickInterval]="5"
+                    (click)="applyNewStreamingConf(selectedDetailStreamingScale, 'detailStreaming');">
                 </mat-slider>
             </div>
 
@@ -69,7 +135,8 @@
                     <label class="liveStreamingQlty">{{ selectedDetailStreamingFps }}</label>
                 </div>
                 <mat-slider [disabled]="false" [max]="detailStreamingMaxFps" [min]="detailStreamingMinFps"
-                    [(ngModel)]="selectedDetailStreamingFps" [thumbLabel]="true" [tickInterval]="1" (click)="applyNefStreamingConf(selectedDetailStreamingFps, 'maxDetailFps');">
+                    [(ngModel)]="selectedDetailStreamingFps" [thumbLabel]="true" [tickInterval]="1"
+                    (click)="applyNewStreamingConf(selectedDetailStreamingFps, 'maxDetailFps');">
                 </mat-slider>
             </div>
         </div>
@@ -126,10 +193,16 @@
             <div class="row-btn">
                 <button id="EventsFilters-btn" mat-raised-button color="primary"
                     (click)="setEventsFilters(false)">{{'Filtra' }}</button>
-                <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset filters' }}</button>
+                <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset
+                    filters' }}</button>
             </div>
         </form>
-
     </mat-expansion-panel>
+
+    <div *ngIf="isLoadedFromDb === true" id="settings-actions">
+        <p id="settings-loaded-from">{{ (isLoadedFromDb === true) ? 'Settings loaded from: DB' : 'Settings loaded from:
+            JSON' }}</p>
+        <button  mat-raised-button color="accent" (click)="restetConfigDB()">{{'Reset DB Config' }}</button>
+    </div>
 
 </mat-accordion>

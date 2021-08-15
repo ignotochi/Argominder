@@ -9,3 +9,10 @@ export enum streamingConf {
     maxLiveFps = 'maxLiveFps',
     maxDetailFps = 'maxDetailFps',
 }
+
+export enum streamingSettings{
+    liveStreamingScale = 'liveStreamingScale',
+    detailStreamingScale = 'detailStreamingScale',
+    liveStreamingMaxFps = 'liveStreamingMaxFps',
+    detailStreamingMaxfps = 'detailStreamingMaxfps',
+}

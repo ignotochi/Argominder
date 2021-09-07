@@ -1,7 +1,7 @@
 # Argominder
 A simple and fast user interface for zoneminder In Angular12 + material. 
 
-# Argominder development Status: 52%
+# Argominder development Status: 58%
 Current state of development
 
 # What Argominder will do?

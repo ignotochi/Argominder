@@ -135,7 +135,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     ))
   }
 
-  mapDBValueSettings(result: DbConfgigObject[]) { 
+  mapDBValueSettings(result: DbConfgigObject[]) {
     result.some(conf => {
       if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
         this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);
@@ -171,7 +171,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   }
 
   applyNewStreamingConf(value: number, type: string) {
-    this.streamingConfChanges.next([{ value: value, type: streamingConf[type] }]);
+    this.sharedService.applyNewStreamingConf(this.streamingConfChanges, value, type);
   }
 
   ifNewStreamingConf() {
@@ -196,7 +196,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   setDefaultTime() {
     const timeNow = new Date();
     const defaulHour = timeNow.getHours();
-    const defaultMinute = timeNow.getMinutes();
+    const defaultMinute = timeNow.getMinutes() < 10 ? '0' + timeNow.getMinutes() : timeNow.getMinutes();
     this.dateRange.startTime = (defaulHour - 1).toString() + ':' + defaultMinute.toString();
     this.dateRange.endTime = (defaulHour).toString() + ':' + defaultMinute.toString();
   }
@@ -210,14 +210,13 @@ export class ConfigComponent implements OnInit, AfterViewInit {
 
   setEventsFilters(isOnLoad: boolean) {
     this.endtDateFIlter = this.startDateFilter;
-    this.sharedService.eventsFilterSearch.next({
-      startDate: this.converDateFormat(this.startDateFilter),
-      endDate: this.converDateFormat(this.endtDateFIlter),
-      startTime: this.dateRange.startTime,
-      endTime: this.dateRange.endTime,
-      cam: this.selectedCam.id,
-    });
-    if (!isOnLoad) {
+    this.sharedService.applyNewEventsFilters(
+      this.converDateFormat(this.startDateFilter),
+      this.converDateFormat(this.endtDateFIlter),
+      this.dateRange.startTime, this.dateRange.endTime,
+      this.selectedCam.id);
+    
+      if (!isOnLoad) {
       this.showDateRangeSpinner = true;
       this.sharedService.getEventFiltersConf().subscribe(result => {
         setTimeout(() => {
@@ -233,13 +232,12 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   resetFilters() {
     this.setDefaultTime();
     const currentDate = new Date();
-    this.sharedService.eventsFilterSearch.next({
-      startDate: this.converDateFormat(currentDate),
-      endDate: this.converDateFormat(currentDate),
-      startTime: this.dateRange.startTime,
-      endTime: this.dateRange.endTime,
-      cam: null,
-    });
+    this.sharedService.resetEventsFilters(
+      this.converDateFormat(currentDate),
+      this.converDateFormat(currentDate),
+      this.dateRange.startTime, 
+      this.dateRange.endTime,
+      null);   
     this.startDateFilter = currentDate;
     this.selectedCam = { name: null, id: null };
   }
@@ -249,8 +247,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   }
 
   relaodLiveStreaming() {
-    this.sharedService.previewStatus.next(true);
-    this.sharedService.previewStatus.next(false);
+    this.sharedService.relaodLiveStreaming();
   }
 
   setLiveStreamingScale(value: number) {

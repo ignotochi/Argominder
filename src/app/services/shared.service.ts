@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { streamingEventMode } from '../enums/enums';
+import { streamingConf, streamingEventMode } from '../enums/enums';
 import { previewType } from '../enums/preview-enum';
 import { ICamRegistry } from '../interfaces/ICamRegistry';
+import { IConfigStreaming } from '../interfaces/IConfStreaming';
 import { IEventsFilter } from '../interfaces/IEventsFilter';
 import { IStreamProperties } from '../interfaces/IStreamProperties';
 
@@ -62,5 +63,32 @@ export class SharedService {
     if (detail === previewType.streamingDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;
     if (detail === previewType.eventDetail) return 'Name: ' + camName + ' | ' + 'Start time: ' + starTime + ' | ' + ' Score: ' + score + ' | ' + ' Length: ' + length;
   }
+
+
+  applyNewStreamingConf(confChanges: BehaviorSubject<IConfigStreaming[]>,value: number, type: string) {
+    confChanges.next([{ value: value, type: streamingConf[type] }]);
+  }
+
+  applyNewEventsFilters(startDate: string, endDate: string, startTime: string, endTime: string, cam: string) {
+    this.eventsFilterSearch.next({startDate, endDate, startTime, endTime, cam});
+  }
+
+  resetEventsFilters(startDate: string, endDate: string, startTime: string, endTime: string, cam: string) {
+    this.eventsFilterSearch.next({startDate, endDate, startTime, endTime, cam});
+  }
+
+  relaodLiveStreaming() {
+    this.previewStatus.next(true);
+    this.previewStatus.next(false);
+  }
+
+  setPreviewStatus(status: boolean) {
+    this.previewStatus.next(status);
+  }
+
+  setDiapason(diapason: ICamRegistry){
+    this.camDiapason.next([diapason]);
+  }
+
 
 }

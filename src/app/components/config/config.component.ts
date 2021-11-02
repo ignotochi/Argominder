@@ -104,7 +104,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
       switchMap((settingsDbObjects: DbConfgigObject[]) => {
         if (settingsDbObjects.length > 0) {
           defaultSettingsDb = settingsDbObjects.map(x => x);
-          this.isLoadedFromDb = true;
+          this.isLoadedFromDb = defaultSettingsDb.length > 0;
           return defaultSettingsDb;
         }
         else {
@@ -131,11 +131,11 @@ export class ConfigComponent implements OnInit, AfterViewInit {
         }
       })
     ).subscribe(() => (
-      this.mapDBValueSettings(defaultSettingsDb)
+      this.mapSettings(defaultSettingsDb)
     ))
   }
 
-  mapDBValueSettings(result: DbConfgigObject[]) {
+  mapSettings(result: DbConfgigObject[]) {
     result.some(conf => {
       if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
         this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);
@@ -159,7 +159,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     });
   }
 
-  restetConfigDB() {
+  restetDbConf() {
     this.dbService.clear(this.database).subscribe(() => {
       this.isLoadedFromDb = false;
       this.changeRef.markForCheck();

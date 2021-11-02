@@ -12,12 +12,10 @@ import { IStreamProperties } from '../interfaces/IStreamProperties';
 export class SharedService {
 
   streamProperties: IStreamProperties = {} as IStreamProperties;
-  eventStreamingMode: streamingEventMode;
-  
-  previewIsActive: boolean = false;
-  camSpecializedInfo: ICamRegistry[] = [{}];
   dateEventsRange: IEventsFilter = {} as IEventsFilter;
-  
+  camSpecializedInfo: ICamRegistry[] = [{}];
+  eventStreamingMode: streamingEventMode;
+  previewIsActive: boolean = false;
   previewStatus = new BehaviorSubject(this.previewIsActive);
   camDiapason = new BehaviorSubject(this.camSpecializedInfo);
   eventsFilterSearch = new BehaviorSubject(this.dateEventsRange);
@@ -89,6 +87,4 @@ export class SharedService {
   setDiapason(diapason: ICamRegistry){
     this.camDiapason.next([diapason]);
   }
-
-
 }

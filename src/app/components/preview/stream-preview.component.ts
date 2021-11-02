@@ -29,13 +29,13 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     ngAfterViewInit() {
-      this.sharedService.previewStatus.next(true);
+      this.sharedService.setPreviewStatus(true);
       
     }
 
     stopStreaming(): void {
       if (this.streaming) this.streaming.nativeElement.src = null;
-      this.sharedService.previewStatus.next(false);
+      this.sharedService.setPreviewStatus(false);
     }
 
     hideSpinners(loadStatus: boolean) {

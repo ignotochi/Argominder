@@ -102,7 +102,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
           Height: result.Monitor.Height,
         }
         this.sharedService.camSpecializedInfo.push(registry);
-        this.sharedService.camDiapason.next([registry]);
+        this.sharedService.setDiapason(registry);
       })
     }, (err: Error) => {
       console.log(err);

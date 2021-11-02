@@ -46,6 +46,20 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { StreamPreview } from './components/preview/stream-preview.component';
 import { SharedService } from './services/shared.service';
 
+import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
+
+const dbConfig: DBConfig  = {
+  name: 'ArgoDB',
+  version: 1.0,
+  objectStoresMeta: [{
+    store: 'settings',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'liveStreamingScale', keypath: 'liveStreamingScale', options: { unique: true } },
+    ]
+  }]
+};
+
 @NgModule({
   declarations: [
     ArgoMinderComponent,
@@ -55,6 +69,7 @@ import { SharedService } from './services/shared.service';
     StreamPreview
   ],
   imports: [
+    NgxIndexedDBModule.forRoot(dbConfig),
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,

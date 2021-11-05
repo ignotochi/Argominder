@@ -54,8 +54,8 @@ export class zmService {
     return this.urlBuilder.liveStreamDetail(camId, token, this.conf);
   }
 
-  getEventStreamDetail(eventId: string, token: string, mode: string) {
-    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf);
+  getEventStreamDetail(eventId: string, token: string, mode: string, frame: string) {
+    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf, frame);
   }
 
   getEventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string) {

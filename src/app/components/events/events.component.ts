@@ -72,7 +72,7 @@ export class EventsComponent implements BasePreviewDetail {
 
   getStreamPreview(eventId: string) {
     this.streamingMode = this.sharedService.eventStreamingMode;
-    return this.zmService.getEventStreamDetail(eventId, this.localToken, this.streamingMode);
+    return this.zmService.getEventStreamDetail(eventId, this.localToken, this.streamingMode, this.zmService.conf.detailStreamingMaxfps);
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {

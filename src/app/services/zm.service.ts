@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ILogin } from '../interfaces/ILogin';
 import { IMonitors } from '../interfaces/IMonitors';
 import { IConf } from '../interfaces/IConf';
@@ -31,14 +31,13 @@ export class zmService {
   }
 
   zmLogin(username: string, password: string) {
-    const buildedUrl = this.conf.protocol + this.conf.baseUrl + zmUrl.host + separators.slash + zmUrl.login + separators.dot + zmUrl.json + zmUrl.user +
-      separators.equal + username + separators.and + zmUrl.pass + separators.equal + password;
-    return this.http.get<ILogin>(buildedUrl);
+    const url = this.urlBuilder.login(username, password, this.conf);
+    return this.http.get<ILogin>(url);
   }
 
   getCamListInfo(token: string) {
-    const buildedUrl = this.conf.protocol + this.conf.baseUrl + zmUrl.monitors + separators.dot + zmUrl.json + zmUrl.token + separators.equal + token;
-    return this.http.get<IMonitors>(buildedUrl);
+    const url = this.urlBuilder.getCamListInfo(token, this.conf)
+    return this.http.get<IMonitors>(url);
   }
 
   getLiveStream(camId: string, token: string, index: number) {

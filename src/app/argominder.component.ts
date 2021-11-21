@@ -59,8 +59,9 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
 
   retrieveSession() {
     this.localToken = localStorage.getItem("accessToken") ? this.localToken = localStorage.getItem("accessToken") : this.localToken;
+    //Rivedere, non salvare Username e Passwd
     this.zmUsername = localStorage.getItem("username") ? this.zmUsername = localStorage.getItem("username") : this.zmUsername;
-    this.zmPassword = localStorage.getItem("password") ? this.zmPassword = localStorage.getItem("password") : this.zmPassword;
+    this.zmPassword = localStorage.getItem("password") ? this.zmPassword = localStorage.getItem("password") : this.zmPassword; 
     if (this.localToken.length > 0 && this.zmUsername.length > 0 && this.zmPassword.length > 0) {
       return true;
     } else {

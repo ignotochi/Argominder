@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Subscription } from "rxjs";
 import { streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
+import { IStreamProperties } from "src/app/interfaces/IStreamProperties";
 import { SharedService } from "src/app/services/shared.service";
 
 @Component({
@@ -8,34 +10,38 @@ import { SharedService } from "src/app/services/shared.service";
     templateUrl: 'stream-preview.component.html',
     styleUrls: ['./stream-preview.component.scss'],
   })
-  export class StreamPreview implements OnInit, AfterViewInit {
+  export class StreamPreview implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('streaming', { static: false }) streaming: ElementRef<HTMLImageElement>;
     @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
     @ViewChild('detailInfoPreview', { read: ElementRef }) detailInfoPreview: ElementRef<HTMLElement>;
 
-     streamUrl: string;
-     previewActive: boolean;
-     showInVideoElement: boolean;
+     private streamUrl: string;
+     public showInVideoElement: boolean;
+
+     private streamingProperties: IStreamProperties;
+     private streamingProperties$: Subscription;
 
     constructor(private sharedService: SharedService) {
-      this.streamUrl = this.sharedService.streamProperties.streamUrl;
-      this.previewActive = this.sharedService.previewIsActive;
+      this.streamingProperties$ = this.sharedService.getStreamingProperties().subscribe(result => { this.streamingProperties = result; });
+      this.streamUrl = this.streamingProperties.streamUrl;
     }
 
     ngOnInit() {
-      this.showInVideoElement = 
-      this.sharedService.streamProperties.previewType === previewType.eventDetail && 
-      this.sharedService.streamProperties.streamingMode === streamingEventMode.video ? true : false;
+      this.showInVideoElement = this.streamingProperties.previewType === previewType.eventDetail && this.streamingProperties.streamingMode === streamingEventMode.video ? true : false;
+    }
+
+    ngOnDestroy() {
+      this.streamingProperties$.unsubscribe()
     }
 
     ngAfterViewInit() {
-      this.sharedService.setPreviewStatus(true);
+      this.sharedService.updatePreviewStatus(true);
       
     }
 
     stopStreaming(): void {
       if (this.streaming) this.streaming.nativeElement.src = null;
-      this.sharedService.setPreviewStatus(false);
+      this.sharedService.updatePreviewStatus(false);
     }
 
     hideSpinners(loadStatus: boolean) {
@@ -58,7 +64,7 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     getPreviewInfo() {
-      return this.sharedService.getPreviewInfo(this.sharedService.streamProperties.camId, this.sharedService.streamProperties.previewType);
+      return this.sharedService.getPreviewInfo(this.streamingProperties.camId, this.streamingProperties.previewType);
     }
 
   }

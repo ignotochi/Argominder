@@ -21,7 +21,7 @@ export enum zmUrl {
     percent = '%20',
     endtime = 'EndTime%20<=:',
     startTime = 'StartTime%20>=:',
-    json = 'json?',
+    json = 'json',
     token = 'token',
     events = 'events/index/',
     monitorId = 'MonitorId',
@@ -48,4 +48,5 @@ export enum separators {
     question = '?',
     equal = '=',
     dot = '.',
+    doublePoints = ':'
 }

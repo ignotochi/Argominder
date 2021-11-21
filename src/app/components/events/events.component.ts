@@ -1,16 +1,20 @@
 import {
-  ChangeDetectionStrategy, Component, Input, ViewChild
+  AfterViewInit,
+  ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild
 }
   from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
+import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
+import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from '../../services/zm.service';
 import { StreamPreview } from '../preview/stream-preview.component';
@@ -22,7 +26,7 @@ import { StreamPreview } from '../preview/stream-preview.component';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class EventsComponent implements BasePreviewDetail {
+export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit, OnDestroy {
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }
@@ -34,6 +38,11 @@ export class EventsComponent implements BasePreviewDetail {
   public dataGrid: MatTableDataSource<object>;
   public streamingMode: streamingEventMode;
 
+  private cambDiapason: ICamRegistry[];
+  private camDiapason$: Subscription;
+
+  private streamingProperties$: Subscription;
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -42,6 +51,7 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   ngOnInit() {
+    this.camDiapason$ = this.sharedService.getCamRegistry().subscribe(result => { this.cambDiapason = result });
     this.getEvents();
   }
 
@@ -50,7 +60,8 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   ngOnDestroy() {
-
+   this.camDiapason$.unsubscribe();
+   this.streamingProperties$.unsubscribe();
   }
 
   getEvents() {
@@ -71,13 +82,20 @@ export class EventsComponent implements BasePreviewDetail {
   }
 
   getStreamPreview(eventId: string) {
-    this.streamingMode = this.sharedService.eventStreamingMode;
+    this.sharedService.getStreamingProperties().subscribe(result => { this.streamingMode = result.eventStreamingMode });
     return this.zmService.getEventStreamDetail(eventId, this.localToken, this.streamingMode, this.zmService.conf.detailStreamingMaxfps);
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
-    this.sharedService.setStreamProperties(previewType.eventDetail, this.getStreamPreview(eventId), camId, this.streamingMode),
-      this.sharedService.camSpecializedInfo.find(cam => {
+    const streamingProperties: IStreamProperties = {
+      previewType: previewType.eventDetail,
+      streamUrl: this.getStreamPreview(eventId),
+      camId: camId,
+      streamingMode: this.streamingMode,
+      eventStreamingMode: null
+    } 
+    this.sharedService.updateStreamingProperties(streamingProperties);  
+    this.cambDiapason.find(cam => {
         if (cam.Id === camId) {
           cam.StartTime = startTime;
           cam.Length = length;
@@ -90,14 +108,14 @@ export class EventsComponent implements BasePreviewDetail {
   loadPreview(target: HTMLElement): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.flushStreamProperties();
+      this.sharedService.updateStreamingProperties({} as IStreamProperties);
       this.markEvent(target);
     });
   }
 
   getCamName(camId: string) {
-    if (this.sharedService.camSpecializedInfo.find(cam => (cam.Id === camId))) {
-      return this.sharedService.camSpecializedInfo.find(cam => cam.Id === camId).Name;
+    if (this.cambDiapason.find(cam => (cam.Id === camId))) {
+      return this.cambDiapason.find(cam => cam.Id === camId).Name;
     }
   }
 
@@ -112,8 +130,5 @@ export class EventsComponent implements BasePreviewDetail {
   markEvent(target: HTMLElement) {
     if (!target.className.includes('eventShown')) target.classList.add('eventShown');
   }
-
-
-
 
 }

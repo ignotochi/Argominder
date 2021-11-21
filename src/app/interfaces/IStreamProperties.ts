@@ -6,4 +6,6 @@ export interface IStreamProperties {
     camId: string;
     previewType: previewType;
     streamingMode: streamingEventMode;
+    eventStreamingMode: streamingEventMode;
+
 }

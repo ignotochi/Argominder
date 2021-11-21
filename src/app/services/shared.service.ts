@@ -9,82 +9,97 @@ import { IStreamProperties } from '../interfaces/IStreamProperties';
 
 @Injectable()
 
-export class SharedService {
-
-  streamProperties: IStreamProperties = {} as IStreamProperties;
-  dateEventsRange: IEventsFilter = {} as IEventsFilter;
-  camSpecializedInfo: ICamRegistry[] = [{}];
-  eventStreamingMode: streamingEventMode;
-  previewIsActive: boolean = false;
-  previewStatus = new BehaviorSubject(this.previewIsActive);
-  camDiapason = new BehaviorSubject(this.camSpecializedInfo);
-  eventsFilterSearch = new BehaviorSubject(this.dateEventsRange);
+export class SharedService { 
+  private previewStatus = new BehaviorSubject(false);
+  private camDiapason = new BehaviorSubject(null as ICamRegistry[]);
+  private eventsFilterSearch = new BehaviorSubject({} as IEventsFilter);
+  private streamingConfChanges = new BehaviorSubject(null as IConfigStreaming[]);
+  private streamingProperties = new BehaviorSubject({} as IStreamProperties);
 
   constructor() {
   }
 
-  getCamRegistry(): Observable<ICamRegistry[]> {
-    return this.camDiapason;
-  }
-
-  getPreviewStatus(): Observable<boolean> {
-    return this.previewStatus;
-  }
-
-  getEventFiltersConf(): Observable<IEventsFilter> {
-    return this.eventsFilterSearch;
-  }
-
-  setStreamProperties(previewType: previewType, streamUrl: string, camId: string, streamingMode: streamingEventMode) {
-    this.streamProperties.previewType = previewType;
-    this.streamProperties.streamUrl = streamUrl;
-    this.streamProperties.camId = camId;
-    this.streamProperties.streamingMode = streamingMode;
-  }
-
-  flushStreamProperties() {
-    this.streamProperties = {} as IStreamProperties;
-  }
-
-  getPreviewInfo(camId: string, detail: previewType) {
-    const camName = this.camSpecializedInfo.find(cam => cam.Id === camId).Name;
-    const camMaxFps = this.camSpecializedInfo.find(cam => cam.Id === camId).MaxFPS;
-    const camWidth = this.camSpecializedInfo.find(cam => cam.Id === camId).Width;
-    const camHeigth = this.camSpecializedInfo.find(cam => cam.Id === camId).Height;
-    const dayEvents = this.camSpecializedInfo.find(cam => cam.Id === camId).DayEvents;
-    const functionMode = this.camSpecializedInfo.find(cam => cam.Id === camId).Function;
-    const starTime = this.camSpecializedInfo.find(cam => cam.Id === camId).StartTime;
-    const score = this.camSpecializedInfo.find(cam => cam.Id === camId).MaxScore;
-    const length = this.camSpecializedInfo.find(cam => cam.Id === camId).Length;
+  public getPreviewInfo(camId: string, detail: previewType) {
+    const selectedCam = this.camDiapason.getValue().find(cam => cam.Id === camId);
+    const camName = selectedCam.Name;
+    const camMaxFps = selectedCam.MaxFPS;
+    const camWidth = selectedCam.Width;
+    const camHeigth = selectedCam.Height;
+    const dayEvents = selectedCam.DayEvents;
+    const functionMode = selectedCam.Function;
+    const starTime = selectedCam.StartTime;
+    const score = selectedCam.MaxScore;
+    const length = selectedCam.Length;
 
     if (detail === previewType.streaming) return camName + ' | ' + camMaxFps + ' fps' + ' | ' + camWidth + ' px' + ' | ' + camHeigth + ' px';
     if (detail === previewType.streamingDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;
     if (detail === previewType.eventDetail) return 'Name: ' + camName + ' | ' + 'Start time: ' + starTime + ' | ' + ' Score: ' + score + ' | ' + ' Length: ' + length;
   }
 
+  public updateStreamingProperties(properties: IStreamProperties): void {
+    this.streamingProperties.next(properties);
 
-  applyNewStreamingConf(confChanges: BehaviorSubject<IConfigStreaming[]>,value: number, type: string) {
-    confChanges.next([{ value: value, type: streamingConf[type] }]);
   }
 
-  applyNewEventsFilters(startDate: string, endDate: string, startTime: string, endTime: string, cam: string) {
-    this.eventsFilterSearch.next({startDate, endDate, startTime, endTime, cam});
+  public getStreamingProperties(): Observable<IStreamProperties> {
+    return this.streamingProperties;
   }
 
-  resetEventsFilters(startDate: string, endDate: string, startTime: string, endTime: string, cam: string) {
-    this.eventsFilterSearch.next({startDate, endDate, startTime, endTime, cam});
+  public completeStreamingProperties(): void {
+    this.streamingProperties.complete();
   }
 
-  relaodLiveStreaming() {
-    this.previewStatus.next(true);
+  public updateStreamingConf(value: number, type: string): void {
+    this.streamingConfChanges.next([{ value: value, type: streamingConf[type] }]);
+  }
+
+  public getStreamingConf(): Observable<IConfigStreaming[]> {
+    return this.streamingConfChanges;
+  }
+
+  public completeStreamingConf(): void {
+    this.streamingConfChanges.complete();
+  }
+
+  public updateEventsFilters(filters: IEventsFilter): void {
+    this.eventsFilterSearch.next(filters);
+  }
+
+  public getEventFiltersConf(): Observable<IEventsFilter> {
+    return this.eventsFilterSearch;
+  }
+
+  public completeEventsFiltersSubject(): void {
+    this.eventsFilterSearch.complete();
+  }
+
+  public relaodLiveStreaming(): void {
+    this.previewStatus.next(true); 
     this.previewStatus.next(false);
   }
 
-  setPreviewStatus(status: boolean) {
+  public updatePreviewStatus(status: boolean): void {
     this.previewStatus.next(status);
   }
 
-  setDiapason(diapason: ICamRegistry){
+  public getPreviewStatus(): Observable<boolean> {
+    return this.previewStatus;
+  }
+
+  public completeLiveStreamingSubject(): void {
+    this.previewStatus.complete();
+  }
+
+  public updateDiapason(diapason: ICamRegistry): void {
     this.camDiapason.next([diapason]);
   }
+
+  public getCamRegistry(): Observable<ICamRegistry[]> {
+    return this.camDiapason;
+  }
+
+  public completeDiapasonSubject(): void {
+    this.camDiapason.complete();
+  }
+  
 }

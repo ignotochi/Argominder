@@ -1,12 +1,15 @@
 import {
-  ChangeDetectionStrategy, Component, ElementRef, Input, QueryList, ViewChildren
+  AfterViewInit,
+  ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, ViewChildren
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
+import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from '../../services/zm.service';
 import { StreamPreview } from '../preview/stream-preview.component';
@@ -17,19 +20,19 @@ import { StreamPreview } from '../preview/stream-preview.component';
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class LiveStreamComponent implements BasePreviewDetail {
+export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy, AfterViewInit {
+
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
   @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
-
 
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
-  public detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
+  private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
 
   constructor(private zmService: zmService, public sharedService: SharedService, private dialog: MatDialog) {
@@ -43,6 +46,7 @@ export class LiveStreamComponent implements BasePreviewDetail {
   }
 
   ngOnInit() {
+
   }
 
   ngAfterViewInit() {
@@ -101,8 +105,8 @@ export class LiveStreamComponent implements BasePreviewDetail {
           Width: result.Monitor.Width,
           Height: result.Monitor.Height,
         }
-        this.sharedService.camSpecializedInfo.push(registry);
-        this.sharedService.setDiapason(registry);
+        //this.sharedService.camSpecializedInfo.push(registry);
+        this.sharedService.updateDiapason(registry);
       })
     }, (err: Error) => {
       console.log(err);
@@ -149,8 +153,15 @@ export class LiveStreamComponent implements BasePreviewDetail {
   setPreview(value: boolean, stream: string, camId: string) {
     this.showInfoDetail = false;
     this.detail = { enabled: value, stream: stream };
-    this.sharedService.setStreamProperties(previewType.streamingDetail, this.detail.stream, camId, null),
-    this.sharedService.previewIsActive = true;
+    const streamingProperties: IStreamProperties = {
+      previewType: previewType.streamingDetail,
+      streamUrl: this.detail.stream,
+      camId: camId,
+      streamingMode: null,
+      eventStreamingMode: null
+    }
+    this.sharedService.updateStreamingProperties(streamingProperties);    
+    this.sharedService.updatePreviewStatus(true);
     this.loadPreview();
   }
 
@@ -158,8 +169,8 @@ export class LiveStreamComponent implements BasePreviewDetail {
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.flushStreamProperties();
-      this.sharedService.previewIsActive = false;
+      this.sharedService.updateStreamingProperties({} as IStreamProperties);
+      this.sharedService.updatePreviewStatus(false);
     });
   }
 

@@ -4,6 +4,17 @@ import { IConf } from "../interfaces/IConf";
 export class UrlsBuilder {
   constructor() { }
 
+  login(username: string, password: string, conf: IConf) {
+    const buildedUrl = conf.protocol + conf.baseUrl + zmUrl.host + separators.slash + zmUrl.login + separators.dot + zmUrl.json + separators.question + zmUrl.user +
+      separators.equal + username + separators.and + zmUrl.pass + separators.equal + password;
+    return buildedUrl;
+  }
+
+  getCamListInfo(token: string, conf: IConf) {
+    const buildedUrl = conf.protocol + conf.baseUrl + zmUrl.monitors + separators.dot + zmUrl.json + separators.question + zmUrl.token + separators.equal + token;
+    return buildedUrl;
+  }
+
   liveStream(camId: string, token: string, streamUrl: string, conf: IConf): string {
     const buildedUrl = conf.protocol + streamUrl + zmUrl.cgiBinPath + separators.question + zmUrl.scale + separators.equal + conf.liveStreamingScale + separators.and +
       zmUrl.mode + separators.equal + streamingEventMode.jpeg + separators.and + zmUrl.maxfps + separators.equal + conf.liveStreamingMaxFps + separators.and +
@@ -33,9 +44,9 @@ export class UrlsBuilder {
   }
 
   eventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string, conf: IConf): string {
-    const monitor = ((camId !== null || camId !== undefined) ? (zmUrl.monitorId + camId + separators.slash + zmUrl.startTime) : (zmUrl.startTime + separators.slash));
+    const monitor = ((camId !== null || camId !== undefined) ? (zmUrl.monitorId + separators.doublePoints + camId + separators.slash + zmUrl.startTime) : (zmUrl.startTime + separators.slash));
     const buildedUrl = conf.protocol + conf.baseUrl + zmUrl.events + monitor + startDate + zmUrl.percent + startTime +
-      zmUrl.endtime + endDate + zmUrl.percent + endTime + separators.dot + zmUrl.json + zmUrl.token + separators.equal + token;
+      zmUrl.endtime + endDate + zmUrl.percent + endTime + separators.dot + zmUrl.json + separators.question + zmUrl.token + separators.equal + token;
     return buildedUrl;
   }
 

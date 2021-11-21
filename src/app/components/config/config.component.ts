@@ -1,14 +1,15 @@
 import {
-  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit,
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnDestroy
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { streamingConf, streamingEventMode, streamingSettings } from 'src/app/enums/enums';
 import { IConfigStreaming } from 'src/app/interfaces/IConfStreaming';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
+import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from 'src/app/services/zm.service';
 
@@ -24,23 +25,23 @@ export interface DbConfgigObject {
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class ConfigComponent implements OnInit, AfterViewInit {
+export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }
   private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
-  public panelOpenState = false;
+  private panelOpenState = false;
   public dateRange: IEventsFilter = {} as IEventsFilter;
   public showDateRangeSpinner: boolean = false;
   public startDateFilter: Date = new Date();
-  public endtDateFIlter: Date = null;
-  public camSelection = new FormControl();
+  private endtDateFIlter: Date = null;
+  private camSelection = new FormControl();
   public camsList: { name: string, id: string }[] = [];
   public selectedCam: { name: string, id: string } = { name: null, id: null };
   public eventStreamMode: { name: string, value: streamingEventMode }[] = [];
   public selectedEventMode: streamingEventMode;
-  public database: string = 'settings';
+  private database: string = 'settings';
 
   public liveStreamingMaxScale = 100;
   public liveStreamingMinScale = 5;
@@ -58,10 +59,12 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   public detailStreamingMinFps = 1;
   public selectedDetailStreamingFps: number = null;
 
-  public newStreamingParametrs: IConfigStreaming[] = [{}] as IConfigStreaming[];
-  public streamingConfChanges = new BehaviorSubject(this.newStreamingParametrs);
-
   public isLoadedFromDb: boolean;
+  
+  private camRegestry$: Subscription;
+  private streamingConf$: Subscription;
+  private eventFilters$: Subscription;
+  private streamingProperties$: Subscription;
 
 
   constructor(public sharedService: SharedService, public zmService: zmService, private changeRef: ChangeDetectorRef, private dbService: NgxIndexedDBService) {
@@ -71,7 +74,7 @@ export class ConfigComponent implements OnInit, AfterViewInit {
       this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
     })
     this.setDefaulEventStreamingConf(streamModes)
-    this.selectedEventMode = this.sharedService.eventStreamingMode;
+    this.streamingProperties$ = this.sharedService.getStreamingProperties().subscribe(result => { this.selectedEventMode = result.eventStreamingMode });
     this.popolateSettingsDB();
     this.ifNewStreamingConf();
   }
@@ -79,19 +82,25 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   setDefaulEventStreamingConf(streamModes: string[]) {
     const defaultEventStreamMode = this.zmService.conf.defaultEventStreamingMode;
     const defaultModeToEnum = streamingEventMode[streamModes.find(mode => (mode === defaultEventStreamMode))];
-    this.sharedService.eventStreamingMode = defaultModeToEnum;
+    this.sharedService.updateStreamingProperties({eventStreamingMode: defaultModeToEnum} as IStreamProperties);
   }
 
   ngOnInit() {
-    this.setEventsFilters(true);
-    this.sharedService.getCamRegistry().subscribe(result => {
-      result.forEach(ele => {
+    this.setEventsFilters(true);    
+    this.camRegestry$ = this.sharedService.getCamRegistry().subscribe(result => { result.forEach(ele => {
         if (ele.Name && ele.Id) {
           this.camsList.push({ name: ele.Name, id: ele.Id });
         }
       });
     })
     if (!window.indexedDB) { console.log("Il tuo browser non supporta indexedDB"); }
+  }
+
+  ngOnDestroy() {
+    this.camRegestry$.unsubscribe();
+    this.streamingConf$.unsubscribe();
+    this.eventFilters$.unsubscribe();
+    this.streamingProperties$.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -166,16 +175,13 @@ export class ConfigComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getStreamingConf(): Observable<IConfigStreaming[]> {
-    return this.streamingConfChanges;
-  }
 
   applyNewStreamingConf(value: number, type: string) {
-    this.sharedService.applyNewStreamingConf(this.streamingConfChanges, value, type);
+    this.sharedService.updateStreamingConf(value, type);
   }
 
   ifNewStreamingConf() {
-    this.getStreamingConf().subscribe(result => {
+    this.streamingConf$ = this.sharedService.getStreamingConf().subscribe(result => {
       result.map(data => {
         if (data.type === streamingConf.liveStreaming) {
           this.setLiveStreamingScale(data.value);
@@ -210,16 +216,17 @@ export class ConfigComponent implements OnInit, AfterViewInit {
 
   setEventsFilters(isOnLoad: boolean) {
     this.endtDateFIlter = this.startDateFilter;
-    this.sharedService.applyNewEventsFilters(
-      this.converDateFormat(this.startDateFilter),
-      this.converDateFormat(this.endtDateFIlter),
-      this.dateRange.startTime, this.dateRange.endTime,
-      this.selectedCam.id);
-    
+    const filters: IEventsFilter = {
+      startDate: this.converDateFormat(this.startDateFilter),
+      endDate: this.converDateFormat(this.endtDateFIlter),
+      startTime: this.dateRange.startTime,
+      endTime: this.dateRange.endTime,
+      cam: this.selectedCam.id
+    }
+    this.sharedService.updateEventsFilters(filters); 
       if (!isOnLoad) {
       this.showDateRangeSpinner = true;
-      this.sharedService.getEventFiltersConf().subscribe(result => {
-        setTimeout(() => {
+      this.eventFilters$ = this.sharedService.getEventFiltersConf().subscribe(result => { setTimeout(() => {
           if (result) {
             this.showDateRangeSpinner = false;
             this.changeRef.markForCheck();
@@ -232,18 +239,20 @@ export class ConfigComponent implements OnInit, AfterViewInit {
   resetFilters() {
     this.setDefaultTime();
     const currentDate = new Date();
-    this.sharedService.resetEventsFilters(
-      this.converDateFormat(currentDate),
-      this.converDateFormat(currentDate),
-      this.dateRange.startTime, 
-      this.dateRange.endTime,
-      null);   
+    const resettedfilters: IEventsFilter = {
+      startDate: this.converDateFormat(currentDate),
+      endDate: this.converDateFormat(currentDate),
+      startTime: this.dateRange.startTime,
+      endTime: this.dateRange.endTime,
+      cam: null
+    }
+    this.sharedService.updateEventsFilters(resettedfilters);   
     this.startDateFilter = currentDate;
     this.selectedCam = { name: null, id: null };
   }
 
   changeEventStreamingMode(mode: streamingEventMode) {
-    this.sharedService.eventStreamingMode = mode;
+    this.sharedService.updateStreamingProperties({eventStreamingMode: mode} as IStreamProperties);
   }
 
   relaodLiveStreaming() {

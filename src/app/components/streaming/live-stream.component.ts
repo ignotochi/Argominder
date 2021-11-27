@@ -38,8 +38,8 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
-  private configurationsList: IConfigurationsList = { 
-    camDiapason: [],eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges:[], streamingProperties:{} as IStreamProperties 
+  private configurationsList: IConfigurationsList = {
+    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
   };
   private dataChange$: Subscription;
   private streamChanges$: Subscription;
@@ -49,10 +49,11 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog) {
     this.configurations.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
-    this.dataChange$ = this.configurations.getDataChanges()?.pipe(filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
-      this.configurationsList = result.payload;
-      if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
-    })
+    this.dataChange$ = this.configurations.getDataChanges()?.pipe(
+      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
+        this.configurationsList = result.payload;
+        if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
+      })
   }
 
   ngAfterContentInit() {
@@ -70,7 +71,7 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
 
   ngAfterViewInit() {
     this.getCamList();
-    this.streamChanges$ = this.streams.changes.subscribe((result) => { if (result.length > 0) this.startStream(); });    
+    this.streamChanges$ = this.streams.changes.subscribe((result) => { if (result.length > 0) this.startStream(); });
   }
 
   showExpands(camId: string, loadStatus: boolean) {
@@ -90,9 +91,11 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   }
 
   loadDetailStreamInfo(camId: string) {
-    this.detailInfo.forEach(detail => { if (detail.nativeElement.getAttribute('id') === camId) {
-      detail.nativeElement.innerText = this.getPreviewInfo(camId);
-    }});
+    this.detailInfo.forEach(detail => {
+      if (detail.nativeElement.getAttribute('id') === camId) {
+        detail.nativeElement.innerText = this.getPreviewInfo(camId);
+      }
+    });
   }
 
   getStream(cam: string, index: number, status: string) {
@@ -174,7 +177,7 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
       streamUrl: this.detail.stream,
       camId: camId,
     } as IStreamProperties;
-    this.configurations.setStreamingProperties(streamingProperties);    
+    this.configurations.setStreamingProperties(streamingProperties);
     this.configurations.setPreviewStatus(true);
     this.loadPreview();
   }
@@ -189,8 +192,8 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   }
 
   previewStatus(previewStatus: boolean) {
-      if (previewStatus === true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
-      else if (previewStatus === false) { if (this.streams && this.streams.length > 0) this.startStream(); }
+    if (previewStatus === true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
+    else if (previewStatus === false) { if (this.streams && this.streams.length > 0) this.startStream(); }
   }
 
   getPreviewInfo(camId: string) {

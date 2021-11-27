@@ -45,10 +45,10 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
   }
 
   ngOnInit() {
-    this.configurationList$ = this.configurations.getDataChanges().subscribe(result => { 
+    this.configurationList$ = this.configurations.getDataChanges().subscribe(result => {
       this.configurationList = result.payload;
       if (result.payload.eventsFilter) this.getEvents();
-     });
+    });
   }
 
   ngAfterViewInit() {
@@ -95,7 +95,7 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
       streamingMode: this.configurationList.streamingProperties.streamingMode,
       eventStreamingMode: null
     }
-    this.configurations.setStreamingProperties(streamingProperties);   
+    this.configurations.setStreamingProperties(streamingProperties);
     this.configurationList.camDiapason.find(cam => {
       if (cam.Id === camId) {
         cam.StartTime = startTime;
@@ -109,7 +109,7 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
   loadPreview(target: HTMLElement): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.configurations.setStreamingProperties({} as IStreamProperties);  
+      this.configurations.setStreamingProperties({} as IStreamProperties);
       this.markEvent(target);
     });
   }

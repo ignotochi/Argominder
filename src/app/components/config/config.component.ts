@@ -69,12 +69,16 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
       this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
     })
     this.setDefaulEventStreamingConf(streamModes)
-    this.configurationList$ = this.configurations.getDataChanges().pipe(filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.StreamingConfChanges || tt.action === configurationsActions.EventsFilter)).subscribe(result => {
-      if (result.action === configurationsActions.CamDiapason) this.mapCamsNames(result.payload.camDiapason);
-      if (result.action === configurationsActions.StreamingConfChanges) this.detectNewStreamingConf(result.payload.streamingConfChanges);
-      if (result.action === configurationsActions.EventsFilter) this.setEventsFilters(false, result.payload.eventsFilter);
-      this.configurationsList = result.payload;
-    });
+    this.configurationList$ = this.configurations.getDataChanges().pipe(
+      filter(
+        tt => tt.action === configurationsActions.CamDiapason ||
+        tt.action === configurationsActions.StreamingConfChanges ||
+        tt.action === configurationsActions.EventsFilter)).subscribe(result => {
+          if (result.action === configurationsActions.CamDiapason) this.mapCamsNames(result.payload.camDiapason);
+          if (result.action === configurationsActions.StreamingConfChanges) this.detectNewStreamingConf(result.payload.streamingConfChanges);
+          if (result.action === configurationsActions.EventsFilter) this.setEventsFilters(false, result.payload.eventsFilter);
+          this.configurationsList = result.payload;
+        });
     this.popolateSettingsDB();
   }
 

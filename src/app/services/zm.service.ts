@@ -6,6 +6,8 @@ import { IConf } from '../interfaces/IConf';
 import { ICamEvents } from '../interfaces/ICamEvent';
 import { separators, streamingEventMode, zmUrl } from '../enums/enums';
 import { UrlsBuilder } from '../core/build-urls';
+import { previewType } from '../enums/preview-enum';
+import { ICamRegistry } from '../interfaces/ICamRegistry';
 
 @Injectable()
 
@@ -20,6 +22,23 @@ export class zmService {
 
   constructor(private http: HttpClient) {
 
+  }
+
+  public getPreviewInfo(camDiapason: ICamRegistry[], camId: string, detail: previewType) {
+    const selectedCam = camDiapason.find(cam => cam.Id === camId);
+    const camName = selectedCam.Name;
+    const camMaxFps = selectedCam.MaxFPS;
+    const camWidth = selectedCam.Width;
+    const camHeigth = selectedCam.Height;
+    const dayEvents = selectedCam.DayEvents;
+    const functionMode = selectedCam.Function;
+    const starTime = selectedCam.StartTime;
+    const score = selectedCam.MaxScore;
+    const length = selectedCam.Length;
+
+    if (detail === previewType.streaming) return camName + ' | ' + camMaxFps + ' fps' + ' | ' + camWidth + ' px' + ' | ' + camHeigth + ' px';
+    if (detail === previewType.streamingDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;
+    if (detail === previewType.eventDetail) return 'Name: ' + camName + ' | ' + 'Start time: ' + starTime + ' | ' + ' Score: ' + score + ' | ' + ' Length: ' + length;
   }
 
   getConfigurationFile() {

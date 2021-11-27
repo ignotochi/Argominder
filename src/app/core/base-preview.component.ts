@@ -20,6 +20,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
     ngOnDestroy() {
 
     }
+    
 
     abstract loadPreview(target?: HTMLElement): void;
 

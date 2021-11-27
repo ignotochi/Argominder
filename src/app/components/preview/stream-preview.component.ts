@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { Subscription } from "rxjs";
-import { streamingEventMode } from "src/app/enums/enums";
+import { filter } from "rxjs/operators";
+import { configurationsActions, streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
-import { IStreamProperties } from "src/app/interfaces/IStreamProperties";
-import { SharedService } from "src/app/services/shared.service";
+import { zmService } from '../../services/zm.service';
+import { ChangeDetectorConfigurations } from "../detectors/configurations.service";
+import { Subscription } from "rxjs";
+import { IConfigurationsList } from "src/app/interfaces/IConfigurationsList";
 
 @Component({
     selector: 'stream-preview',
@@ -15,33 +17,34 @@ import { SharedService } from "src/app/services/shared.service";
     @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
     @ViewChild('detailInfoPreview', { read: ElementRef }) detailInfoPreview: ElementRef<HTMLElement>;
 
-     private streamUrl: string;
+     public streamUrl: string;
      public showInVideoElement: boolean;
-
-     private streamingProperties: IStreamProperties;
-     private streamingProperties$: Subscription;
-
-    constructor(private sharedService: SharedService) {
-      this.streamingProperties$ = this.sharedService.getStreamingProperties().subscribe(result => { this.streamingProperties = result; });
-      this.streamUrl = this.streamingProperties.streamUrl;
+     private dataChange$: Subscription;
+     public configurationsList: IConfigurationsList;
+     
+    constructor(private configurations: ChangeDetectorConfigurations, private zmService: zmService) {
+      this.dataChange$ = this.configurations.getDataChanges().pipe(filter(tt => (tt.action === configurationsActions.StreamingProperties || tt.action === configurationsActions.CamDiapason))).subscribe(result => { 
+        this.configurationsList = result.payload;
+      });
+      this.configurationsList = this.configurations.getDataChangesValues().payload;
     }
 
     ngOnInit() {
-      this.showInVideoElement = this.streamingProperties.previewType === previewType.eventDetail && this.streamingProperties.streamingMode === streamingEventMode.video ? true : false;
+      this.streamUrl = this.configurationsList.streamingProperties.streamUrl;
+      this.showInVideoElement = this.configurationsList.streamingProperties.previewType === previewType.eventDetail && this.configurationsList.streamingProperties.streamingMode === streamingEventMode.video ? true : false;
     }
 
     ngOnDestroy() {
-      this.streamingProperties$.unsubscribe()
+      this.dataChange$.unsubscribe();
     }
 
     ngAfterViewInit() {
-      this.sharedService.updatePreviewStatus(true);
-      
+      this.configurations.setPreviewStatus(true);
     }
 
     stopStreaming(): void {
       if (this.streaming) this.streaming.nativeElement.src = null;
-      this.sharedService.updatePreviewStatus(false);
+      this.configurations.setPreviewStatus(false);
     }
 
     hideSpinners(loadStatus: boolean) {
@@ -64,7 +67,7 @@ import { SharedService } from "src/app/services/shared.service";
     }
 
     getPreviewInfo() {
-      return this.sharedService.getPreviewInfo(this.streamingProperties.camId, this.streamingProperties.previewType);
+      return this.zmService.getPreviewInfo(this.configurationsList.camDiapason, this.configurationsList.streamingProperties.camId, this.configurationsList.streamingProperties.previewType);
     }
 
   }

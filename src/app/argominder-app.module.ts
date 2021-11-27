@@ -44,9 +44,10 @@ import { EventsComponent } from './components/events/events.component';
 import { ConfigComponent } from './components/config/config.component';
 import { MatNativeDateModule } from '@angular/material/core';
 import { StreamPreview } from './components/preview/stream-preview.component';
-import { SharedService } from './services/shared.service';
+import { DataStoreDetector } from './services/change-detector.service';
 
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
+import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
 
 const dbConfig: DBConfig  = {
   name: 'ArgoDB',
@@ -109,7 +110,7 @@ const dbConfig: DBConfig  = {
     MatPaginatorModule,
     MatNativeDateModule,
   ],
-  providers: [zmService, SharedService],
+  providers: [zmService, ChangeDetectorConfigurations],
   bootstrap: [ArgoMinderComponent]
 })
 export class ArgoMinderModule { }

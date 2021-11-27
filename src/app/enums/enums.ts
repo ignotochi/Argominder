@@ -50,3 +50,16 @@ export enum separators {
     dot = '.',
     doublePoints = ':'
 }
+
+export enum configurationsActions {
+    All = "All",
+    PreviewStatus = "PreviewStatus",
+    CamDiapason = "CamDiapason",
+    EventsFilter = "EventsFilter",
+    StreamingConfChanges = "StreamingConfChanges",
+    StreamingProperties = "StreamingProperties",
+}
+
+export interface Enum {
+    [id: number]: string;
+  }

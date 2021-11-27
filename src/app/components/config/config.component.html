@@ -11,7 +11,7 @@
 
         <mat-form-field appearance="fill">
             <mat-label>Event Streaming Mode</mat-label>
-            <mat-select [(value)]="selectedEventMode">
+            <mat-select [(value)]="configurationsList.streamingProperties.eventStreamingMode">
                 <mat-option *ngFor="let mode of eventStreamMode" [value]="mode.value"
                     (click)="changeEventStreamingMode(mode.value)">{{ mode.name}}</mat-option>
             </mat-select>

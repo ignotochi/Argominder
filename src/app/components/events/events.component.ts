@@ -3,20 +3,18 @@ import {
   ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild
 }
   from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
 import { BasePreviewDetail } from 'src/app/core/base-preview.component';
-import { streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
-import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
+import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { SharedService } from 'src/app/services/shared.service';
 import { zmService } from '../../services/zm.service';
+import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
 @Component({
@@ -36,23 +34,21 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
   public datasource: ICamEvents = (<ICamEvents>{ events: [], pagination: {} });
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
-  public streamingMode: streamingEventMode;
-
-  private cambDiapason: ICamRegistry[];
-  private camDiapason$: Subscription;
-
-  private streamingProperties$: Subscription;
+  private configurationList: IConfigurationsList;
+  private configurationList$: Subscription;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private zmService: zmService, private dialog: MatDialog, public sharedService: SharedService) {
+  constructor(private zmService: zmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations) {
     this.showPreview = false;
   }
 
   ngOnInit() {
-    this.camDiapason$ = this.sharedService.getCamRegistry().subscribe(result => { this.cambDiapason = result });
-    this.getEvents();
+    this.configurationList$ = this.configurations.getDataChanges().subscribe(result => { 
+      this.configurationList = result.payload;
+      if (result.payload.eventsFilter) this.getEvents();
+     });
   }
 
   ngAfterViewInit() {
@@ -60,15 +56,17 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
   }
 
   ngOnDestroy() {
-   this.camDiapason$.unsubscribe();
-   this.streamingProperties$.unsubscribe();
+    this.configurationList$.unsubscribe();
   }
 
   getEvents() {
-    this.sharedService.getEventFiltersConf().pipe(
-      switchMap((dataRange) => {
-        return this.zmService.getEventsList(this.localToken, dataRange.startDate, dataRange.endDate, dataRange.startTime, dataRange.endTime, dataRange.cam)
-      })
+    this.zmService.getEventsList(
+      this.localToken,
+      this.configurationList.eventsFilter.startDate,
+      this.configurationList.eventsFilter.endDate,
+      this.configurationList.eventsFilter.startTime,
+      this.configurationList.eventsFilter.endTime,
+      this.configurationList.eventsFilter.cam
     ).subscribe(result => {
       this.dataGrid = new MatTableDataSource(result.events.map(data => {
         data.Event.Name = this.getCamName(data.Event.MonitorId);
@@ -78,12 +76,15 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
     })
-
   }
 
   getStreamPreview(eventId: string) {
-    this.sharedService.getStreamingProperties().subscribe(result => { this.streamingMode = result.eventStreamingMode });
-    return this.zmService.getEventStreamDetail(eventId, this.localToken, this.streamingMode, this.zmService.conf.detailStreamingMaxfps);
+    return this.zmService.getEventStreamDetail(
+      eventId,
+      this.localToken,
+      this.configurationList.streamingProperties.streamingMode,
+      this.zmService.conf.detailStreamingMaxfps
+    );
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
@@ -91,40 +92,38 @@ export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit
       previewType: previewType.eventDetail,
       streamUrl: this.getStreamPreview(eventId),
       camId: camId,
-      streamingMode: this.streamingMode,
+      streamingMode: this.configurationList.streamingProperties.streamingMode,
       eventStreamingMode: null
-    } 
-    this.sharedService.updateStreamingProperties(streamingProperties);  
-    this.cambDiapason.find(cam => {
-        if (cam.Id === camId) {
-          cam.StartTime = startTime;
-          cam.Length = length;
-          cam.MaxScore = maxScore;
-        }
-      })
+    }
+    this.configurations.setStreamingProperties(streamingProperties);   
+    this.configurationList.camDiapason.find(cam => {
+      if (cam.Id === camId) {
+        cam.StartTime = startTime;
+        cam.Length = length;
+        cam.MaxScore = maxScore;
+      }
+    })
     this.loadPreview(target);
   }
 
   loadPreview(target: HTMLElement): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.updateStreamingProperties({} as IStreamProperties);
+      this.configurations.setStreamingProperties({} as IStreamProperties);  
       this.markEvent(target);
     });
   }
 
   getCamName(camId: string) {
-    if (this.cambDiapason.find(cam => (cam.Id === camId))) {
-      return this.cambDiapason.find(cam => cam.Id === camId).Name;
+    if (this.configurationList.camDiapason.find(cam => (cam.Id === camId))) {
+      return this.configurationList.camDiapason.find(cam => cam.Id === camId).Name;
     }
   }
 
   stopStream() {
-
   }
 
   startStream() {
-
   }
 
   markEvent(target: HTMLElement) {

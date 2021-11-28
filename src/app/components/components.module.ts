@@ -13,7 +13,6 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatListModule} from '@angular/material/list';
-import {MatGridListModule} from '@angular/material/grid-list';
 import {MatCardModule} from '@angular/material/card';
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -34,22 +33,29 @@ import { EventsComponent } from './events/events.component';
 import { ConfigComponent } from './config/config.component';
 import { StreamPreview } from './preview/stream-preview.component';
 import { ArgoMinderComponent } from '../argominder.component';
-import { LiveStreamComponent } from './streaming/live-stream.component';
 import { ChangeDetectorConfigurations } from './detectors/configurations.service';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { zmService } from '../services/zm.service';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @NgModule({
   declarations: [
     ArgoMinderComponent,
-    LiveStreamComponent,
     EventsComponent,
     ConfigComponent,
     StreamPreview
   ],
-  imports: [
+  imports: [     
+    RouterModule.forRoot([  
+      {
+        path: 'live', 
+        loadChildren: () => import('./streaming/live-steram.module').then(tt => tt.LiveStreamModule)},         
+      ]),    
     FormsModule,
     BrowserAnimationsModule,
+    MatGridListModule,
     MatCheckboxModule,
     MatButtonModule,
     MatInputModule,
@@ -64,7 +70,6 @@ import { FormsModule } from '@angular/forms';
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
-    MatGridListModule,
     MatCardModule,
     MatStepperModule,
     MatTabsModule,
@@ -81,8 +86,13 @@ import { FormsModule } from '@angular/forms';
     MatSortModule,
     MatPaginatorModule,
     MatNativeDateModule,
+    RouterModule
   ],
-  providers: [ChangeDetectorConfigurations],
-  bootstrap: [ArgoMinderComponent]
+  providers: [zmService, ChangeDetectorConfigurations],
+  exports: [RouterModule]
 })
 export class ComponentsModule { }
+function routes(routes: any, arg1: { relativeLinkResolution: "legacy"; }): any[] | import("@angular/core").Type<any> | import("@angular/core").ModuleWithProviders<{}> {
+  throw new Error('Function not implemented.');
+}
+

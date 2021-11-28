@@ -76,7 +76,6 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
         tt.action === configurationsActions.EventsFilter)).subscribe(result => {
           if (result.action === configurationsActions.CamDiapason) this.mapCamsNames(result.payload.camDiapason);
           if (result.action === configurationsActions.StreamingConfChanges) this.detectNewStreamingConf(result.payload.streamingConfChanges);
-          if (result.action === configurationsActions.EventsFilter) this.setEventsFilters(false, result.payload.eventsFilter);
           this.configurationsList = result.payload;
         });
     this.popolateSettingsDB();
@@ -216,23 +215,23 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
     return [year, month, day].join('-');
   }
 
-  setEventsFilters(isOnLoad: boolean, eventFilters?: IEventsFilter) {
-    this.endtDateFIlter = this.startDateFilter;
-    const filters: IEventsFilter = {
-      startDate: this.converDateFormat(this.startDateFilter),
-      endDate: this.converDateFormat(this.endtDateFIlter),
-      startTime: this.dateRange.startTime,
-      endTime: this.dateRange.endTime,
-      cam: this.selectedCam.id
+  setEventsFilters(isOnLoad: boolean) {
+    if(isOnLoad) {
+      this.endtDateFIlter = this.startDateFilter;
+      const filters: IEventsFilter = {
+        startDate: this.converDateFormat(this.startDateFilter),
+        endDate: this.converDateFormat(this.endtDateFIlter),
+        startTime: this.dateRange.startTime,
+        endTime: this.dateRange.endTime,
+        cam: this.selectedCam.id
+      }
+      this.configurations.setEventsFilters(filters);
     }
-    this.configurations.seteEventsFilters(filters);
-    if (!isOnLoad && eventFilters !== null) {
+    if (!isOnLoad) {
       this.showDateRangeSpinner = true;
       setTimeout(() => {
-        if (eventFilters) {
           this.showDateRangeSpinner = false;
-          this.changeRef.markForCheck();
-        }
+          this.changeRef.markForCheck();  
       }, 1500);
     }
   }
@@ -247,7 +246,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
       endTime: this.dateRange.endTime,
       cam: null
     }
-    this.configurations.seteEventsFilters(resettedfilters);
+    this.configurations.setEventsFilters(resettedfilters);
     this.startDateFilter = currentDate;
     this.selectedCam = { name: null, id: null };
   }

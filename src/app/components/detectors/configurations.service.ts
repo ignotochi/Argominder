@@ -19,7 +19,7 @@ export class ChangeDetectorConfigurations extends DataStoreDetector<IConfigurati
     setCamDiapason(incCamDiapason: ICamRegistry) {
         this.updateDataChanges({ action: configurationsActions.CamDiapason, payload: { ...this.getClonedDataChange(), camDiapason: [...this.getClonedDataChange()?.camDiapason, incCamDiapason] } });
     }
-    seteEventsFilters(eventsFilter: IEventsFilter) {
+    setEventsFilters(eventsFilter: IEventsFilter) {
         this.updateDataChanges({ action: configurationsActions.EventsFilter, payload: { ...this.getClonedDataChange(), eventsFilter: eventsFilter } });
     }
     setStreamingChanges(streamingConfChanges: IConfigStreaming[]) {

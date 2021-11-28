@@ -2,8 +2,12 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
+import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
 import { IConf } from './interfaces/IConf';
+import { IConfigurationsList } from './interfaces/IConfigurationsList';
+import { IEventsFilter } from './interfaces/IEventsFilter';
 import { ILogin } from './interfaces/ILogin';
+import { IStreamProperties } from './interfaces/IStreamProperties';
 import { zmService } from './services/zm.service';
 
 @Component({
@@ -21,10 +25,15 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   localToken: string = '';
   selectedTab: number;
   loadStream: boolean;
-
-  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef) {
+  private configurationsList: IConfigurationsList = {
+    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
+  };
+  
+  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations) {
+    this.configurations.initializeDataChanges();
+    this.configurations.setAll(this.configurationsList);
     if(this.retrieveSession() === true) {
-      this.selectedTab = 1;
+      this.selectedTab = 0;
       this.userIsLogged = true;
       this.logInZm(true);
     }
@@ -48,7 +57,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
         this.userIsLogged = this.login.access_token.length > 0 ? true : false;
         this.saveSession();
         this.localToken = localStorage.getItem("accessToken");
-        this.selectedTab = 1;
+        this.selectedTab = 0;
       }
       this.loadStream = login.access_token.length > 0 ? true : false;
       this.changeRef.markForCheck();

@@ -38,17 +38,13 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
-  private configurationsList: IConfigurationsList = {
-    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
-  };
+  private configurationsList: IConfigurationsList;
   private dataChange$: Subscription;
   private streamChanges$: Subscription;
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
   constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog) {
-    this.configurations.initializeDataChanges();
-    this.configurations.setAll(this.configurationsList);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
         this.configurationsList = result.payload;

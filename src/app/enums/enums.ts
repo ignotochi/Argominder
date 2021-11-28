@@ -60,6 +60,11 @@ export enum configurationsActions {
     StreamingProperties = "StreamingProperties",
 }
 
+export enum authActions {
+    All = "All",
+    token = "token"
+}
+
 export interface Enum {
     [id: number]: string;
   }

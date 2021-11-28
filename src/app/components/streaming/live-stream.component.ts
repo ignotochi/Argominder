@@ -5,8 +5,8 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BasePreviewDetail } from 'src/app/core/base-preview.component';
-import { configurationsActions } from 'src/app/enums/enums';
+import { BaseComponentDetail } from 'src/app/core/base-preview.component';
+import { authActions, configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
@@ -17,6 +17,7 @@ import { zmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
+import { ChangeDetectorAuth } from '../detectors/auth.service';
 
 @Component({
   selector: 'live-stream',
@@ -24,18 +25,14 @@ import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy, AfterViewInit {
+export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
   @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
 
-  @Input()
-  public set localToken(input: string) { this._localToken = input; }
-  public get localToken(): string { return this._localToken; }
-  private _localToken: string = null;
-  public datasource: IMonitors = (<IMonitors>{ monitors: [] });
+  //public datasource = (<IMonitors>{ monitors: [] });
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
   private configurationsList: IConfigurationsList;
@@ -44,12 +41,13 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog) {
+  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorAuth) {
+    super(auth);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
         this.configurationsList = result.payload;
         if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
-      })
+      });
   }
 
   ngAfterContentInit() {
@@ -96,15 +94,15 @@ export class LiveStreamComponent implements BasePreviewDetail, OnInit, OnDestroy
 
   getStream(cam: string, index: number, status: string) {
     if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.localToken, index);
+    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.token, index);
   }
 
   getStreamPreview(cam: string) {
-    return this.zmService.getLiveStreamDetail(cam, this.localToken);
+    return this.zmService.getLiveStreamDetail(cam, this.token);
   }
 
   getCamList() {
-    this.camInfo$ = this.zmService.getCamListInfo(this.localToken).subscribe((result) => {
+    this.camInfo$ = this.zmService.getCamListInfo(this.token).subscribe((result) => {
       this.datasource.monitors = result.monitors;
 
       result.monitors.forEach(result => {

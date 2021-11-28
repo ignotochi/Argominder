@@ -39,6 +39,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { zmService } from '../services/zm.service';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { ChangeDetectorAuth } from './detectors/auth.service';
 
 @NgModule({
   declarations: [
@@ -88,7 +89,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MatNativeDateModule,
     RouterModule
   ],
-  providers: [zmService, ChangeDetectorConfigurations],
+  providers: [zmService, ChangeDetectorConfigurations, ChangeDetectorAuth],
   exports: [RouterModule]
 })
 export class ComponentsModule { }

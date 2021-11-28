@@ -2,7 +2,7 @@
 
 <ng-template #showApp>
   <div>
-    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab">
+    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="navigationPath($event.index)">
 
       <mat-tab label="Informations">
         <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
@@ -14,21 +14,19 @@
 
       <mat-tab label="Live Stream">
         <!-- <live-stream [localToken]="localToken"></live-stream>  -->
-        <!-- <button routerLink="live">live</button> -->
-        <nav mat-tab-nav-bar>
+        <!-- <nav mat-tab-nav-bar>
           <a mat-tab-link
           routerLink="live"
           routerLinkActive #rla="routerLinkActive"
-          [active]="true">prova
+          [active]="true">prova -->
           
-          </a>
-        </nav>
+          <!-- </a>
+        </nav> -->
 
        </mat-tab> 
 
 
-     
-      
+    
 
       <mat-tab label="Events">
         <events [localToken]="localToken"></events>

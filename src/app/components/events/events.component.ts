@@ -8,7 +8,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
-import { BasePreviewDetail } from 'src/app/core/base-preview.component';
+import { BaseComponentDetail } from 'src/app/core/base-preview.component';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
@@ -24,7 +24,7 @@ import { StreamPreview } from '../preview/stream-preview.component';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class EventsComponent implements BasePreviewDetail, OnInit, AfterViewInit, OnDestroy {
+export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public set localToken(input: string) { this._localToken = input; }
   public get localToken(): string { return this._localToken; }

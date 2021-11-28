@@ -1,7 +1,9 @@
 import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
+import { ChangeDetectorAuth } from './components/detectors/auth.service';
 import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
 import { IConf } from './interfaces/IConf';
 import { IConfigurationsList } from './interfaces/IConfigurationsList';
@@ -29,14 +31,16 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
   };
   
-  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations) {
+  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations, private auth: ChangeDetectorAuth, public router: Router) {
     this.configurations.initializeDataChanges();
+    this.auth.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
     if(this.retrieveSession() === true) {
       this.selectedTab = 0;
       this.userIsLogged = true;
       this.logInZm(true);
     }
+    this.auth.setToken(this.localToken);
   }
 
   ngOnInit() {
@@ -95,6 +99,19 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     this.userIsLogged = false;
     this.destroySession();
     location.reload();
+  }
+
+  navigationPath(tabIndex: number) {
+    let path: string;
+    switch (tabIndex) {
+      case 1:
+        path = "live";
+        break;
+    
+      default:
+        break;
+    }
+    this.router.navigate([path]);
   }
 
 }

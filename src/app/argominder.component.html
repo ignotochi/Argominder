@@ -2,40 +2,25 @@
 
 <ng-template #showApp>
   <div>
-    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="navigationPath($event.index)">
+    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="tabNavigation($event.index)">
 
       <mat-tab label="Informations">
-        <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
-        <p class="info-p"><b>token di accesso: </b>{{ login.refresh_token }}</p>
-        <p class="info-p"><b>api version: </b> {{ login.apiversion }}</p>
-        <p class="info-p"><b>credenziali: </b> {{ login.credentials }}</p>
-        <p class="info-p"><b>cadenza token: </b> {{ login.refresh_token_expires }}</p>
+          <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
+          <p class="info-p"><b>token di accesso: </b>{{ login.refresh_token }}</p>
+          <p class="info-p"><b>api version: </b> {{ login.apiversion }}</p>
+          <p class="info-p"><b>credenziali: </b> {{ login.credentials }}</p>
+          <p class="info-p"><b>cadenza token: </b> {{ login.refresh_token_expires }}</p>
       </mat-tab>
 
-      <mat-tab label="Live Stream">
-        <!-- <live-stream [localToken]="localToken"></live-stream>  -->
-        <!-- <nav mat-tab-nav-bar>
-          <a mat-tab-link
-          routerLink="live"
-          routerLinkActive #rla="routerLinkActive"
-          [active]="true">prova -->
-          
-          <!-- </a>
-        </nav> -->
-
-       </mat-tab> 
-
-
-    
+      <mat-tab label="Live Stream"></mat-tab> 
 
       <mat-tab label="Events">
-        <events [localToken]="localToken"></events>
+        <!-- <events [localToken]="localToken"></events> -->
       </mat-tab>
 
       <mat-tab label="Settings">
-        <config></config>
+        <!-- <config></config> -->
       </mat-tab>
-
 
       <mat-tab label="actions">
         <div class="row" id="actions-block">

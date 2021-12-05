@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { ChangeDetectorAuth } from './components/detectors/auth.service';
 import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
+import { Menu } from './enums/enums';
 import { IConf } from './interfaces/IConf';
 import { IConfigurationsList } from './interfaces/IConfigurationsList';
 import { IEventsFilter } from './interfaces/IEventsFilter';
@@ -30,17 +31,17 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   private configurationsList: IConfigurationsList = {
     camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
   };
-  
+
   constructor(private zmService: zmService, private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations, private auth: ChangeDetectorAuth, public router: Router) {
     this.configurations.initializeDataChanges();
     this.auth.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
-    if(this.retrieveSession() === true) {
+    this.navigationPath(Menu.Home);
+    if (this.retrieveSession() === true) {
       this.selectedTab = 0;
       this.userIsLogged = true;
       this.logInZm(true);
     }
-    this.auth.setToken(this.localToken);
   }
 
   ngOnInit() {
@@ -63,6 +64,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
         this.localToken = localStorage.getItem("accessToken");
         this.selectedTab = 0;
       }
+      this.auth.setToken(this.localToken);
       this.loadStream = login.access_token.length > 0 ? true : false;
       this.changeRef.markForCheck();
     }, (err: Error) => {
@@ -74,7 +76,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     this.localToken = localStorage.getItem("accessToken") ? this.localToken = localStorage.getItem("accessToken") : this.localToken;
     //Rivedere, non salvare Username e Passwd
     this.zmUsername = localStorage.getItem("username") ? this.zmUsername = localStorage.getItem("username") : this.zmUsername;
-    this.zmPassword = localStorage.getItem("password") ? this.zmPassword = localStorage.getItem("password") : this.zmPassword; 
+    this.zmPassword = localStorage.getItem("password") ? this.zmPassword = localStorage.getItem("password") : this.zmPassword;
     if (this.localToken.length > 0 && this.zmUsername.length > 0 && this.zmPassword.length > 0) {
       return true;
     } else {
@@ -92,22 +94,46 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     localStorage.setItem("accessToken", '');
     localStorage.setItem("username", '');
     localStorage.setItem("password", '');
+    this.auth.compleDataChanges();
+    this.configurations.compleDataChanges()
+    this.navigationPath(Menu.Home);
+    this.auth = null;
+    this.zmService = null;
+    this.configurations = null;
     this.errorLogin = '';
   }
 
   logOutZm() {
     this.userIsLogged = false;
     this.destroySession();
+    this.navigationPath(Menu.Home);
     location.reload();
   }
 
-  navigationPath(tabIndex: number) {
-    let path: string;
+  tabNavigation(tabIndex: number): void {
     switch (tabIndex) {
-      case 1:
-        path = "live";
+      case 0:
+        this.navigationPath(Menu.Home);
         break;
-    
+      case 1:
+        this.navigationPath(Menu.Live);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  navigationPath(menuSelected: Menu): void {
+    let path: string;
+    switch (menuSelected) {
+      case Menu.Home:
+        path = Menu.Home;
+        break;
+      case Menu.Live:
+        path = Menu.Live;
+        break;
+
       default:
         break;
     }

@@ -8,7 +8,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
-import { BaseComponentDetail } from 'src/app/core/base-preview.component';
+import { BaseDetailComponent } from 'src/app/core/base-preview.component';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';

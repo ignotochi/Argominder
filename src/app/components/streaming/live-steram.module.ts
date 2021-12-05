@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { MatGridListModule } from "@angular/material/grid-list";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { RouterModule, Routes } from "@angular/router";
 import { LiveStreamComponent } from "./live-stream.component";
 
@@ -10,7 +11,8 @@ const routes: Routes = [ { path: '', component: LiveStreamComponent} ];
   imports: [
       CommonModule,
       RouterModule.forChild(routes), 
-      MatGridListModule
+      MatGridListModule,
+      MatProgressSpinnerModule
     ],
     declarations: [
       LiveStreamComponent

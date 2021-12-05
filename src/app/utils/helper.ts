@@ -49,3 +49,5 @@ export function timeStringToDate(date: string) {
   dt.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds));
   return dt;
 }
+
+

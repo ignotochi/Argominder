@@ -5,14 +5,14 @@
     <mat-grid-tile *ngFor="let item of datasource.monitors; let i = index">
 
       <div class="cam-block">
-        <mat-spinner class="spinnerCam" [id]="'camSpinner-' + item.Monitor.Id" diameter="50" #spinner></mat-spinner>
+        <mat-spinner class="spinnerCam" [id]="'camSpinner-' + item.Monitor.Id" diameter="50" #spinners></mat-spinner>
 
-        <img [attr.camId]="item.Monitor.Id" style="width:100%;" src="#" (load)="onImageLoad($event, item.Monitor.Id);" #stream>
+        <img [attr.camId]="item.Monitor.Id" style="width:100%;" src="#" (load)="onImageLoad($event, item.Monitor.Id);" #streams>
 
           <p *ngIf="showInfoDetail" [id]="item.Monitor.Id" class="preview-info" #detailInfo></p>
 
         <mat-icon [attr.camId]="item.Monitor.Id" class="expand-stream hidden" aria-hidden="false" aria-label="icon"
-          (click)="setPreview(true, getStreamPreview(item.Monitor.Id), item.Monitor.Id);" #expand></mat-icon>
+          (click)="setPreview(true, getStreamPreview(item.Monitor.Id), item.Monitor.Id);" #expands></mat-icon>
       </div>
 
     </mat-grid-tile>

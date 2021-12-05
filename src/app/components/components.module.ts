@@ -50,6 +50,10 @@ import { ChangeDetectorAuth } from './detectors/auth.service';
   ],
   imports: [     
     RouterModule.forRoot([  
+      // {
+      //   path: '', 
+      //   component: ArgoMinderComponent
+      // },
       {
         path: 'live', 
         loadChildren: () => import('./streaming/live-steram.module').then(tt => tt.LiveStreamModule)},         

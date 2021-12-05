@@ -5,8 +5,8 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseComponentDetail } from 'src/app/core/base-preview.component';
-import { authActions, configurationsActions } from 'src/app/enums/enums';
+import { BaseDetailComponent } from 'src/app/core/base-preview.component';
+import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
@@ -16,23 +16,23 @@ import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { zmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
-import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { ChangeDetectorAuth } from '../detectors/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'live-stream',
   templateUrl: './live-stream.component.html',
   styleUrls: ['./live-stream.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
+  //providers: [zmService, ChangeDetectorConfigurations]
 })
-export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
-  @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
+  @ViewChildren('expands', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
 
-  //public datasource = (<IMonitors>{ monitors: [] });
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
   private configurationsList: IConfigurationsList;
@@ -41,7 +41,8 @@ export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implemen
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorAuth) {
+  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorAuth,
+    private elementRef: ElementRef<HTMLElement>) {
     super(auth);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
@@ -54,18 +55,22 @@ export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implemen
   }
 
   ngOnDestroy() {
-    this.dataChange$.unsubscribe();
-    this.streamChanges$.unsubscribe();
-    this.camInfo$.unsubscribe();
-    this.dialog$.unsubscribe();
+    this.stopStream();
+    this.dataChange$?.unsubscribe();
+    this.streamChanges$?.unsubscribe();
+    this.camInfo$?.unsubscribe();
+    this.dialog$?.unsubscribe();
+    this.elementRef.nativeElement.remove();
   }
 
   ngOnInit() {
+    this.getCamList();
   }
 
   ngAfterViewInit() {
-    this.getCamList();
-    this.streamChanges$ = this.streams.changes.subscribe((result) => { if (result.length > 0) this.startStream(); });
+    this.streamChanges$ = this.streams.changes.subscribe((result) => {
+      if (result.length > 0) this.startStream();
+    });
   }
 
   showExpands(camId: string, loadStatus: boolean) {
@@ -120,7 +125,7 @@ export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implemen
           Height: result.Monitor.Height,
         }
         this.configurations.setCamDiapason(registry);
-      })
+      });
     }, (err: Error) => {
       console.log(err);
     });
@@ -160,7 +165,8 @@ export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implemen
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
       this.showInfoDetail = true;
-    })
+    });
+
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
@@ -186,8 +192,12 @@ export class LiveStreamComponent extends BaseComponentDetail<IMonitors> implemen
   }
 
   previewStatus(previewStatus: boolean) {
-    if (previewStatus === true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
-    else if (previewStatus === false) { if (this.streams && this.streams.length > 0) this.startStream(); }
+    if (previewStatus === true) {
+      if (this.streams && this.streams.length > 0) this.stopStream();
+    }
+    else if (previewStatus === false) {
+      if (this.streams && this.streams.length > 0) this.startStream();
+    }
   }
 
   getPreviewInfo(camId: string) {

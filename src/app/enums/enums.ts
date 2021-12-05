@@ -68,3 +68,10 @@ export enum authActions {
 export interface Enum {
     [id: number]: string;
   }
+
+export enum Menu {
+    Home = '',
+    Live = 'live',
+    Settings = 'settings',
+    Events = 'events'
+}

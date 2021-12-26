@@ -4,7 +4,7 @@ import { ILogin } from "src/app/interfaces/ILogin";
 import { DataStoreDetector } from "src/app/services/change-detector.service";
 
 @Injectable()
-export class ChangeDetectorAuth extends DataStoreDetector<ILogin, authActions> {
+export class ChangeDetectorJwt extends DataStoreDetector<ILogin, authActions> {
 
     setAll(input: ILogin) {
         this.updateDataChanges({ action: authActions.All, payload: input });

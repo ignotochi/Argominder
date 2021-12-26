@@ -1,8 +1,7 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
+import {  Component} from '@angular/core';
 import { Subscription } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
-import { ChangeDetectorAuth } from '../components/detectors/auth.service';
+import { filter } from 'rxjs/operators';
+import { ChangeDetectorJwt } from '../components/detectors/jwt.service';
 import { authActions } from '../enums/enums';
 
 
@@ -15,7 +14,7 @@ export abstract class BaseDetailComponent<T> {
   private auth$: Subscription;
   public datasource: T;
 
-  constructor(public auth: ChangeDetectorAuth) {
+  constructor(public auth: ChangeDetectorJwt) {
     this.auth$ = this.auth.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(result => {
       this.token = result.payload.access_token;
     })

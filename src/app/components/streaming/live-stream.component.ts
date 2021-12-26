@@ -16,7 +16,7 @@ import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { zmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
-import { ChangeDetectorAuth } from '../detectors/auth.service';
+import { ChangeDetectorJwt } from '../detectors/jwt.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -41,7 +41,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorAuth,
+  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorJwt,
     private elementRef: ElementRef<HTMLElement>) {
     super(auth);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
@@ -166,7 +166,6 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
       stream.nativeElement.classList.remove('hidden');
       this.showInfoDetail = true;
     });
-
   }
 
   setPreview(value: boolean, stream: string, camId: string) {

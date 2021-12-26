@@ -1,15 +1,15 @@
-<div *ngIf="userIsLogged === true; then showApp else showLogin"></div>
+<div *ngIf="this.authConf.userIsLogged; then showApp else showLogin"></div>
 
 <ng-template #showApp>
   <div>
     <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="tabNavigation($event.index)">
 
       <mat-tab label="Informations">
-          <h3 class="info-h3">Loggato in zoneminder version: {{ login.version }}</h3>
-          <p class="info-p"><b>token di accesso: </b>{{ login.refresh_token }}</p>
-          <p class="info-p"><b>api version: </b> {{ login.apiversion }}</p>
-          <p class="info-p"><b>credenziali: </b> {{ login.credentials }}</p>
-          <p class="info-p"><b>cadenza token: </b> {{ login.refresh_token_expires }}</p>
+          <h3 class="info-h3">Loggato in zoneminder version: {{ this.authConf.login.version }}</h3>
+          <p class="info-p"><b>token di accesso: </b>{{ this.authConf.login.refresh_token }}</p>
+          <p class="info-p"><b>api version: </b> {{ this.authConf.login.apiversion }}</p>
+          <p class="info-p"><b>credenziali: </b> {{ this.authConf.login.credentials }}</p>
+          <p class="info-p"><b>cadenza token: </b> {{ this.authConf.login.refresh_token_expires }}</p>
       </mat-tab>
 
       <mat-tab label="Live Stream"></mat-tab> 
@@ -26,19 +26,19 @@
         <div class="row" id="actions-block">
           <div class="row-action">
             <p>{{ 'Avvia Zoneminder' }}</p>
-            <button id="start-btn" mat-raised-button color="primary" (click)="logOutZm()">{{ 'Start' }}</button>
+            <button id="start-btn" mat-raised-button color="primary" (click)="this.authConf.logOutZm()">{{ 'Start' }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Stop Zoneminder' }}</p>
-            <button id="stop-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Stop' }}</button>
+            <button id="stop-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Stop' }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Riavvia Zoneminder' }}</p>
-            <button id="restart-btn" mat-raised-button color="accent" (click)="logOutZm()">{{ 'Restart' }}</button>
+            <button id="restart-btn" mat-raised-button color="accent" (click)="this.authConf.logOutZm()">{{ 'Restart' }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Logut Zoneminder' }}</p>
-            <button id="logout-btn" mat-raised-button color="warn" (click)="logOutZm()">{{ 'Logout' }}</button>
+            <button id="logout-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Logout' }}</button>
           </div>
         </div>
       </mat-tab>
@@ -54,14 +54,14 @@
       <form class="example-form">
         <mat-form-field class="input-login" appearance="fill">
           <mat-label>zm username</mat-label>
-          <input matInput placeholder="username" [(ngModel)]="zmUsername" type="text" name="username">
+          <input matInput placeholder="username" [(ngModel)]="this.authConf.zmUsername" type="text" name="username">
         </mat-form-field>
         <mat-form-field class="password-login" appearance="fill">
           <mat-label>zm password</mat-label>
-          <input matInput placeholder="password" [(ngModel)]="zmPassword" type="password" name="password">
+          <input matInput placeholder="password" [(ngModel)]="this.authConf.zmPassword" type="password" name="password">
         </mat-form-field>
       </form>
-      <button mat-raised-button color="primary" (click)="logInZm()">{{ 'Login' }}</button>
+      <button mat-raised-button color="primary" (click)="this.authConf.logInZm()">{{ 'Login' }}</button>
       <p *ngIf="errorLogin">{{ 'Errore di autenticazione' }}</p>
     </div>
   </div>

@@ -13,11 +13,11 @@ import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { zmService } from '../../services/zm.service';
+import { ZmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 import { ChangeDetectorJwt } from '../detectors/jwt.service';
-import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'live-stream',
@@ -41,7 +41,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(private zmService: zmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorJwt,
+  constructor(private zmService: ZmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorJwt,
     private elementRef: ElementRef<HTMLElement>) {
     super(auth);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
@@ -109,23 +109,6 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   getCamList() {
     this.camInfo$ = this.zmService.getCamListInfo(this.token).subscribe((result) => {
       this.datasource.monitors = result.monitors;
-
-      result.monitors.forEach(result => {
-        const registry: ICamRegistry = {
-          Name: result.Monitor.Name,
-          Id: result.Monitor.Id,
-          DayEvents: result.Monitor.DayEvents,
-          MonthEvents: result.Monitor.MonthEvents,
-          TotalEvents: result.Monitor.TotalEvents,
-          Function: result.Monitor.Function,
-          MaxFPS: result.Monitor.MaxFPS,
-          Path: result.Monitor.Path,
-          Type: result.Monitor.Type,
-          Width: result.Monitor.Width,
-          Height: result.Monitor.Height,
-        }
-        this.configurations.setCamDiapason(registry);
-      });
     }, (err: Error) => {
       console.log(err);
     });

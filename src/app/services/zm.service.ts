@@ -11,7 +11,7 @@ import { ICamRegistry } from '../interfaces/ICamRegistry';
 
 @Injectable()
 
-export class zmService {
+export class ZmService {
   confUrl: string = 'assets/argominder.conf.json';
   streamLimt1: number = 6;
   streamLimt2: number = 12;

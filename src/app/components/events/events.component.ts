@@ -8,12 +8,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
+import { BaseDetailComponent } from 'src/app/core/base-preview.component';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { zmService } from '../../services/zm.service';
+import { ZmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
+import { ChangeDetectorJwt } from '../detectors/jwt.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
 @Component({
@@ -23,14 +25,10 @@ import { StreamPreview } from '../preview/stream-preview.component';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
   @Input()
-  public set localToken(input: string) { this._localToken = input; }
-  public get localToken(): string { return this._localToken; }
-  private _localToken: string = null;
   public showPreview: boolean;
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
-  public datasource: ICamEvents = (<ICamEvents>{ events: [], pagination: {} });
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
   private configurationList: IConfigurationsList;
@@ -39,7 +37,8 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private zmService: zmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations) {
+  constructor(private zmService: ZmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations, public auth: ChangeDetectorJwt) {
+    super(auth);
     this.showPreview = false;
   }
 
@@ -51,7 +50,6 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.sort.sort(({ id: 'StartTime', start: 'desc' }) as MatSortable);
   }
 
   ngOnDestroy() {
@@ -60,7 +58,7 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getEvents() {
     this.zmService.getEventsList(
-      this.localToken,
+      this.token,
       this.configurationList.eventsFilter.startDate,
       this.configurationList.eventsFilter.endDate,
       this.configurationList.eventsFilter.startTime,
@@ -71,6 +69,7 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
         data.Event.Name = this.getCamName(data.Event.MonitorId);
         return data.Event;
       }));
+      this.sort.sort(({ id: 'StartTime', start: 'desc' }) as MatSortable);
       this.dataGrid.sort = this.sort;
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
@@ -80,7 +79,7 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   getStreamPreview(eventId: string) {
     return this.zmService.getEventStreamDetail(
       eventId,
-      this.localToken,
+      this.token,
       this.configurationList.streamingProperties.streamingMode,
       this.zmService.conf.detailStreamingMaxfps
     );

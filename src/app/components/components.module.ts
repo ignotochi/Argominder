@@ -29,7 +29,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatNativeDateModule } from '@angular/material/core';
-import { EventsComponent } from './events/events.component';
 import { ConfigComponent } from './config/config.component';
 import { StreamPreview } from './preview/stream-preview.component';
 import { ArgoMinderComponent } from '../argominder.component';
@@ -37,19 +36,19 @@ import { ChangeDetectorConfigurations } from './detectors/configurations.service
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { zmService } from '../services/zm.service';
-import { MatGridListModule } from '@angular/material/grid-list';
+import { ZmService } from '../services/zm.service';
 import { ChangeDetectorJwt } from './detectors/jwt.service';
 import { Auth } from '../services/auth.service';
 import { AuthGuardService } from '../services/auth-guard.service';
+import { MatGridListModule } from "@angular/material/grid-list";
 import {
   AuthGuardService as AuthGuard
 } from '../services/auth-guard.service';
+import { CommoneInitializer } from '../services/common-initializer.service';
 
 @NgModule({
   declarations: [
     ArgoMinderComponent,
-    EventsComponent,
     ConfigComponent,
     StreamPreview
   ],
@@ -57,17 +56,22 @@ import {
     RouterModule.forRoot([
       // {
       //   path: '', 
-      //   component: ArgoMinderComponent
+      //   component: ArgoMinderComponent,
+      //   canActivate: [AuthGuard]
       // },
       {
         path: 'live',
         loadChildren: () => import('./streaming/live-steram.module').then(tt => tt.LiveStreamModule),
         canActivate: [AuthGuard]
       },
+      {
+        path: 'events',
+        loadChildren: () => import('./events/events.module').then(tt => tt.EventModule),
+        canActivate: [AuthGuard]
+      },
     ]),
     FormsModule,
     BrowserAnimationsModule,
-    MatGridListModule,
     MatCheckboxModule,
     MatButtonModule,
     MatInputModule,
@@ -89,18 +93,19 @@ import {
     MatButtonToggleModule,
     MatChipsModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     MatProgressBarModule,
     MatDialogModule,
     MatTooltipModule,
     MatSnackBarModule,
     MatTableModule,
     MatSortModule,
-    MatPaginatorModule,
     MatNativeDateModule,
-    RouterModule
+    RouterModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule,
+    MatGridListModule,
   ],
-  providers: [zmService, ChangeDetectorConfigurations, ChangeDetectorJwt, Auth, AuthGuardService],
+  providers: [ZmService, ChangeDetectorConfigurations, ChangeDetectorJwt, Auth, AuthGuardService, CommoneInitializer],
   exports: [RouterModule]
 })
 export class ComponentsModule { }

@@ -12,7 +12,7 @@ import { IConfigStreaming } from 'src/app/interfaces/IConfStreaming';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { zmService } from 'src/app/services/zm.service';
+import { ZmService } from 'src/app/services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 
 export interface DbConfgigObject {
@@ -62,7 +62,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   public configurationsList: IConfigurationsList;
 
 
-  constructor(private configurations: ChangeDetectorConfigurations, public zmService: zmService, private changeRef: ChangeDetectorRef, private dbService: NgxIndexedDBService) {
+  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef, private dbService: NgxIndexedDBService) {
     this.setDefaultTime();
     const streamModes = Object.keys(streamingEventMode);
     streamModes.forEach(mode => {

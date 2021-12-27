@@ -32,7 +32,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     this.configurations.initializeDataChanges();
     this.auth.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
-   
+
     this.auth$ = this.auth.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
       this.loadStream = this.authConf.login.access_token.length > 0 ? true : false;
       this.changeRef.markForCheck();
@@ -47,32 +47,38 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
 
   tabNavigation(tabIndex: number): void {
     switch (tabIndex) {
-        case 0:
-            this.navigationPath(Menu.Home);
-            break;
-        case 1:
-            this.navigationPath(Menu.Live);
-            break;
+      case 0:
+        this.navigationPath(Menu.Home);
+        break;
+      case 1:
+        this.navigationPath(Menu.Live);
+        break;
+      case 2:
+        this.navigationPath(Menu.Events);
+        break;
 
-        default:
-            break;
+      default:
+        break;
     }
-}
+  }
 
-navigationPath(menuSelected: Menu): void {
+  navigationPath(menuSelected: Menu): void {
     let path: string;
     switch (menuSelected) {
-        case Menu.Home:
-            path = Menu.Home;
-            break;
-        case Menu.Live:
-            path = Menu.Live;
-            break;
+      case Menu.Home:
+        path = Menu.Home;
+        break;
+      case Menu.Live:
+        path = Menu.Live;
+        break;
+      case Menu.Events:
+        path = Menu.Events;
+        break;
 
-        default:
-            break;
+      default:
+        break;
     }
     this.router.navigate([path]);
-}
+  }
 
 }

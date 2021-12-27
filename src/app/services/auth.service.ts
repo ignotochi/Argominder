@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChangeDetectorJwt } from 'src/app/components/detectors/jwt.service';
 import { ChangeDetectorConfigurations } from 'src/app/components/detectors/configurations.service';
-import { zmService } from 'src/app/services/zm.service';
+import { ZmService } from 'src/app/services/zm.service';
+import { CommoneInitializer } from 'src/app/services/common-initializer.service';
 import { Menu } from 'src/app/enums/enums';
 import { ILogin } from 'src/app/interfaces/ILogin';
 import { IConf } from '../interfaces/Iconf';
@@ -18,24 +19,25 @@ export class Auth {
     public userIsLogged: boolean = false;
     public login: ILogin = (<ILogin>{ login: {} });
 
-    constructor(private router: Router, private auth: ChangeDetectorJwt, private configurations: ChangeDetectorConfigurations, private zmService: zmService) {
+    constructor(private router: Router, private auth: ChangeDetectorJwt, private configurations: ChangeDetectorConfigurations, private zmService: ZmService, 
+        private commoneInitializer: CommoneInitializer) {
         this.setSession();
     }
 
-    setSession() {
+    private setSession() {
         this.localToken = localStorage.getItem("accessToken") ? this.localToken = localStorage.getItem("accessToken") : this.localToken;
     }
 
-    isValidToken() {
+    public isValidToken() {
         if (this.localToken.length > 0 && this.zmUsername.length > 0 && this.zmPassword.length > 0) return true;
         else return false;
     }
 
-    saveSession() {
+    private saveSession() {
         localStorage.setItem("accessToken", this.login.access_token);
     }
 
-    destroySession() {
+    public destroySession() {
         localStorage.setItem("accessToken", '');
         this.auth.compleDataChanges();
         this.configurations.compleDataChanges()
@@ -46,7 +48,7 @@ export class Auth {
         this.errorLogin = '';
     }
 
-    logInZm() {
+    public logInZm() {
         return this.zmService.getConfigurationFile().pipe(
             switchMap((conf: IConf) => {
                 this.zmService.configurationFileMapping(conf);
@@ -58,17 +60,22 @@ export class Auth {
             this.saveSession();
             this.localToken = localStorage.getItem("accessToken");
             this.auth.setToken(this.localToken);
+            this.afterLogin();
         },
             (err: Error) => {
                 this.errorLogin = err.message;
             });
     }
 
-    logOutZm() {
+    public logOutZm() {
         this.userIsLogged = false;
         this.destroySession();
         this.router.navigate([Menu.Home]);
         location.reload();
+    }
+
+    private afterLogin() {
+        this.commoneInitializer.getCamList(this.localToken);
     }
 
 

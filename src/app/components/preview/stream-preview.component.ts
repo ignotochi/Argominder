@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 import { filter } from "rxjs/operators";
 import { configurationsActions, streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
-import { zmService } from '../../services/zm.service';
+import { ZmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from "../detectors/configurations.service";
 import { Subscription } from "rxjs";
 import { IConfigurationsList } from "src/app/interfaces/IConfigurationsList";
@@ -22,7 +22,7 @@ export class StreamPreview implements OnInit, AfterViewInit, OnDestroy {
   private dataChange$: Subscription;
   public configurationsList: IConfigurationsList;
 
-  constructor(private configurations: ChangeDetectorConfigurations, private zmService: zmService) {
+  constructor(private configurations: ChangeDetectorConfigurations, private zmService: ZmService) {
     this.dataChange$ = this.configurations.getDataChanges().pipe(
       filter(tt => (tt.action === configurationsActions.StreamingProperties || tt.action === configurationsActions.CamDiapason))).subscribe(result => {
         this.configurationsList = result.payload;

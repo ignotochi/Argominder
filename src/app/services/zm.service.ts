@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ILogin } from '../interfaces/ILogin';
 import { IMonitors } from '../interfaces/IMonitors';
 import { IConf } from '../interfaces/IConf';
 import { ICamEvents } from '../interfaces/ICamEvent';
 import { separators, streamingEventMode, zmUrl } from '../enums/enums';
 import { UrlsBuilder } from '../core/build-urls';
+import { previewType } from '../enums/preview-enum';
+import { ICamRegistry } from '../interfaces/ICamRegistry';
 
 @Injectable()
 
-export class zmService {
+export class ZmService {
   confUrl: string = 'assets/argominder.conf.json';
   streamLimt1: number = 6;
   streamLimt2: number = 12;
@@ -22,6 +24,23 @@ export class zmService {
 
   }
 
+  public getPreviewInfo(camDiapason: ICamRegistry[], camId: string, detail: previewType) {
+    const selectedCam = camDiapason.find(cam => cam.Id === camId);
+    const camName = selectedCam.Name;
+    const camMaxFps = selectedCam.MaxFPS;
+    const camWidth = selectedCam.Width;
+    const camHeigth = selectedCam.Height;
+    const dayEvents = selectedCam.DayEvents;
+    const functionMode = selectedCam.Function;
+    const starTime = selectedCam.StartTime;
+    const score = selectedCam.MaxScore;
+    const length = selectedCam.Length;
+
+    if (detail === previewType.streaming) return camName + ' | ' + camMaxFps + ' fps' + ' | ' + camWidth + ' px' + ' | ' + camHeigth + ' px';
+    if (detail === previewType.streamingDetail) return 'Name: ' + camName + ' | ' + 'Day Events: ' + dayEvents + ' | ' + ' Mode: ' + functionMode;
+    if (detail === previewType.eventDetail) return 'Name: ' + camName + ' | ' + 'Start time: ' + starTime + ' | ' + ' Score: ' + score + ' | ' + ' Length: ' + length;
+  }
+
   getConfigurationFile() {
     return this.http.get(this.confUrl);
   }
@@ -31,14 +50,13 @@ export class zmService {
   }
 
   zmLogin(username: string, password: string) {
-    const buildedUrl = this.conf.protocol + this.conf.baseUrl + zmUrl.host + separators.slash + zmUrl.login + separators.dot + zmUrl.json + zmUrl.user +
-      separators.equal + username + separators.and + zmUrl.pass + separators.equal + password;
-    return this.http.get<ILogin>(buildedUrl);
+    const url = this.urlBuilder.login(username, password, this.conf);
+    return this.http.get<ILogin>(url);
   }
 
   getCamListInfo(token: string) {
-    const buildedUrl = this.conf.protocol + this.conf.baseUrl + zmUrl.monitors + separators.dot + zmUrl.json + zmUrl.token + separators.equal + token;
-    return this.http.get<IMonitors>(buildedUrl);
+    const url = this.urlBuilder.getCamListInfo(token, this.conf)
+    return this.http.get<IMonitors>(url);
   }
 
   getLiveStream(camId: string, token: string, index: number) {
@@ -54,8 +72,8 @@ export class zmService {
     return this.urlBuilder.liveStreamDetail(camId, token, this.conf);
   }
 
-  getEventStreamDetail(eventId: string, token: string, mode: string) {
-    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf);
+  getEventStreamDetail(eventId: string, token: string, mode: string, frame: string) {
+    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf, frame);
   }
 
   getEventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string) {

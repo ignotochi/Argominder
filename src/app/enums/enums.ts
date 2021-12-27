@@ -21,7 +21,7 @@ export enum zmUrl {
     percent = '%20',
     endtime = 'EndTime%20<=:',
     startTime = 'StartTime%20>=:',
-    json = 'json?',
+    json = 'json',
     token = 'token',
     events = 'events/index/',
     monitorId = 'MonitorId',
@@ -48,4 +48,30 @@ export enum separators {
     question = '?',
     equal = '=',
     dot = '.',
+    doublePoints = ':'
+}
+
+export enum configurationsActions {
+    All = "All",
+    PreviewStatus = "PreviewStatus",
+    CamDiapason = "CamDiapason",
+    EventsFilter = "EventsFilter",
+    StreamingConfChanges = "StreamingConfChanges",
+    StreamingProperties = "StreamingProperties",
+}
+
+export enum authActions {
+    All = "All",
+    token = "token"
+}
+
+export interface Enum {
+    [id: number]: string;
+  }
+
+export enum Menu {
+    Home = '',
+    Live = 'live',
+    Settings = 'settings',
+    Events = 'events'
 }

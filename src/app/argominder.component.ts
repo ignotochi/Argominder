@@ -1,10 +1,16 @@
 import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
-import { switchMap } from 'rxjs/operators';
-import { IConf } from './interfaces/IConf';
-import { ILogin } from './interfaces/ILogin';
-import { zmService } from './services/zm.service';
+import { Router } from '@angular/router';
+import { ChangeDetectorJwt } from './components/detectors/jwt.service';
+import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
+import { Auth } from './services/auth.service';
+import { IConfigurationsList } from './interfaces/IConfigurationsList';
+import { IEventsFilter } from './interfaces/IEventsFilter';
+import { IStreamProperties } from './interfaces/IStreamProperties';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { authActions, Menu } from './enums/enums';
 
 @Component({
   selector: 'argominder',
@@ -13,21 +19,24 @@ import { zmService } from './services/zm.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArgoMinderComponent implements OnInit, AfterViewInit {
-  login: ILogin = (<ILogin>{ login: {} });
-  userIsLogged: boolean = false;
-  errorLogin: string = '';
-  zmUsername: string = '';
-  zmPassword: string = '';
-  localToken: string = '';
-  selectedTab: number;
+  selectedTab: number = 0;
   loadStream: boolean;
+  private auth$: Subscription;
 
-  constructor(private zmService: zmService, private changeRef: ChangeDetectorRef) {
-    if(this.retrieveSession() === true) {
-      this.selectedTab = 1;
-      this.userIsLogged = true;
-      this.logInZm(true);
-    }
+  private configurationsList: IConfigurationsList = {
+    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
+  };
+
+  constructor(private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations,
+    private auth: ChangeDetectorJwt, public router: Router, public authConf: Auth) {
+    this.configurations.initializeDataChanges();
+    this.auth.initializeDataChanges();
+    this.configurations.setAll(this.configurationsList);
+
+    this.auth$ = this.auth.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
+      this.loadStream = this.authConf.login.access_token.length > 0 ? true : false;
+      this.changeRef.markForCheck();
+    })
   }
 
   ngOnInit() {
@@ -36,55 +45,40 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
-  logInZm(isRetrieved: boolean) {
-    return this.zmService.getConfigurationFile().pipe(
-      switchMap((conf: IConf) => {
-        this.zmService.configurationFileMapping(conf);
-        return this.zmService.zmLogin(this.zmUsername, this.zmPassword);
-      })
-    ).subscribe((login: ILogin) => {
-      this.login = login;
-      if (!isRetrieved) {
-        this.userIsLogged = this.login.access_token.length > 0 ? true : false;
-        this.saveSession();
-        this.localToken = localStorage.getItem("accessToken");
-        this.selectedTab = 1;
-      }
-      this.loadStream = login.access_token.length > 0 ? true : false;
-      this.changeRef.markForCheck();
-    }, (err: Error) => {
-      this.errorLogin = err.message;
-    });
-  }
+  tabNavigation(tabIndex: number): void {
+    switch (tabIndex) {
+      case 0:
+        this.navigationPath(Menu.Home);
+        break;
+      case 1:
+        this.navigationPath(Menu.Live);
+        break;
+      case 2:
+        this.navigationPath(Menu.Events);
+        break;
 
-  retrieveSession() {
-    this.localToken = localStorage.getItem("accessToken") ? this.localToken = localStorage.getItem("accessToken") : this.localToken;
-    this.zmUsername = localStorage.getItem("username") ? this.zmUsername = localStorage.getItem("username") : this.zmUsername;
-    this.zmPassword = localStorage.getItem("password") ? this.zmPassword = localStorage.getItem("password") : this.zmPassword;
-    if (this.localToken.length > 0 && this.zmUsername.length > 0 && this.zmPassword.length > 0) {
-      return true;
-    } else {
-      return false;
+      default:
+        break;
     }
   }
 
-  saveSession() {
-    localStorage.setItem("accessToken", this.login.access_token);
-    localStorage.setItem("username", this.zmUsername);
-    localStorage.setItem("password", this.zmPassword);
-  }
+  navigationPath(menuSelected: Menu): void {
+    let path: string;
+    switch (menuSelected) {
+      case Menu.Home:
+        path = Menu.Home;
+        break;
+      case Menu.Live:
+        path = Menu.Live;
+        break;
+      case Menu.Events:
+        path = Menu.Events;
+        break;
 
-  destroySession() {
-    localStorage.setItem("accessToken", '');
-    localStorage.setItem("username", '');
-    localStorage.setItem("password", '');
-    this.errorLogin = '';
-  }
-
-  logOutZm() {
-    this.userIsLogged = false;
-    this.destroySession();
-    location.reload();
+      default:
+        break;
+    }
+    this.router.navigate([path]);
   }
 
 }

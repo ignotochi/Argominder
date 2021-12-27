@@ -1,7 +1,7 @@
 # Argominder
-A simple and fast user interface for zoneminder In Angular12 + material. 
+A simple and fast user interface for zoneminder In Angular12. 
 
-# Argominder development Status: 58%
+# Argominder development Status: 65%
 Current state of development
 
 # What Argominder will do?
@@ -9,7 +9,8 @@ Current state of development
 - see events and apply filters (Date/Time - Cam)
 - set streaming quality
 - trig alarms
-- smart streaming 
+- smart streaming (stop/start by preview status)
 - set cam options
 - start, restart, stop the zoneminder server
+- preview component for stream and events
 

@@ -1,55 +1,76 @@
 import {
-  ChangeDetectionStrategy, Component, ElementRef, Input, QueryList, ViewChildren
+  AfterViewInit,
+  ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, ViewChildren
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { BasePreviewDetail } from 'src/app/core/base-preview.component';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { BaseDetailComponent } from 'src/app/core/base-preview.component';
+import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
+import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
-import { SharedService } from 'src/app/services/shared.service';
-import { zmService } from '../../services/zm.service';
+import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
+import { ZmService } from '../../services/zm.service';
+import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
+import { ChangeDetectorJwt } from '../detectors/jwt.service';
+
 
 @Component({
   selector: 'live-stream',
   templateUrl: './live-stream.component.html',
   styleUrls: ['./live-stream.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
+  //providers: [zmService, ChangeDetectorConfigurations]
 })
-export class LiveStreamComponent implements BasePreviewDetail {
-  @ViewChildren('spinner', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('stream', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
-  @ViewChildren('expand', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
+export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+
+  @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
+  @ViewChildren('expands', { read: ElementRef }) expands: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
 
-
-  @Input()
-  public set localToken(input: string) { this._localToken = input; }
-  public get localToken(): string { return this._localToken; }
-  private _localToken: string = null;
-  public datasource: IMonitors = (<IMonitors>{ monitors: [] });
-  public detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
+  private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
+  private configurationsList: IConfigurationsList;
+  private dataChange$: Subscription;
+  private streamChanges$: Subscription;
+  private camInfo$: Subscription;
+  private dialog$: Subscription;
 
-  constructor(private zmService: zmService, public sharedService: SharedService, private dialog: MatDialog) {
-    this.previewStatus();
+  constructor(private zmService: ZmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorJwt,
+    private elementRef: ElementRef<HTMLElement>) {
+    super(auth);
+    this.dataChange$ = this.configurations.getDataChanges()?.pipe(
+      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
+        this.configurationsList = result.payload;
+        if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
+      });
   }
 
   ngAfterContentInit() {
   }
 
   ngOnDestroy() {
+    this.stopStream();
+    this.dataChange$?.unsubscribe();
+    this.streamChanges$?.unsubscribe();
+    this.camInfo$?.unsubscribe();
+    this.dialog$?.unsubscribe();
+    this.elementRef.nativeElement.remove();
   }
 
   ngOnInit() {
+    this.getCamList();
   }
 
   ngAfterViewInit() {
-    this.getCamList();
-    this.streams.changes.subscribe((result) => {
-      if (result.length > 0) { this.startStream(); } 
-    });    
+    this.streamChanges$ = this.streams.changes.subscribe((result) => {
+      if (result.length > 0) this.startStream();
+    });
   }
 
   showExpands(camId: string, loadStatus: boolean) {
@@ -69,41 +90,25 @@ export class LiveStreamComponent implements BasePreviewDetail {
   }
 
   loadDetailStreamInfo(camId: string) {
-    this.detailInfo.forEach(detail => { if (detail.nativeElement.getAttribute('id') === camId) {
-      detail.nativeElement.innerText = this.getPreviewInfo(camId);
-    }});
+    this.detailInfo.forEach(detail => {
+      if (detail.nativeElement.getAttribute('id') === camId) {
+        detail.nativeElement.innerText = this.getPreviewInfo(camId);
+      }
+    });
   }
 
   getStream(cam: string, index: number, status: string) {
     if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.localToken, index);
+    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.token, index);
   }
 
   getStreamPreview(cam: string) {
-    return this.zmService.getLiveStreamDetail(cam, this.localToken);
+    return this.zmService.getLiveStreamDetail(cam, this.token);
   }
 
   getCamList() {
-    this.zmService.getCamListInfo(this.localToken).subscribe((result) => {
+    this.camInfo$ = this.zmService.getCamListInfo(this.token).subscribe((result) => {
       this.datasource.monitors = result.monitors;
-
-      result.monitors.forEach(result => {
-        const registry: ICamRegistry = {
-          Name: result.Monitor.Name,
-          Id: result.Monitor.Id,
-          DayEvents: result.Monitor.DayEvents,
-          MonthEvents: result.Monitor.MonthEvents,
-          TotalEvents: result.Monitor.TotalEvents,
-          Function: result.Monitor.Function,
-          MaxFPS: result.Monitor.MaxFPS,
-          Path: result.Monitor.Path,
-          Type: result.Monitor.Type,
-          Width: result.Monitor.Width,
-          Height: result.Monitor.Height,
-        }
-        this.sharedService.camSpecializedInfo.push(registry);
-        this.sharedService.setDiapason(registry);
-      })
     }, (err: Error) => {
       console.log(err);
     });
@@ -143,35 +148,42 @@ export class LiveStreamComponent implements BasePreviewDetail {
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
       this.showInfoDetail = true;
-    })
+    });
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
     this.showInfoDetail = false;
     this.detail = { enabled: value, stream: stream };
-    this.sharedService.setStreamProperties(previewType.streamingDetail, this.detail.stream, camId, null),
-    this.sharedService.previewIsActive = true;
+    const streamingProperties: IStreamProperties = {
+      previewType: previewType.streamingDetail,
+      streamUrl: this.detail.stream,
+      camId: camId,
+    } as IStreamProperties;
+    this.configurations.setStreamingProperties(streamingProperties);
+    this.configurations.setPreviewStatus(true);
     this.loadPreview();
   }
 
   loadPreview(): void {
     let dialogRef: MatDialogRef<StreamPreview>;
-    dialogRef = this.dialog.open(StreamPreview);
-    dialogRef.afterClosed().subscribe(() => {
-      this.sharedService.flushStreamProperties();
-      this.sharedService.previewIsActive = false;
+    dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
+    this.dialog$ = dialogRef.afterClosed().subscribe(() => {
+      this.configurations.setStreamingProperties({} as IStreamProperties);
+      this.configurations.setPreviewStatus(false);
     });
   }
 
-  previewStatus() {
-    this.sharedService.getPreviewStatus().subscribe(result => {
-      if (result === true) { if (this.streams && this.streams.length > 0) this.stopStream(); }
-      else if (result === false) { if (this.streams && this.streams.length > 0) this.startStream(); }
-    })
+  previewStatus(previewStatus: boolean) {
+    if (previewStatus === true) {
+      if (this.streams && this.streams.length > 0) this.stopStream();
+    }
+    else if (previewStatus === false) {
+      if (this.streams && this.streams.length > 0) this.startStream();
+    }
   }
 
   getPreviewInfo(camId: string) {
-    return this.sharedService.getPreviewInfo(camId, previewType.streaming);
+    return this.zmService.getPreviewInfo(this.configurationsList.camDiapason, camId, previewType.streaming);
   }
 
 }

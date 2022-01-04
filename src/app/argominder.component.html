@@ -3,43 +3,44 @@
 <ng-template #showApp>
   <div>
     <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="tabNavigation($event.index)">
+      <h3 class="info-h3">Loggato in zoneminder version: {{ this.authConf.login.version }}</h3>
 
-      <mat-tab label="Informations">
-          <h3 class="info-h3">Loggato in zoneminder version: {{ this.authConf.login.version }}</h3>
-          <p class="info-p"><b>token di accesso: </b>{{ this.authConf.login.refresh_token }}</p>
-          <p class="info-p"><b>api version: </b> {{ this.authConf.login.apiversion }}</p>
-          <p class="info-p"><b>credenziali: </b> {{ this.authConf.login.credentials }}</p>
-          <p class="info-p"><b>cadenza token: </b> {{ this.authConf.login.refresh_token_expires }}</p>
-      </mat-tab>
-
-      <mat-tab label="Live Stream"></mat-tab> 
-
-      <mat-tab label="Events"></mat-tab>
-
-      <mat-tab label="Settings">
-        <!-- <config></config> -->
-      </mat-tab>
-
-      <mat-tab label="actions">
+      <mat-tab label="General">
         <div class="row" id="actions-block">
           <div class="row-action">
             <p>{{ 'Avvia Zoneminder' }}</p>
-            <button id="start-btn" mat-raised-button color="primary" (click)="this.authConf.logOutZm()">{{ 'Start' }}</button>
+            <button id="start-btn" mat-raised-button color="primary" (click)="this.authConf.logOutZm()">{{ 'Start'
+              }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Stop Zoneminder' }}</p>
-            <button id="stop-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Stop' }}</button>
+            <button id="stop-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Stop'
+              }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Riavvia Zoneminder' }}</p>
-            <button id="restart-btn" mat-raised-button color="accent" (click)="this.authConf.logOutZm()">{{ 'Restart' }}</button>
+            <button id="restart-btn" mat-raised-button color="accent" (click)="this.authConf.logOutZm()">{{ 'Restart'
+              }}</button>
           </div>
           <div class="row-action">
             <p>{{ 'Logut Zoneminder' }}</p>
-            <button id="logout-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Logout' }}</button>
+            <button id="logout-btn" mat-raised-button color="warn" (click)="this.authConf.logOutZm()">{{ 'Logout'
+              }}</button>
           </div>
         </div>
+
+        <div class="row" id="actions-block">
+          <p class="info-p"><b>api version: </b> {{ this.authConf.login.apiversion }}</p>
+          <p class="info-p"><b>scadenza token: </b> {{ this.authConf.login.access_token_expires + ' s '}}</p>
+          <p class="info-p"><b>rinnovo token: </b> {{ this.authConf.login.refresh_token_expires + ' s '}}</p>
+        </div>
       </mat-tab>
+
+      <mat-tab label="Live Stream"></mat-tab>
+
+      <mat-tab label="Events"></mat-tab>
+      
+      <mat-tab label="Settings"></mat-tab>
     </mat-tab-group>
 
   </div>

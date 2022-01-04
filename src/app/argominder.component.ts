@@ -56,7 +56,9 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
       case 2:
         this.navigationPath(Menu.Events);
         break;
-
+      case 3:
+        this.navigationPath(Menu.Settings);
+        break;
       default:
         break;
     }
@@ -74,7 +76,9 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
       case Menu.Events:
         path = Menu.Events;
         break;
-
+      case Menu.Settings:
+        path = Menu.Settings;
+        break;
       default:
         break;
     }

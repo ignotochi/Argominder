@@ -62,7 +62,8 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   public configurationsList: IConfigurationsList;
 
 
-  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef, private dbService: NgxIndexedDBService) {
+  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef, 
+    private dbService: NgxIndexedDBService) {
     this.setDefaultTime();
     const streamModes = Object.keys(streamingEventMode);
     streamModes.forEach(mode => {

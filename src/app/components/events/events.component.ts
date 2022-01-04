@@ -8,7 +8,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { BaseDetailComponent } from 'src/app/core/base-preview.component';
+import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
@@ -43,16 +45,22 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   }
 
   ngOnInit() {
-    this.configurationList$ = this.configurations.getDataChanges().subscribe(result => {
+    this.configurationList$ = this.configurations.getDataChanges().pipe(
+      filter(tt => tt.action === configurationsActions.CamDiapason || 
+        tt.action === configurationsActions.EventsFilter || 
+        tt.action === configurationsActions.StreamingProperties))
+        .subscribe(result => {
       this.configurationList = result.payload;
       if (result.payload.eventsFilter) this.getEvents();
     });
   }
 
   ngAfterViewInit() {
+    this.sort.sort(({ id: 'StartTime', start: 'desc' }) as MatSortable);
   }
 
   ngOnDestroy() {
+    this.configurations.setStreamingProperties({} as IStreamProperties);
     this.configurationList$.unsubscribe();
   }
 
@@ -69,7 +77,6 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
         data.Event.Name = this.getCamName(data.Event.MonitorId);
         return data.Event;
       }));
-      this.sort.sort(({ id: 'StartTime', start: 'desc' }) as MatSortable);
       this.dataGrid.sort = this.sort;
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
@@ -80,7 +87,7 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
     return this.zmService.getEventStreamDetail(
       eventId,
       this.token,
-      this.configurationList.streamingProperties.streamingMode,
+      this.configurationList.streamingProperties.eventStreamingMode,
       this.zmService.conf.detailStreamingMaxfps
     );
   }
@@ -90,10 +97,10 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
       previewType: previewType.eventDetail,
       streamUrl: this.getStreamPreview(eventId),
       camId: camId,
-      streamingMode: this.configurationList.streamingProperties.streamingMode,
-      eventStreamingMode: null
+      eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     }
     this.configurations.setStreamingProperties(streamingProperties);
+    
     this.configurationList.camDiapason.find(cam => {
       if (cam.Id === camId) {
         cam.StartTime = startTime;
@@ -105,9 +112,8 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   }
 
   loadPreview(target: HTMLElement): void {
-    const dialogRef = this.dialog.open(StreamPreview);
+    const dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
     dialogRef.afterClosed().subscribe(() => {
-      this.configurations.setStreamingProperties({} as IStreamProperties);
       this.markEvent(target);
     });
   }
@@ -125,7 +131,9 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   }
 
   markEvent(target: HTMLElement) {
-    if (!target.className.includes('eventShown')) target.classList.add('eventShown');
+    if (!target.className.includes("eventMarked")) { 
+      target.classList.add("eventMarked"); 
+    };
   }
 
 }

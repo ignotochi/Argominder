@@ -15,11 +15,26 @@ table {
   z-index: 9;
 }
 
-tr.mat-row.cdk-row:hover {
-  background: #673ab7ab;
+.evntPreview-btn:hover {
+  background: #ff5722;
+  color: white;
+  cursor: pointer;
 }
 
-.eventShown {
-  background: #673ab7;
+.evntPreview-btn {
+  background: #e0e0e0;
+  border: none;
+  padding: 7px 10px;
+}
+.eventMarked {
+  background: #673ab7!important;
   color: white;
+}
+
+::ng-deep .custom-dialog-class {
+  .mat-dialog-container {
+    padding: 20px;
+    overflow: hidden;
+    margin: 35px;
+  }
 }

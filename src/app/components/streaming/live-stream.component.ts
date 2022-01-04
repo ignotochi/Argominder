@@ -55,6 +55,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   }
 
   ngOnDestroy() {
+    this.configurations.setStreamingProperties({} as IStreamProperties);
     this.stopStream();
     this.dataChange$?.unsubscribe();
     this.streamChanges$?.unsubscribe();
@@ -168,7 +169,6 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
-      this.configurations.setStreamingProperties({} as IStreamProperties);
       this.configurations.setPreviewStatus(false);
     });
   }

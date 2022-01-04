@@ -33,7 +33,7 @@ export class StreamPreview implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.streamUrl = this.configurationsList.streamingProperties.streamUrl;
     this.showInVideoElement = this.configurationsList.streamingProperties.previewType === previewType.eventDetail &&
-      this.configurationsList.streamingProperties.streamingMode === streamingEventMode.video ? true : false;
+      this.configurationsList.streamingProperties.eventStreamingMode === streamingEventMode.video ? true : false;
   }
 
   ngOnDestroy() {

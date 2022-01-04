@@ -4,7 +4,6 @@ import { ILogin } from '../interfaces/ILogin';
 import { IMonitors } from '../interfaces/IMonitors';
 import { IConf } from '../interfaces/IConf';
 import { ICamEvents } from '../interfaces/ICamEvent';
-import { separators, streamingEventMode, zmUrl } from '../enums/enums';
 import { UrlsBuilder } from '../core/build-urls';
 import { previewType } from '../enums/preview-enum';
 import { ICamRegistry } from '../interfaces/ICamRegistry';

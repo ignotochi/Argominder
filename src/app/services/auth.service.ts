@@ -44,6 +44,7 @@ export class Auth {
         this.router.navigate([Menu.Home]);
         this.auth = null;
         this.zmService = null;
+        this.commoneInitializer = null;
         this.configurations = null;
         this.errorLogin = '';
     }
@@ -76,6 +77,8 @@ export class Auth {
 
     private afterLogin() {
         this.commoneInitializer.getCamList(this.localToken);
+        this.commoneInitializer.setDefaulEventStreamingConf();
+        this.commoneInitializer.setEventsFilters();
     }
 
 

@@ -1,20 +1,20 @@
-import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { EventsComponentDetail } from "./events.component";
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from "@angular/material/sort";
+import { CommonComponentModules } from "../components.module";
 
 const routes: Routes = [ { path: '', component: EventsComponentDetail} ]; 
 
 @NgModule({
   imports: [
-      CommonModule,
-      RouterModule.forChild(routes), 
+      RouterModule.forChild(routes),
+      CommonComponentModules,
       MatPaginatorModule,
       MatTableModule,
-      MatSortModule
+      MatSortModule,
     ],
     declarations: [
       EventsComponentDetail

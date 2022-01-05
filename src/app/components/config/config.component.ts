@@ -94,9 +94,9 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
-    this.configurationList$.unsubscribe();
-    this.dbConf$.unsubscribe();
-    this.dbService$.unsubscribe();
+    this.configurationList$?.unsubscribe();
+    this.dbConf$?.unsubscribe();
+    this.dbService$?.unsubscribe();
   }
 
   ngAfterViewInit() {

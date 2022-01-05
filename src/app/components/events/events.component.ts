@@ -10,7 +10,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseDetailComponent } from 'src/app/core/base-preview.component';
-import { configurationsActions } from 'src/app/enums/enums';
+import { configurationsActions, streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
@@ -33,7 +33,7 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
-  private configurationList: IConfigurationsList;
+  private configurationList: IConfigurationsList = null;
   private configurationList$: Subscription;
 
   @ViewChild(MatSort) sort: MatSort;
@@ -48,9 +48,11 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
     this.configurationList$ = this.configurations.getDataChanges().pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || 
         tt.action === configurationsActions.EventsFilter || 
-        tt.action === configurationsActions.StreamingProperties))
+        tt.action === configurationsActions.StreamingProperties || this.configurationList === null))
         .subscribe(result => {
       this.configurationList = result.payload;
+      const defaultModeToEnum = streamingEventMode[ Object.keys(streamingEventMode).find(mode => (mode === this.zmService.conf.defaultEventStreamingMode))];      
+      if (!result.payload.streamingProperties.eventStreamingMode) this.configurationList.streamingProperties.eventStreamingMode = defaultModeToEnum;      
       if (result.payload.eventsFilter) this.getEvents();
     });
   }

@@ -9,7 +9,6 @@ import { BaseDetailComponent } from 'src/app/core/base-preview.component';
 import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
-import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
@@ -24,7 +23,6 @@ import { ChangeDetectorJwt } from '../detectors/jwt.service';
   templateUrl: './live-stream.component.html',
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
-  //providers: [zmService, ChangeDetectorConfigurations]
 })
 export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
@@ -35,7 +33,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
 
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
   public showInfoDetail: boolean = false;
-  private configurationsList: IConfigurationsList;
+  private configurationList: IConfigurationsList = null;
   private dataChange$: Subscription;
   private streamChanges$: Subscription;
   private camInfo$: Subscription;
@@ -45,9 +43,9 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
     private elementRef: ElementRef<HTMLElement>) {
     super(auth);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
-      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus)).subscribe(result => {
-        this.configurationsList = result.payload;
+      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus || this.configurationList === null)).subscribe(result => {
         if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
+        this.configurationList = result.payload;
       });
   }
 
@@ -159,6 +157,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
       previewType: previewType.streamingDetail,
       streamUrl: this.detail.stream,
       camId: camId,
+      eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     } as IStreamProperties;
     this.configurations.setStreamingProperties(streamingProperties);
     this.configurations.setPreviewStatus(true);
@@ -183,7 +182,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   }
 
   getPreviewInfo(camId: string) {
-    return this.zmService.getPreviewInfo(this.configurationsList.camDiapason, camId, previewType.streaming);
+    return this.zmService.getPreviewInfo(this.configurationList.camDiapason, camId, previewType.streaming);
   }
 
 }

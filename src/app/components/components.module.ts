@@ -15,7 +15,6 @@ import { CommonModule } from '@angular/common';
   ],
 
   imports: [
-    FormsModule,
     CommonModule,
     MatButtonModule,
     MatInputModule,

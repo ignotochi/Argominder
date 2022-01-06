@@ -13,7 +13,7 @@ export class ChangeDetectorConfigurations extends DataStoreDetector<IConfigurati
     setAll(input: IConfigurationsList) {
         this.updateDataChanges({ action: configurationsActions.All, payload: input });
     }
-    setPreviewStatus(previewStatus: boolean) {
+    setStreamingStatus(previewStatus: boolean) {
         this.updateDataChanges({ action: configurationsActions.PreviewStatus, payload: { ...this.getClonedDataChange(), previewStatus: previewStatus } });
     }
     setCamDiapason(incCamDiapason: ICamRegistry) {
@@ -21,9 +21,6 @@ export class ChangeDetectorConfigurations extends DataStoreDetector<IConfigurati
     }
     setEventsFilters(eventsFilter: IEventsFilter) {
         this.updateDataChanges({ action: configurationsActions.EventsFilter, payload: { ...this.getClonedDataChange(), eventsFilter: eventsFilter } });
-    }
-    setStreamingChanges(streamingConfChanges: IConfigStreaming[]) {
-        this.updateDataChanges({ action: configurationsActions.StreamingConfChanges, payload: { ...this.getClonedDataChange(), streamingConfChanges: streamingConfChanges } });
     }
     setStreamingProperties(streamingProperties: IStreamProperties) {
         this.updateDataChanges({ action: configurationsActions.StreamingProperties, payload: { ...this.getClonedDataChange(), streamingProperties: streamingProperties } });

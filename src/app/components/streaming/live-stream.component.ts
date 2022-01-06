@@ -160,7 +160,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     } as IStreamProperties;
     this.configurations.setStreamingProperties(streamingProperties);
-    this.configurations.setPreviewStatus(true);
+    this.configurations.setStreamingStatus(true);
     this.loadPreview();
   }
 
@@ -168,7 +168,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
-      this.configurations.setPreviewStatus(false);
+      this.configurations.setStreamingStatus(false);
     });
   }
 

@@ -4,11 +4,10 @@ import {
 import { FormControl } from '@angular/forms';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription } from 'rxjs';
-import { filter, switchMap } from 'rxjs/operators';
-import { configurationsActions, streamingConf, streamingEventMode, streamingSettings } from 'src/app/enums/enums';
+import { filter } from 'rxjs/operators';
+import { configurationsActions, streamingEventMode, streamingSettings } from 'src/app/enums/enums';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
-import { IConfigStreaming } from 'src/app/interfaces/IConfStreaming';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
@@ -56,24 +55,16 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   public detailStreamingMaxFps = 10;
   public detailStreamingMinFps = 1;
   public selectedDetailStreamingFps: number = null;
-  public isLoadedFromDb: boolean;
   private configurationList$: Subscription;
   private dbConf$: Subscription;
-  private dbService$: Subscription;
   public configurationsList: IConfigurationsList = null;
 
   constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef,
     private dbService: NgxIndexedDBService, public commonInitializer: CommoneInitializer, private dateAdapter: DateAdapter<Date>) {
 
     this.configurationList$ = this.configurations.getDataChanges().pipe(
-      filter(
-        tt => tt.action === configurationsActions.CamDiapason ||
-          tt.action === configurationsActions.StreamingConfChanges ||
-          tt.action === configurationsActions.EventsFilter || !this.configurationsList))
+      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.EventsFilter || !this.configurationsList))
       .subscribe(result => {
-        if (result.action === configurationsActions.StreamingConfChanges) {
-          this.detectNewStreamingConf(result.payload.streamingConfChanges);
-        };
         if (result.payload.camDiapason.length > 0) {
           this.mapCamsNames(result.payload.camDiapason);
           this.selectedCam.id = result.payload.eventsFilter?.cam;
@@ -95,7 +86,6 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.configurationList$?.unsubscribe();
     this.dbConf$?.unsubscribe();
-    this.dbService$?.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -110,90 +100,53 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   loadIndexedDbSettings() {
-    return this.dbService.getAll(this.database).pipe(
-      switchMap((settingsDbObjects: DbConfgigObject[]) => {
-        if (settingsDbObjects.length > 0) {
-          const defaultSettingsDb: DbConfgigObject[] = settingsDbObjects.map(x => x);
-          this.isLoadedFromDb = defaultSettingsDb.length > 0;
-          this.mapSettings(defaultSettingsDb)
-          return defaultSettingsDb;
-        }
-        else {
-          const defaultSettingsDb: DbConfgigObject[] = [
-            {
-              id: streamingSettings.liveStreamingScale,
-              value: this.zmService.conf.liveStreamingScale
-            },
-            {
-              id: streamingSettings.detailStreamingScale,
-              value: this.zmService.conf.detailStreamingScale
-            },
-            {
-              id: streamingSettings.liveStreamingMaxFps,
-              value: this.zmService.conf.liveStreamingMaxFps
-            },
-            {
-              id: streamingSettings.detailStreamingMaxfps,
-              value: this.zmService.conf.detailStreamingMaxfps
-            }];
-          this.mapSettings(defaultSettingsDb)
-          return this.dbService.bulkAdd(this.database, defaultSettingsDb);
-        }
-      })
-    );
+    this.dbConf$ = this.dbService.getAll(this.database).subscribe((settingsDbObjects: DbConfgigObject[]) => {
+      if (settingsDbObjects.length > 0) {
+        this.setLoadedConf(settingsDbObjects)
+      }
+      else {
+        const defaultSettingsDb: DbConfgigObject[] = [
+          {
+            id: streamingSettings.liveStreamingScale,
+            value: this.zmService.conf.liveStreamingScale
+          },
+          {
+            id: streamingSettings.detailStreamingScale,
+            value: this.zmService.conf.detailStreamingScale
+          },
+          {
+            id: streamingSettings.liveStreamingMaxFps,
+            value: this.zmService.conf.liveStreamingMaxFps
+          },
+          {
+            id: streamingSettings.detailStreamingMaxfps,
+            value: this.zmService.conf.detailStreamingMaxfps
+          }];
+        this.setLoadedConf(defaultSettingsDb)
+        this.dbService.add(this.database, defaultSettingsDb).subscribe(() => {});
+      }
+    })
+
   }
 
-  mapSettings(result: DbConfgigObject[]) {
+  setLoadedConf(result: DbConfgigObject[]) {
     result.some(conf => {
       if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
         this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);
-        this.applyNewStreamingConf(parseInt(conf.value), streamingConf.liveStreaming);
       }
 
       if (conf.id === streamingSettings.detailStreamingScale && this.selectedDetailStreamingScale === null) {
         this.selectedDetailStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingScale);
-        this.applyNewStreamingConf(parseInt(conf.value), streamingConf.detailStreaming);
       }
 
       if (conf.id === streamingSettings.liveStreamingMaxFps && this.selectedLiveStreamingFps === null) {
         this.selectedLiveStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingMaxFps);
-        this.applyNewStreamingConf(parseInt(conf.value), streamingConf.maxLiveFps);
       }
 
       if (conf.id === streamingSettings.detailStreamingMaxfps && this.selectedDetailStreamingFps === null) {
         this.selectedDetailStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingMaxfps);
-        this.applyNewStreamingConf(parseInt(conf.value), streamingConf.maxDetailFps);
       }
     });
-  }
-
-  restetDbConf() {
-    this.dbService$ = this.dbService.clear(this.database).subscribe(() => {
-      this.isLoadedFromDb = false;
-      this.changeRef.markForCheck();
-    });
-  }
-
-
-  applyNewStreamingConf(value: number, type: string) {
-    this.configurations.setStreamingChanges([{ value: value, type: type }] as IConfigStreaming[]);
-  }
-
-  detectNewStreamingConf(streamingConfChanges: IConfigStreaming[]) {
-    streamingConfChanges.map(data => {
-      if (data.type === streamingConf.liveStreaming) {
-        this.setLiveStreamingScale(data.value);
-      };
-      if (data.type === streamingConf.maxLiveFps) {
-        this.setLiveStreamingFps(data.value);
-      };
-      if (data.type === streamingConf.detailStreaming) {
-        this.setDetailStreamingScale(data.value);
-      };
-      if (data.type === streamingConf.maxDetailFps) {
-        this.setDetailStreamingFps(data.value);
-      };
-    })
   }
 
   setEventsFilters() {
@@ -232,8 +185,8 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   relaodLiveStreaming() {
-    this.configurations.setPreviewStatus(true);
-    this.configurations.setPreviewStatus(false);
+    this.configurations.setStreamingStatus(true);
+    this.configurations.setStreamingStatus(false);
   }
 
   setLiveStreamingScale(value: number) {
@@ -261,7 +214,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateConfDB(key: string, value: string) {
-    this.dbService.update(this.database, { id: key, value: value });
+    this.dbService.update(this.database, { id: key, value: value }).subscribe(() => {});
   }
 
 }

@@ -41,12 +41,12 @@ export class StreamPreview implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.configurations.setPreviewStatus(true);
+    this.configurations.setStreamingStatus(true);
   }
 
   stopStreaming(): void {
     if (this.streaming) this.streaming.nativeElement.src = null;
-    this.configurations.setPreviewStatus(false);
+    this.configurations.setStreamingStatus(false);
   }
 
   hideSpinners(loadStatus: boolean) {

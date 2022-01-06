@@ -24,7 +24,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   private auth$: Subscription;
 
   private configurationsList: IConfigurationsList = {
-    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
+    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingProperties: {} as IStreamProperties
   };
 
   constructor(private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations,

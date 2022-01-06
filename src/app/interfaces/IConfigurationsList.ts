@@ -7,6 +7,5 @@ export interface IConfigurationsList {
     previewStatus: boolean;
     camDiapason: ICamRegistry[];
     eventsFilter: IEventsFilter;
-    streamingConfChanges: IConfigStreaming[];
     streamingProperties: IStreamProperties;
   }

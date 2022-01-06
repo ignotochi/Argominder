@@ -130,8 +130,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
         this.setLoadedConf(defaultSettingsDb)
         this.dbService.add(this.database, defaultSettingsDb).subscribe(() => { });
       }
-    })
-
+    });
   }
 
   setLoadedConf(result: DbConfgigObject[]) {

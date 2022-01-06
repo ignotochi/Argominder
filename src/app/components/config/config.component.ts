@@ -42,6 +42,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   public camsList: { name: string, id: string }[] = [];
   public selectedCam: { name: string, id: string } = { name: null, id: null };
   public eventStreamMode: { name: string, value: streamingEventMode }[] = [];
+  public languages: { name: string, value: string }[] = [{ name: "Italiano", value: "it-IT" }, { name: "English", value: "en-EN" }];
   private database: string = 'settings';
   public liveStreamingMaxScale = 100;
   public liveStreamingMinScale = 5;
@@ -75,6 +76,10 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
         this.startTime = result.payload.eventsFilter.startTime;
         this.endTime = result.payload.eventsFilter.endTime;;
       });
+    const streamModes = Object.keys(streamingEventMode);
+    streamModes.forEach(mode => {
+      this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
+    })
     this.loadIndexedDbSettings();
     this.dateAdapter.setLocale(this.zmService.conf.language);
   }
@@ -123,7 +128,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
             value: this.zmService.conf.detailStreamingMaxfps
           }];
         this.setLoadedConf(defaultSettingsDb)
-        this.dbService.add(this.database, defaultSettingsDb).subscribe(() => {});
+        this.dbService.add(this.database, defaultSettingsDb).subscribe(() => { });
       }
     })
 
@@ -214,7 +219,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   updateConfDB(key: string, value: string) {
-    this.dbService.update(this.database, { id: key, value: value }).subscribe(() => {});
+    this.dbService.update(this.database, { id: key, value: value }).subscribe(() => { });
   }
 
 }

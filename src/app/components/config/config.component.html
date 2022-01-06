@@ -17,12 +17,15 @@
             </mat-select>
         </mat-form-field>
 
-        <div class="settingsFromJson">
-            <mat-form-field appearance="fill">
-                <mat-label>{{ 'Language' }}</mat-label>
-                <input [disabled]="true" matInput [value]="zmService.conf.language">
-            </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+            <mat-label>Languages</mat-label>
+            <mat-select [(value)]="this.zmService.conf.language">
+                <mat-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
 
+        <div class="settingsFromJson">
             <mat-form-field appearance="fill">
                 <mat-label>{{ 'Protocol' }}</mat-label>
                 <input [disabled]="true" matInput [value]="zmService.conf.protocol">

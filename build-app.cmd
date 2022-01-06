@@ -1,1 +1,1 @@
-ng build --configuration production --base-href /zmlivetest/ --deploy-url /zmlivetest/
+ng build --configuration production --base-href /argominder/ --deploy-url /argominder/

@@ -26,8 +26,8 @@ const dbConfig: DBConfig  = {
 
 @NgModule({
   imports: [
-    NgxIndexedDBModule.forRoot(dbConfig),
     RouterModule.forChild(routes),
+    NgxIndexedDBModule.forRoot(dbConfig),
     CommonComponentModules,
     MatSelectModule,
     MatNativeDateModule,

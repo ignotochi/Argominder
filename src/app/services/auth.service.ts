@@ -78,7 +78,7 @@ export class Auth {
     private afterLogin() {
         this.commoneInitializer.getCamList(this.localToken);
         this.commoneInitializer.setDefaulEventStreamingConf();
-        this.commoneInitializer.setEventsFilters();
+        this.commoneInitializer.setDefaultEventsFilters();
     }
 
 

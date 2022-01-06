@@ -8,6 +8,7 @@ import { StreamPreview } from './preview/stream-preview.component';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -22,9 +23,10 @@ import { CommonModule } from '@angular/common';
     MatButtonToggleModule,
     MatIconModule,
     MatDialogModule,
+    MatProgressSpinnerModule
   ],
 
-  exports: [FormsModule, CommonModule, MatButtonModule, MatInputModule, MatTabsModule, MatButtonToggleModule, MatIconModule, MatDialogModule]
+  exports: [FormsModule, CommonModule, MatButtonModule, MatInputModule, MatTabsModule, MatButtonToggleModule, MatIconModule, MatDialogModule, MatProgressSpinnerModule]
 })
 export class CommonComponentModules { }
 

@@ -1,5 +1,6 @@
 
 export interface IConf {
+    language: string;
     protocol: string; 
     baseUrl : string;
     streamUrl1: string;

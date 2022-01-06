@@ -14,6 +14,10 @@ import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
 import { ZmService } from 'src/app/services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
+import { CommoneInitializer } from 'src/app/services/common-initializer.service';
+import { convertDateToString, convertStringToDate } from 'src/app/utils/helper';
+import { DateAdapter } from '@angular/material/core';
+
 
 export interface DbConfgigObject {
   id: string,
@@ -29,15 +33,12 @@ export interface DbConfgigObject {
 
 export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input()
-  public set localToken(input: string) { this._localToken = input; }
-  public get localToken(): string { return this._localToken; }
-  private _localToken: string = null;
   public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public panelOpenState = false;
-  public dateRange: IEventsFilter = {} as IEventsFilter;
   public showDateRangeSpinner: boolean = false;
-  public startDateFilter: Date = new Date();
-  private endtDateFIlter: Date = null;
+  public startDate: Date = new Date();
+  public startTime: string;
+  public endTime: string;
   public camSelection = new FormControl();
   public camsList: { name: string, id: string }[] = [];
   public selectedCam: { name: string, id: string } = { name: null, id: null };
@@ -59,37 +60,35 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   private configurationList$: Subscription;
   private dbConf$: Subscription;
   private dbService$: Subscription;
-  public configurationsList: IConfigurationsList;
+  public configurationsList: IConfigurationsList = null;
 
+  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef,
+    private dbService: NgxIndexedDBService, public commonInitializer: CommoneInitializer, private dateAdapter: DateAdapter<Date>) {
 
-  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef, 
-    private dbService: NgxIndexedDBService) {
-    this.setDefaultTime();
-    const streamModes = Object.keys(streamingEventMode);
-    streamModes.forEach(mode => {
-      this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
-    })
-    this.setDefaulEventStreamingConf(streamModes)
     this.configurationList$ = this.configurations.getDataChanges().pipe(
       filter(
         tt => tt.action === configurationsActions.CamDiapason ||
-        tt.action === configurationsActions.StreamingConfChanges ||
-        tt.action === configurationsActions.EventsFilter)).subscribe(result => {
-          if (result.action === configurationsActions.CamDiapason) this.mapCamsNames(result.payload.camDiapason);
-          if (result.action === configurationsActions.StreamingConfChanges) this.detectNewStreamingConf(result.payload.streamingConfChanges);
-          this.configurationsList = result.payload;
-        });
+          tt.action === configurationsActions.StreamingConfChanges ||
+          tt.action === configurationsActions.EventsFilter || !this.configurationsList))
+      .subscribe(result => {
+        if (result.action === configurationsActions.StreamingConfChanges) {
+          this.detectNewStreamingConf(result.payload.streamingConfChanges);
+        };
+        if (result.payload.camDiapason.length > 0) {
+          this.mapCamsNames(result.payload.camDiapason);
+          this.selectedCam.id = result.payload.eventsFilter?.cam;
+          this.selectedCam.name = this.camsList.find(x => x.id === result.payload.eventsFilter?.cam)?.name;
+        }
+        this.configurationsList = result.payload;
+        this.startDate = convertStringToDate(result.payload.eventsFilter.startDate);
+        this.startTime = result.payload.eventsFilter.startTime;
+        this.endTime = result.payload.eventsFilter.endTime;;
+      });
     this.popolateSettingsDB();
-  }
-
-  setDefaulEventStreamingConf(streamModes: string[]) {
-    const defaultEventStreamMode = this.zmService.conf.defaultEventStreamingMode;
-    const defaultModeToEnum = streamingEventMode[streamModes.find(mode => (mode === defaultEventStreamMode))];
-    this.configurations.setStreamingProperties({ eventStreamingMode: defaultModeToEnum } as IStreamProperties);
+    this.dateAdapter.setLocale(this.zmService.conf.language); 
   }
 
   ngOnInit() {
-    this.setEventsFilters(true);
     if (!window.indexedDB) { console.log("Il tuo browser non supporta indexedDB"); }
   }
 
@@ -201,54 +200,34 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   }
 
-  setDefaultTime() {
-    const timeNow = new Date();
-    const defaulHour = timeNow.getHours();
-    const defaultMinute = timeNow.getMinutes() < 10 ? '0' + timeNow.getMinutes() : timeNow.getMinutes();
-    this.dateRange.startTime = (defaulHour - 1).toString() + ':' + defaultMinute.toString();
-    this.dateRange.endTime = (defaulHour).toString() + ':' + defaultMinute.toString();
-  }
-
-  converDateFormat(date: Date) {
-    let d = date, month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
-    if (month.length < 2) month = '0' + month;
-    if (day.length < 2) day = '0' + day;
-    return [year, month, day].join('-');
-  }
-
-  setEventsFilters(isOnLoad: boolean) {
-    if(isOnLoad) {
-      this.endtDateFIlter = this.startDateFilter;
-      const filters: IEventsFilter = {
-        startDate: this.converDateFormat(this.startDateFilter),
-        endDate: this.converDateFormat(this.endtDateFIlter),
-        startTime: this.dateRange.startTime,
-        endTime: this.dateRange.endTime,
-        cam: this.selectedCam.id
-      }
-      this.configurations.setEventsFilters(filters);
+  setEventsFilters() {
+    const filters: IEventsFilter = {
+      startDate: convertDateToString(this.startDate),
+      endDate: convertDateToString(this.startDate),
+      startTime: this.startTime,
+      endTime: this.endTime,
+      cam: this.selectedCam.id
     }
-    if (!isOnLoad) {
-      this.showDateRangeSpinner = true;
-      setTimeout(() => {
-          this.showDateRangeSpinner = false;
-          this.changeRef.markForCheck();  
-      }, 1500);
-    }
+    this.configurations.setEventsFilters(filters);
+    this.showDateRangeSpinner = true;
+    setTimeout(() => {
+      this.showDateRangeSpinner = false;
+      this.changeRef.markForCheck();
+    }, 1500);
   }
 
   resetFilters() {
-    this.setDefaultTime();
+    this.commonInitializer.setDefaultTime();
     const currentDate = new Date();
     const resettedfilters: IEventsFilter = {
-      startDate: this.converDateFormat(currentDate),
-      endDate: this.converDateFormat(currentDate),
-      startTime: this.dateRange.startTime,
-      endTime: this.dateRange.endTime,
+      startDate: convertDateToString(currentDate),
+      endDate: convertDateToString(currentDate),
+      startTime: this.startTime,
+      endTime: this.endTime,
       cam: null
     }
     this.configurations.setEventsFilters(resettedfilters);
-    this.startDateFilter = currentDate;
+    this.startDate = currentDate;
     this.selectedCam = { name: null, id: null };
   }
 

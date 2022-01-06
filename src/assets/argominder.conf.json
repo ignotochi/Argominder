@@ -1,4 +1,5 @@
 {
+    "language" : "it-IT",
     "protocol": "https://",
     "baseUrl": "fetchtec.com/zm/api/",
     "streamUrl1": "centos.fetchtec.com",

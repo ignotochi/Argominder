@@ -6,22 +6,21 @@ import { ChangeDetectorConfigurations } from '../components/detectors/configurat
 import { streamingEventMode } from '../enums/enums';
 import { IStreamProperties } from '../interfaces/IStreamProperties';
 import { IEventsFilter } from '../interfaces/IEventsFilter';
-
+import { convertDateToString } from '../utils/helper';
 
 @Injectable()
-
 export class CommoneInitializer {
     private camInfo$: Subscription;
     private auth$: Subscription;
     private streamModes = Object.keys(streamingEventMode);
-    private dateRange: IEventsFilter = {} as IEventsFilter;
+    public dateRange: IEventsFilter = {} as IEventsFilter;
     private startDateFilter: Date = new Date();
     private endtDateFIlter: Date = null;
 
     constructor(private zmService: ZmService, private configurations: ChangeDetectorConfigurations) {
     }
 
-    getCamList(token: string) {
+    public getCamList(token: string) {
         this.camInfo$ = this.zmService.getCamListInfo(token).subscribe((result) => {
 
             result.monitors.forEach(result => {
@@ -45,13 +44,13 @@ export class CommoneInitializer {
         });
     }
 
-    setDefaulEventStreamingConf() {
+    public setDefaulEventStreamingConf() {
         const defaultEventStreamMode = this.zmService.conf.defaultEventStreamingMode;
         const defaultModeToEnum = streamingEventMode[this.streamModes.find(mode => (mode === defaultEventStreamMode))];
         this.configurations.setStreamingProperties({ eventStreamingMode: defaultModeToEnum } as IStreamProperties);
     }
 
-    setDefaultTime() {
+    public setDefaultTime() {
         const timeNow = new Date();
         const defaulHour = timeNow.getHours();
         const defaultMinute = timeNow.getMinutes() < 10 ? '0' + timeNow.getMinutes() : timeNow.getMinutes();
@@ -59,19 +58,12 @@ export class CommoneInitializer {
         this.dateRange.endTime = (defaulHour).toString() + ':' + defaultMinute.toString();
     }
 
-    converDateFormat(date: Date) {
-        let d = date, month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-        return [year, month, day].join('-');
-    }
-
-    setEventsFilters() {
+    public setDefaultEventsFilters() {
         this.setDefaultTime();
         this.endtDateFIlter = this.startDateFilter;
         const filters: IEventsFilter = {
-            startDate: this.converDateFormat(this.startDateFilter),
-            endDate: this.converDateFormat(this.endtDateFIlter),
+            startDate: convertDateToString(this.startDateFilter),
+            endDate: convertDateToString(this.endtDateFIlter),
             startTime: this.dateRange.startTime,
             endTime: this.dateRange.endTime,
             cam: null

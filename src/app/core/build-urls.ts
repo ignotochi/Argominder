@@ -45,7 +45,7 @@ export class UrlsBuilder {
 
   eventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string, conf: IConf): string {
     const monitor = ((camId !== null && camId !== undefined) ? (zmUrl.monitorId + separators.doublePoints + camId + separators.slash + zmUrl.startTime) : zmUrl.startTime );
-    const buildedUrl = conf.protocol + conf.baseUrl + zmUrl.events + monitor + startDate + zmUrl.percent + startTime +
+    const buildedUrl = conf.protocol + conf.baseUrl + zmUrl.events + monitor + startDate + zmUrl.percent + startTime + separators.slash +
       zmUrl.endtime + endDate + zmUrl.percent + endTime + separators.dot + zmUrl.json + separators.question + zmUrl.token + separators.equal + token;
     return buildedUrl;
   }

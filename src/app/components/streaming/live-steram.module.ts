@@ -12,7 +12,6 @@ const routes: Routes = [ { path: '', component: LiveStreamComponent} ];
       RouterModule.forChild(routes),
       CommonComponentModules,
       MatGridListModule,
-      MatProgressSpinnerModule,
     ],
     declarations: [
       LiveStreamComponent

@@ -58,21 +58,21 @@ export class ZmService {
     return this.http.get<IMonitors>(url);
   }
 
-  getLiveStream(camId: string, token: string, index: number) {
+  getLiveStream(camId: string, token: string, index: number, streamScale: string, streamFps: string) {
     var streamUrl: string;
     if (index <= this.streamLimt1) streamUrl = this.conf.streamUrl1;
     else if (index <= this.streamLimt2) streamUrl = this.conf.streamUrl2;
     else if (index <= this.streamLimt3) streamUrl = this.conf.streamUrl3;
     else if (index <= this.streamLimt4) streamUrl = this.conf.streamUrl4;
-    return this.urlBuilder.liveStream(camId, token, streamUrl, this.conf);
+    return this.urlBuilder.liveStream(camId, token, streamUrl, this.conf, streamScale, streamFps);
   }
 
-  getLiveStreamDetail(camId: string, token: string) {
-    return this.urlBuilder.liveStreamDetail(camId, token, this.conf);
+  getLiveStreamDetail(camId: string, token: string, detailStreamingScale: string, detailStreamingMaxfps: string) {
+    return this.urlBuilder.liveStreamDetail(camId, token, this.conf, detailStreamingScale, detailStreamingMaxfps);
   }
 
-  getEventStreamDetail(eventId: string, token: string, mode: string, frame: string) {
-    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf, frame);
+  getEventStreamDetail(eventId: string, token: string, mode: string, frame: string, streamScale: string) {
+    return this.urlBuilder.eventStreamDetail(eventId, token, mode, this.conf, frame, streamScale);
   }
 
   getEventsList(token: string, startDate: string, endDate: string, startTime: string, endTime: string, camId: string) {

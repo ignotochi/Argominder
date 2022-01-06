@@ -16,6 +16,8 @@ import { ChangeDetectorConfigurations } from '../detectors/configurations.servic
 import { CommoneInitializer } from 'src/app/services/common-initializer.service';
 import { convertDateToString, convertStringToDate } from 'src/app/utils/helper';
 import { DateAdapter } from '@angular/material/core';
+import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
+import { ChangeDetectorJwt } from '../detectors/jwt.service';
 
 
 export interface DbConfgigObject {
@@ -30,9 +32,8 @@ export interface DbConfgigObject {
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
   @Input()
-  public datasource: IMonitors = (<IMonitors>{ monitors: [] });
   public panelOpenState = false;
   public showDateRangeSpinner: boolean = false;
   public startDate: Date = new Date();
@@ -43,25 +44,13 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   public selectedCam: { name: string, id: string } = { name: null, id: null };
   public eventStreamMode: { name: string, value: streamingEventMode }[] = [];
   public languages: { name: string, value: string }[] = [{ name: "Italiano", value: "it-IT" }, { name: "English", value: "en-EN" }];
-  private database: string = 'settings';
-  public liveStreamingMaxScale = 100;
-  public liveStreamingMinScale = 5;
-  public selectedLiveStreamingScale: number = null;
-  public detailStreamingMaxScale = 100;
-  public detailStreamingMinScale = 5;
-  public selectedDetailStreamingScale: number = null;
-  public liveStreamingMaxFps = 10;
-  public liveStreamingMinFps = 1;
-  public selectedLiveStreamingFps: number = null;
-  public detailStreamingMaxFps = 10;
-  public detailStreamingMinFps = 1;
-  public selectedDetailStreamingFps: number = null;
   private configurationList$: Subscription;
-  private dbConf$: Subscription;
   public configurationsList: IConfigurationsList = null;
 
-  constructor(private configurations: ChangeDetectorConfigurations, public zmService: ZmService, private changeRef: ChangeDetectorRef,
-    private dbService: NgxIndexedDBService, public commonInitializer: CommoneInitializer, private dateAdapter: DateAdapter<Date>) {
+  constructor(public dbService: NgxIndexedDBService, private configurations: ChangeDetectorConfigurations, public zmService: ZmService, 
+    private changeRef: ChangeDetectorRef, private commonInitializer: CommoneInitializer, private dateAdapter: DateAdapter<Date>, public auth: ChangeDetectorJwt) {
+    super(dbService, auth, zmService);
+    Object.keys(streamingEventMode).forEach(mode => { this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] }) });
 
     this.configurationList$ = this.configurations.getDataChanges().pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.EventsFilter || !this.configurationsList))
@@ -76,16 +65,11 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
         this.startTime = result.payload.eventsFilter.startTime;
         this.endTime = result.payload.eventsFilter.endTime;;
       });
-    const streamModes = Object.keys(streamingEventMode);
-    streamModes.forEach(mode => {
-      this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] })
-    })
-    this.loadIndexedDbSettings();
+
     this.dateAdapter.setLocale(this.zmService.conf.language);
   }
 
   ngOnInit() {
-    if (!window.indexedDB) { console.log("Il tuo browser non supporta indexedDB"); }
   }
 
   ngOnDestroy() {
@@ -97,60 +81,7 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   mapCamsNames(camDiapason: ICamRegistry[]) {
-    camDiapason.forEach(ele => {
-      if (ele.Name && ele.Id) {
-        this.camsList.push({ name: ele.Name, id: ele.Id });
-      }
-    });
-  }
-
-  loadIndexedDbSettings() {
-    this.dbConf$ = this.dbService.getAll(this.database).subscribe((settingsDbObjects: DbConfgigObject[]) => {
-      if (settingsDbObjects.length > 0) {
-        this.setLoadedConf(settingsDbObjects)
-      }
-      else {
-        const defaultSettingsDb: DbConfgigObject[] = [
-          {
-            id: streamingSettings.liveStreamingScale,
-            value: this.zmService.conf.liveStreamingScale
-          },
-          {
-            id: streamingSettings.detailStreamingScale,
-            value: this.zmService.conf.detailStreamingScale
-          },
-          {
-            id: streamingSettings.liveStreamingMaxFps,
-            value: this.zmService.conf.liveStreamingMaxFps
-          },
-          {
-            id: streamingSettings.detailStreamingMaxfps,
-            value: this.zmService.conf.detailStreamingMaxfps
-          }];
-        this.setLoadedConf(defaultSettingsDb)
-        this.dbService.add(this.database, defaultSettingsDb).subscribe(() => { });
-      }
-    });
-  }
-
-  setLoadedConf(result: DbConfgigObject[]) {
-    result.some(conf => {
-      if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
-        this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);
-      }
-
-      if (conf.id === streamingSettings.detailStreamingScale && this.selectedDetailStreamingScale === null) {
-        this.selectedDetailStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingScale);
-      }
-
-      if (conf.id === streamingSettings.liveStreamingMaxFps && this.selectedLiveStreamingFps === null) {
-        this.selectedLiveStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingMaxFps);
-      }
-
-      if (conf.id === streamingSettings.detailStreamingMaxfps && this.selectedDetailStreamingFps === null) {
-        this.selectedDetailStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingMaxfps);
-      }
-    });
+    camDiapason.forEach(ele => { if (ele.Name && ele.Id) this.camsList.push({ name: ele.Name, id: ele.Id });});
   }
 
   setEventsFilters() {
@@ -215,10 +146,6 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
     this.zmService.conf.detailStreamingMaxfps = value.toString();
     this.updateConfDB(streamingSettings.detailStreamingMaxfps, value.toString());
     this.relaodLiveStreaming();
-  }
-
-  updateConfDB(key: string, value: string) {
-    this.dbService.update(this.database, { id: key, value: value }).subscribe(() => { });
   }
 
 }

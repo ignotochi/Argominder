@@ -7,9 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseDetailComponent } from 'src/app/core/base-preview.component';
+import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
 import { configurationsActions, streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
@@ -27,7 +28,7 @@ import { StreamPreview } from '../preview/stream-preview.component';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
+export class EventsComponentDetail extends BaseArgComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public showPreview: boolean;
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
@@ -39,8 +40,8 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private zmService: ZmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations, public auth: ChangeDetectorJwt) {
-    super(auth);
+  constructor(public dbService: NgxIndexedDBService, public zmService: ZmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations, public auth: ChangeDetectorJwt) {
+    super(dbService, auth, zmService);
     this.showPreview = false;
   }
 
@@ -64,6 +65,7 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   ngOnDestroy() {
     this.configurations.setStreamingProperties({} as IStreamProperties);
     this.configurationList$.unsubscribe();
+    this.dbConf$?.unsubscribe();
   }
 
   getEvents() {
@@ -86,12 +88,7 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   }
 
   getStreamPreview(eventId: string) {
-    return this.zmService.getEventStreamDetail(
-      eventId,
-      this.token,
-      this.configurationList.streamingProperties.eventStreamingMode,
-      this.zmService.conf.detailStreamingMaxfps
-    );
+    return this.zmService.getEventStreamDetail(eventId, this.token, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedLiveStreamingScale.toString());
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
@@ -124,12 +121,6 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
     if (this.configurationList.camDiapason.find(cam => (cam.Id === camId))) {
       return this.configurationList.camDiapason.find(cam => cam.Id === camId).Name;
     }
-  }
-
-  stopStream() {
-  }
-
-  startStream() {
   }
 
   markEvent(target: HTMLElement) {

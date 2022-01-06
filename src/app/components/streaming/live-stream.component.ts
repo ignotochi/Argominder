@@ -5,7 +5,7 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseDetailComponent } from 'src/app/core/base-preview.component';
+import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
 import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
@@ -16,6 +16,7 @@ import { ZmService } from '../../services/zm.service';
 import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 import { ChangeDetectorJwt } from '../detectors/jwt.service';
+import { NgxIndexedDBService } from 'ngx-indexed-db';
 
 
 @Component({
@@ -24,7 +25,7 @@ import { ChangeDetectorJwt } from '../detectors/jwt.service';
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
@@ -39,9 +40,9 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(private zmService: ZmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, public auth: ChangeDetectorJwt,
-    private elementRef: ElementRef<HTMLElement>) {
-    super(auth);
+  constructor(public dbService: NgxIndexedDBService, public zmService: ZmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, 
+    public auth: ChangeDetectorJwt, private elementRef: ElementRef<HTMLElement>) {
+    super(dbService, auth, zmService);
     this.dataChange$ = this.configurations.getDataChanges()?.pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus || this.configurationList === null)).subscribe(result => {
         if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
@@ -59,7 +60,8 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
     this.streamChanges$?.unsubscribe();
     this.camInfo$?.unsubscribe();
     this.dialog$?.unsubscribe();
-    this.elementRef.nativeElement.remove();
+    this.elementRef?.nativeElement.remove();
+    this.dbConf$?.unsubscribe();
   }
 
   ngOnInit() {
@@ -98,11 +100,11 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
 
   getStream(cam: string, index: number, status: string) {
     if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.token, index);
+    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.token, index, this.selectedLiveStreamingScale.toString(), this.selectedLiveStreamingFps.toString());
   }
 
   getStreamPreview(cam: string) {
-    return this.zmService.getLiveStreamDetail(cam, this.token);
+    return this.zmService.getLiveStreamDetail(cam, this.token, this.selectedDetailStreamingScale.toString(), this.selectedDetailStreamingFps.toString());
   }
 
   getCamList() {

@@ -84,8 +84,8 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
         this.startTime = result.payload.eventsFilter.startTime;
         this.endTime = result.payload.eventsFilter.endTime;;
       });
-    this.popolateSettingsDB();
-    this.dateAdapter.setLocale(this.zmService.conf.language); 
+    this.loadIndexedDbSettings();
+    this.dateAdapter.setLocale(this.zmService.conf.language);
   }
 
   ngOnInit() {
@@ -109,19 +109,17 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  popolateSettingsDB() {
-    let defaultSettingsDb: DbConfgigObject[] = [];
-
-    return this.dbConf$ = this.dbService.getAll(this.database).pipe(
+  loadIndexedDbSettings() {
+    return this.dbService.getAll(this.database).pipe(
       switchMap((settingsDbObjects: DbConfgigObject[]) => {
         if (settingsDbObjects.length > 0) {
-          defaultSettingsDb = settingsDbObjects.map(x => x);
+          const defaultSettingsDb: DbConfgigObject[] = settingsDbObjects.map(x => x);
           this.isLoadedFromDb = defaultSettingsDb.length > 0;
+          this.mapSettings(defaultSettingsDb)
           return defaultSettingsDb;
         }
         else {
-          this.isLoadedFromDb = false;
-          defaultSettingsDb.push(
+          const defaultSettingsDb: DbConfgigObject[] = [
             {
               id: streamingSettings.liveStreamingScale,
               value: this.zmService.conf.liveStreamingScale
@@ -137,14 +135,12 @@ export class ConfigComponent implements OnInit, OnDestroy, AfterViewInit {
             {
               id: streamingSettings.detailStreamingMaxfps,
               value: this.zmService.conf.detailStreamingMaxfps
-            },
-          )
+            }];
+          this.mapSettings(defaultSettingsDb)
           return this.dbService.bulkAdd(this.database, defaultSettingsDb);
         }
       })
-    ).subscribe(() => (
-      this.mapSettings(defaultSettingsDb)
-    ))
+    );
   }
 
   mapSettings(result: DbConfgigObject[]) {

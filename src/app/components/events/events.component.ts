@@ -114,7 +114,7 @@ export class EventsComponentDetail extends BaseDetailComponent<ICamEvents> imple
   }
 
   loadPreview(target: HTMLElement): void {
-    const dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
+    const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
       this.markEvent(target);
     });

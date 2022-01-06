@@ -166,7 +166,7 @@ export class LiveStreamComponent extends BaseDetailComponent<IMonitors> implemen
 
   loadPreview(): void {
     let dialogRef: MatDialogRef<StreamPreview>;
-    dialogRef = this.dialog.open(StreamPreview, { panelClass: 'custom-dialog-class' });
+    dialogRef = this.dialog.open(StreamPreview);
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
       this.configurations.setStreamingStatus(false);
     });

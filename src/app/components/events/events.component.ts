@@ -10,25 +10,24 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
+import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
+import { CoreMainServices } from 'src/app/core/core-main-services.service';
 import { configurationsActions, streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { ZmService } from '../../services/zm.service';
-import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
-import { ChangeDetectorJwt } from '../detectors/jwt.service';
 import { StreamPreview } from '../preview/stream-preview.component';
 
 @Component({
   selector: 'events',
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
+  providers: [CoreMainServices]
 })
 
-export class EventsComponentDetail extends BaseArgComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
+export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public showPreview: boolean;
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
@@ -40,13 +39,13 @@ export class EventsComponentDetail extends BaseArgComponent<ICamEvents> implemen
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(public dbService: NgxIndexedDBService, public zmService: ZmService, private dialog: MatDialog, public configurations: ChangeDetectorConfigurations, public auth: ChangeDetectorJwt) {
-    super(dbService, auth, zmService);
+  constructor(public mainServices: CoreMainServices, private dialog: MatDialog) {
+    super(mainServices);
     this.showPreview = false;
   }
 
   ngOnInit() {
-    this.configurationList$ = this.configurations.getDataChanges().pipe(
+    this.configurationList$ = this.mainServices.configurations.getDataChanges().pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || 
         tt.action === configurationsActions.EventsFilter || 
         tt.action === configurationsActions.StreamingProperties || this.configurationList === null))
@@ -63,7 +62,7 @@ export class EventsComponentDetail extends BaseArgComponent<ICamEvents> implemen
   }
 
   ngOnDestroy() {
-    this.configurations.setStreamingProperties({} as IStreamProperties);
+    this.mainServices.configurations.setStreamingProperties({} as IStreamProperties);
     this.configurationList$.unsubscribe();
     this.dbConf$?.unsubscribe();
   }
@@ -98,7 +97,7 @@ export class EventsComponentDetail extends BaseArgComponent<ICamEvents> implemen
       camId: camId,
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     }
-    this.configurations.setStreamingProperties(streamingProperties);
+    this.mainServices.configurations.setStreamingProperties(streamingProperties);
     
     this.configurationList.camDiapason.find(cam => {
       if (cam.Id === camId) {

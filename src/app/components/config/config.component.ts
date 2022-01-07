@@ -2,7 +2,6 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, OnDestroy
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { configurationsActions, streamingEventMode, streamingSettings } from 'src/app/enums/enums';
@@ -11,13 +10,11 @@ import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IEventsFilter } from 'src/app/interfaces/IEventsFilter';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { ZmService } from 'src/app/services/zm.service';
-import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
-import { CommoneInitializer } from 'src/app/services/common-initializer.service';
-import { convertDateToString, convertStringToDate } from 'src/app/utils/helper';
+import { convertDateToString, convertStringToDate, convertTimeStringToHHmm } from 'src/app/utils/helper';
 import { DateAdapter } from '@angular/material/core';
-import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
-import { ChangeDetectorJwt } from '../detectors/jwt.service';
+import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
+import { CoreMainServices } from 'src/app/core/core-main-services.service';
+import { trimTrailingNulls } from '@angular/compiler/src/render3/view/util';
 
 
 export interface DbConfgigObject {
@@ -29,10 +26,11 @@ export interface DbConfgigObject {
   selector: 'config',
   templateUrl: './config.component.html',
   styleUrls: ['./config.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
+  providers: [CoreMainServices]
 })
 
-export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class ConfigComponent extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
   @Input()
   public panelOpenState = false;
   public showDateRangeSpinner: boolean = false;
@@ -47,12 +45,11 @@ export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnIn
   private configurationList$: Subscription;
   public configurationsList: IConfigurationsList = null;
 
-  constructor(public dbService: NgxIndexedDBService, private configurations: ChangeDetectorConfigurations, public zmService: ZmService, 
-    private changeRef: ChangeDetectorRef, private commonInitializer: CommoneInitializer, private dateAdapter: DateAdapter<Date>, public auth: ChangeDetectorJwt) {
-    super(dbService, auth, zmService);
+  constructor(public mainServices: CoreMainServices, private changeRef: ChangeDetectorRef, private dateAdapter: DateAdapter<Date>) {
+    super(mainServices);
     Object.keys(streamingEventMode).forEach(mode => { this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] }) });
 
-    this.configurationList$ = this.configurations.getDataChanges().pipe(
+    this.configurationList$ = this.mainServices.configurations.getDataChanges().pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.EventsFilter || !this.configurationsList))
       .subscribe(result => {
         if (result.payload.camDiapason.length > 0) {
@@ -60,10 +57,14 @@ export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnIn
           this.selectedCam.id = result.payload.eventsFilter?.cam;
           this.selectedCam.name = this.camsList.find(x => x.id === result.payload.eventsFilter?.cam)?.name;
         }
+        if (result.action === configurationsActions.EventsFilter && this.showDateRangeSpinner) {
+          this.showDateRangeSpinner = false;
+          this.changeRef.markForCheck();
+        }
         this.configurationsList = result.payload;
         this.startDate = convertStringToDate(result.payload.eventsFilter.startDate);
-        this.startTime = result.payload.eventsFilter.startTime;
-        this.endTime = result.payload.eventsFilter.endTime;;
+        this.startTime = convertTimeStringToHHmm(result.payload.eventsFilter.startTime);
+        this.endTime = convertTimeStringToHHmm(result.payload.eventsFilter.endTime);
       });
 
     this.dateAdapter.setLocale(this.zmService.conf.language);
@@ -85,6 +86,7 @@ export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnIn
   }
 
   setEventsFilters() {
+    this.showDateRangeSpinner = true;
     const filters: IEventsFilter = {
       startDate: convertDateToString(this.startDate),
       endDate: convertDateToString(this.startDate),
@@ -92,60 +94,44 @@ export class ConfigComponent extends BaseArgComponent<IMonitors> implements OnIn
       endTime: this.endTime,
       cam: this.selectedCam.id
     }
-    this.configurations.setEventsFilters(filters);
-    this.showDateRangeSpinner = true;
     setTimeout(() => {
-      this.showDateRangeSpinner = false;
-      this.changeRef.markForCheck();
+      this.mainServices.configurations.setEventsFilters(filters);
     }, 1500);
   }
 
   resetFilters() {
-    this.commonInitializer.setDefaultTime();
+    this.mainServices.commonInitializer.setDefaultTime();
     const currentDate = new Date();
     const resettedfilters: IEventsFilter = {
       startDate: convertDateToString(currentDate),
       endDate: convertDateToString(currentDate),
-      startTime: this.startTime,
-      endTime: this.endTime,
+      startTime: (currentDate.getHours() - 1).toString() + ":" + currentDate.getMinutes().toString(),
+      endTime: currentDate.getHours().toString() + ":" + currentDate.getMinutes().toString(),
       cam: null
     }
-    this.configurations.setEventsFilters(resettedfilters);
+    this.mainServices.configurations.setEventsFilters(resettedfilters);
     this.startDate = currentDate;
     this.selectedCam = { name: null, id: null };
   }
 
   changeEventStreamingMode(eventStreamingMode: streamingEventMode) {
-    this.configurations.setStreamingProperties({ eventStreamingMode: eventStreamingMode } as IStreamProperties);
-  }
-
-  relaodLiveStreaming() {
-    this.configurations.setStreamingStatus(true);
-    this.configurations.setStreamingStatus(false);
+    this.mainServices.configurations.setStreamingProperties({ eventStreamingMode: eventStreamingMode } as IStreamProperties);
   }
 
   setLiveStreamingScale(value: number) {
-    this.zmService.conf.liveStreamingScale = value.toString();
     this.updateConfDB(streamingSettings.liveStreamingScale, value.toString());
-    this.relaodLiveStreaming();
   }
 
   setDetailStreamingScale(value: number) {
-    this.zmService.conf.detailStreamingScale = value.toString();
     this.updateConfDB(streamingSettings.detailStreamingScale, value.toString());
-    this.relaodLiveStreaming();
   }
 
   setLiveStreamingFps(value: number) {
-    this.zmService.conf.liveStreamingMaxFps = value.toString();
     this.updateConfDB(streamingSettings.liveStreamingMaxFps, value.toString());
-    this.relaodLiveStreaming();
   }
 
   setDetailStreamingFps(value: number) {
-    this.zmService.conf.detailStreamingMaxfps = value.toString();
     this.updateConfDB(streamingSettings.detailStreamingMaxfps, value.toString());
-    this.relaodLiveStreaming();
   }
 
 }

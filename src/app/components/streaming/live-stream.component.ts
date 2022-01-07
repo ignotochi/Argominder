@@ -5,18 +5,15 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseArgComponent } from 'src/app/core/base-arg-component.component';
+import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
 import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { ZmService } from '../../services/zm.service';
-import { ChangeDetectorConfigurations } from '../detectors/configurations.service';
 import { StreamPreview } from '../preview/stream-preview.component';
-import { ChangeDetectorJwt } from '../detectors/jwt.service';
-import { NgxIndexedDBService } from 'ngx-indexed-db';
+import { CoreMainServices } from 'src/app/core/core-main-services.service';
 
 
 @Component({
@@ -24,8 +21,9 @@ import { NgxIndexedDBService } from 'ngx-indexed-db';
   templateUrl: './live-stream.component.html',
   styleUrls: ['./live-stream.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
+  providers: [CoreMainServices]
 })
-export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class LiveStreamComponent extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
@@ -40,11 +38,11 @@ export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements 
   private camInfo$: Subscription;
   private dialog$: Subscription;
 
-  constructor(public dbService: NgxIndexedDBService, public zmService: ZmService, private configurations: ChangeDetectorConfigurations, private dialog: MatDialog, 
-    public auth: ChangeDetectorJwt, private elementRef: ElementRef<HTMLElement>) {
-    super(dbService, auth, zmService);
-    this.dataChange$ = this.configurations.getDataChanges()?.pipe(
-      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus || this.configurationList === null)).subscribe(result => {
+  constructor(public mainServices: CoreMainServices, private dialog: MatDialog, private elementRef: ElementRef<HTMLElement>) {
+    super(mainServices);
+    this.dataChange$ = this.mainServices.configurations.getDataChanges()?.pipe(
+      filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus || this.configurationList === null))
+      .subscribe(result => {
         if (result.action === configurationsActions.PreviewStatus) this.previewStatus(result.payload.previewStatus);
         this.configurationList = result.payload;
       });
@@ -54,7 +52,7 @@ export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements 
   }
 
   ngOnDestroy() {
-    this.configurations.setStreamingProperties({} as IStreamProperties);
+    this.mainServices.configurations.setStreamingProperties({} as IStreamProperties);
     this.stopStream();
     this.dataChange$?.unsubscribe();
     this.streamChanges$?.unsubscribe();
@@ -161,8 +159,8 @@ export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements 
       camId: camId,
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     } as IStreamProperties;
-    this.configurations.setStreamingProperties(streamingProperties);
-    this.configurations.setStreamingStatus(true);
+    this.mainServices.configurations.setStreamingProperties(streamingProperties);
+    this.mainServices.configurations.setStreamingStatus(true);
     this.loadPreview();
   }
 
@@ -170,7 +168,7 @@ export class LiveStreamComponent extends BaseArgComponent<IMonitors> implements 
     let dialogRef: MatDialogRef<StreamPreview>;
     dialogRef = this.dialog.open(StreamPreview);
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
-      this.configurations.setStreamingStatus(false);
+      this.mainServices.configurations.setStreamingStatus(false);
     });
   }
 

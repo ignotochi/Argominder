@@ -1,3 +1,5 @@
+import { min } from "rxjs";
+
 export function isNullOrUndefined(value: any) {
   return value === null || value === undefined;
 }
@@ -50,6 +52,14 @@ export function convertDateToStringHHmmss(date: Date) {
   const formattedSeconds = seconds < 10 ? '0' + seconds.toString() : seconds.toString();
   const time = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
   return time;
+}
+
+export function convertTimeStringToHHmm(time: string) {
+  const [hours, minutes] = time.split(':');
+  const formattedHours = parseInt(hours) < 10 && !hours.includes("0") ? '0' + hours.toString() : hours.toString();
+  const formattedMinutes = parseInt(minutes) < 10  && !minutes.includes("0") ? '0' + minutes.toString() : minutes.toString();
+  const formattedTime = formattedHours + ':' + formattedMinutes;
+  return formattedTime;
 }
 
 export function convertDateToString(date: Date) {

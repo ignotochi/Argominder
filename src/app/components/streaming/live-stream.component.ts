@@ -52,7 +52,6 @@ export class LiveStreamComponent extends BaseCoreUtilsComponent<IMonitors> imple
   }
 
   ngOnDestroy() {
-    this.mainServices.configurations.setStreamingProperties({} as IStreamProperties);
     this.stopStream();
     this.dataChange$?.unsubscribe();
     this.streamChanges$?.unsubscribe();

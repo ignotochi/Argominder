@@ -29,9 +29,9 @@ export class UrlsBuilder {
     return buildedUrl;
   }
 
-  eventStreamDetail(eventId: string, token: string, mode: string, conf: IConf, frame: string, streamScale: string): string {
+  eventStreamDetail(eventId: string, token: string, mode: string, conf: IConf, frame: string, detailStreamingScale: string): string {
     if (mode === streamingEventMode.jpeg) {
-      const buildedUrl = conf.protocol + conf.streamUrl1 + zmUrl.cgiBinPath + separators.question + zmUrl.scale + separators.equal + streamScale +
+      const buildedUrl = conf.protocol + conf.streamUrl1 + zmUrl.cgiBinPath + separators.question + zmUrl.scale + separators.equal + detailStreamingScale +
         separators.and + zmUrl.mode + separators.equal + streamingEventMode.jpeg + separators.and + zmUrl.frame + separators.equal + frame + separators.and + zmUrl.event +
         separators.equal + eventId + separators.and + zmUrl.token + separators.equal + token;
       return buildedUrl;

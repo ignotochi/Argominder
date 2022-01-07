@@ -62,7 +62,6 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   }
 
   ngOnDestroy() {
-    this.mainServices.configurations.setStreamingProperties({} as IStreamProperties);
     this.configurationList$.unsubscribe();
     this.dbConf$?.unsubscribe();
   }
@@ -87,7 +86,7 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   }
 
   getStreamPreview(eventId: string) {
-    return this.zmService.getEventStreamDetail(eventId, this.token, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedLiveStreamingScale.toString());
+    return this.zmService.getEventStreamDetail(eventId, this.token, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedDetailStreamingScale.toString());
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {

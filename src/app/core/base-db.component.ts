@@ -16,9 +16,9 @@ export abstract class BaseIndexedDbConfigurationComponent {
     public selectedDetailStreamingScale: number = null;
     public selectedLiveStreamingFps: number = null;
     public selectedDetailStreamingFps: number = null;
-    public liveStreamingMaxScale = 100;
+    public liveStreamingMaxScale = 99;
     public liveStreamingMinScale = 5;
-    public detailStreamingMaxScale = 100;
+    public detailStreamingMaxScale = 99;
     public detailStreamingMinScale = 5;
     public liveStreamingMaxFps = 10;
     public liveStreamingMinFps = 1;
@@ -43,7 +43,7 @@ export abstract class BaseIndexedDbConfigurationComponent {
     loadIndexedDbSettings() {
         this.dbConf$ = this.dbService.getAll(this.database).subscribe((defaultSettingsDb: DbConfgigObject[]) => {
             if (defaultSettingsDb.length > 0) {
-                this.setLoadedConf(defaultSettingsDb);
+                this.mapLoadedConf(defaultSettingsDb);
             }
             else {
                 const defaultSettingsDb = [
@@ -64,12 +64,12 @@ export abstract class BaseIndexedDbConfigurationComponent {
                         value: this.zmService.conf.detailStreamingMaxfps
                     }];
                 this.dbService.add(this.database, defaultSettingsDb).subscribe(() => { });
-                this.setLoadedConf(defaultSettingsDb);
+                this.mapLoadedConf(defaultSettingsDb);
             }
         });
     }
 
-    setLoadedConf(result: DbConfgigObject[]) {
+    mapLoadedConf(result: DbConfgigObject[]) {
         result.some(conf => {
             if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
                 this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);

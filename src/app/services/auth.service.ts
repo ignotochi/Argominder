@@ -8,6 +8,7 @@ import { Menu } from 'src/app/enums/enums';
 import { ILogin } from 'src/app/interfaces/ILogin';
 import { IConf } from '../interfaces/Iconf';
 import { switchMap } from 'rxjs/operators';
+import { UrlsBuilder } from '../core/build-urls';
 
 @Injectable()
 
@@ -18,6 +19,7 @@ export class Auth {
     public localToken: string = "";
     public userIsLogged: boolean = false;
     public login: ILogin = (<ILogin>{ login: {} });
+    public urlsBuilder: UrlsBuilder;
 
     constructor(private router: Router, private auth: ChangeDetectorJwt, private configurations: ChangeDetectorConfigurations, private zmService: ZmService, 
         private commoneInitializer: CommoneInitializer) {
@@ -60,6 +62,7 @@ export class Auth {
             this.userIsLogged = this.login.access_token.length > 0 ? true : false;
             this.saveSession();
             this.localToken = localStorage.getItem("accessToken");
+            this.zmService.urlsBuilder.token = this.localToken;
             this.auth.setToken(this.localToken);
             this.afterLogin();
         },

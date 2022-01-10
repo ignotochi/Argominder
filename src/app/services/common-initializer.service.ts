@@ -11,7 +11,6 @@ import { convertDateToString } from '../utils/helper';
 @Injectable()
 export class CommoneInitializer {
     private camInfo$: Subscription;
-    private auth$: Subscription;
     private streamModes = Object.keys(streamingEventMode);
     public dateRange: IEventsFilter = {} as IEventsFilter;
     private startDateFilter: Date = new Date();
@@ -21,7 +20,7 @@ export class CommoneInitializer {
     }
 
     public getCamList(token: string) {
-        this.camInfo$ = this.zmService.getCamListInfo(token).subscribe((result) => {
+        this.camInfo$ = this.zmService.getCamListInfo().subscribe((result) => {
 
             result.monitors.forEach(result => {
                 const registry: ICamRegistry = {

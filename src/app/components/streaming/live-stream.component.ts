@@ -97,15 +97,15 @@ export class LiveStreamComponent extends BaseCoreUtilsComponent<IMonitors> imple
 
   getStream(cam: string, index: number, status: string) {
     if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, this.token, index, this.selectedLiveStreamingScale.toString(), this.selectedLiveStreamingFps.toString());
+    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, index, this.selectedLiveStreamingScale.toString(), this.selectedLiveStreamingFps.toString());
   }
 
   getStreamPreview(cam: string) {
-    return this.zmService.getLiveStreamDetail(cam, this.token, this.selectedDetailStreamingScale.toString(), this.selectedDetailStreamingFps.toString());
+    return this.zmService.getLiveStreamDetail(cam, this.selectedDetailStreamingScale.toString(), this.selectedDetailStreamingFps.toString());
   }
 
   getCamList() {
-    this.camInfo$ = this.zmService.getCamListInfo(this.token).subscribe((result) => {
+    this.camInfo$ = this.zmService.getCamListInfo().subscribe((result) => {
       this.datasource.monitors = result.monitors;
     }, (err: Error) => {
       console.log(err);

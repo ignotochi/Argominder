@@ -14,8 +14,6 @@ import { convertDateToString, convertStringToDate, convertTimeStringToHHmm } fro
 import { DateAdapter } from '@angular/material/core';
 import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
 import { CoreMainServices } from 'src/app/core/core-main-services.service';
-import { trimTrailingNulls } from '@angular/compiler/src/render3/view/util';
-
 
 export interface DbConfgigObject {
   id: string,

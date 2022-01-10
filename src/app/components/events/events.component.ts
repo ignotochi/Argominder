@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
@@ -68,7 +67,6 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
 
   getEvents() {
     this.zmService.getEventsList(
-      this.token,
       this.configurationList.eventsFilter.startDate,
       this.configurationList.eventsFilter.endDate,
       this.configurationList.eventsFilter.startTime,
@@ -86,7 +84,7 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   }
 
   getStreamPreview(eventId: string) {
-    return this.zmService.getEventStreamDetail(eventId, this.token, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedDetailStreamingScale.toString());
+    return this.zmService.getEventStreamDetail(eventId, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedDetailStreamingScale.toString());
   }
 
   setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {

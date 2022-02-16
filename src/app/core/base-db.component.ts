@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { Subscription } from 'rxjs';
+import { Subscription, takeUntil } from 'rxjs';
 import { DbConfgigObject } from '../components/config/config.component';
 import { streamingSettings } from '../enums/enums';
 import { ZmService } from '../services/zm.service';
@@ -29,18 +29,9 @@ export abstract class BaseIndexedDbConfigurationComponent {
         if (!window.indexedDB) { console.log("Il tuo browser non supporta indexedDB"); }
     }
 
-    ngOnInit() {
-    }
-
-    ngAfterViewInit() {
-
-    }
-
-    ngOnDestroy() {
-        this.dbConf$?.unsubscribe();
-    }
-
     loadIndexedDbSettings() {
+        //var mycomponet = this 
+        //lancia il complete.pipe(takeUntil() o takeWile(lamda => myComponet !== null))
         this.dbConf$ = this.dbService.getAll(this.database).subscribe((defaultSettingsDb: DbConfgigObject[]) => {
             if (defaultSettingsDb.length > 0) {
                 this.mapLoadedConf(defaultSettingsDb);

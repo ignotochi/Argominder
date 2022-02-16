@@ -28,12 +28,12 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   };
 
   constructor(private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations,
-    private auth: ChangeDetectorJwt, public router: Router, public authConf: Auth) {
+    private jwt: ChangeDetectorJwt, public router: Router, public authConf: Auth) {
     this.configurations.initializeDataChanges();
-    this.auth.initializeDataChanges();
+    this.jwt.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
 
-    this.auth$ = this.auth.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
+    this.auth$ = this.jwt.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
       this.loadStream = this.authConf.login.access_token.length > 0 ? true : false;
       this.changeRef.markForCheck();
     })

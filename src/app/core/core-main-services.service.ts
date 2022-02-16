@@ -9,7 +9,7 @@ import { ZmService } from '../services/zm.service';
 @Injectable()
 
 export class CoreMainServices  {
-    constructor(public zmService: ZmService, public dbService: NgxIndexedDBService, public auth: ChangeDetectorJwt, public configurations: ChangeDetectorConfigurations,
+    constructor(public zmService: ZmService, public dbService: NgxIndexedDBService, public jwt: ChangeDetectorJwt, public configurations: ChangeDetectorConfigurations,
         public commonInitializer: CommoneInitializer) {
     }
 }

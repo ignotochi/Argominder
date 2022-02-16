@@ -21,7 +21,7 @@ export class Auth {
     public login: ILogin = (<ILogin>{ login: {} });
     public urlsBuilder: UrlsBuilder;
 
-    constructor(private router: Router, private auth: ChangeDetectorJwt, private configurations: ChangeDetectorConfigurations, private zmService: ZmService, 
+    constructor(private router: Router, private jwt: ChangeDetectorJwt, private configurations: ChangeDetectorConfigurations, private zmService: ZmService, 
         private commoneInitializer: CommoneInitializer) {
         this.setSession();
     }
@@ -41,10 +41,10 @@ export class Auth {
 
     public destroySession() {
         localStorage.setItem("accessToken", '');
-        this.auth.compleDataChanges();
+        this.jwt.compleDataChanges();
         this.configurations.compleDataChanges()
         this.router.navigate([Menu.Home]);
-        this.auth = null;
+        this.jwt = null;
         this.zmService = null;
         this.commoneInitializer = null;
         this.configurations = null;
@@ -63,7 +63,7 @@ export class Auth {
             this.saveSession();
             this.localToken = localStorage.getItem("accessToken");
             this.zmService.urlsBuilder.token = this.localToken;
-            this.auth.setToken(this.localToken);
+            this.jwt.setToken(this.localToken);
             this.afterLogin();
         },
             (err: Error) => {
@@ -83,6 +83,4 @@ export class Auth {
         this.commoneInitializer.setDefaulEventStreamingConf();
         this.commoneInitializer.setDefaultEventsFilters();
     }
-
-
 }

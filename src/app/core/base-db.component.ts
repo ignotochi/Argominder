@@ -4,6 +4,7 @@ import { Subscription, takeUntil } from 'rxjs';
 import { DbConfgigObject } from '../components/config/config.component';
 import { streamingSettings } from '../enums/enums';
 import { ZmService } from '../services/zm.service';
+import { isArray } from '../utils/helper';
 
 @Component({
     template: ''
@@ -12,10 +13,10 @@ import { ZmService } from '../services/zm.service';
 export abstract class BaseIndexedDbConfigurationComponent {
     public dbConf$: Subscription;
     private database: string = 'settings';
-    public selectedLiveStreamingScale: number = null;
-    public selectedDetailStreamingScale: number = null;
-    public selectedLiveStreamingFps: number = null;
-    public selectedDetailStreamingFps: number = null;
+    public selectedLiveStreamingScale: number;
+    public selectedDetailStreamingScale: number;
+    public selectedLiveStreamingFps: number;
+    public selectedDetailStreamingFps: number;
     public liveStreamingMaxScale = 99;
     public liveStreamingMinScale = 5;
     public detailStreamingMaxScale = 99;
@@ -37,7 +38,7 @@ export abstract class BaseIndexedDbConfigurationComponent {
                 this.mapLoadedConf(defaultSettingsDb);
             }
             else {
-                const defaultSettingsDb = [
+                const defaultSettingsDb: DbConfgigObject[] = [
                     {
                         id: streamingSettings.liveStreamingScale,
                         value: this.zmService.conf.liveStreamingScale
@@ -54,26 +55,25 @@ export abstract class BaseIndexedDbConfigurationComponent {
                         id: streamingSettings.detailStreamingMaxfps,
                         value: this.zmService.conf.detailStreamingMaxfps
                     }];
-                this.dbService.add(this.database, defaultSettingsDb).subscribe(() => { });
+                defaultSettingsDb.forEach(x => this.updateConfDB(x.id, x.value));
                 this.mapLoadedConf(defaultSettingsDb);
             }
         });
     }
 
     mapLoadedConf(result: DbConfgigObject[]) {
-        result.some(conf => {
-            if (conf.id === streamingSettings.liveStreamingScale && this.selectedLiveStreamingScale === null) {
-                this.selectedLiveStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingScale);
-            }
-            if (conf.id === streamingSettings.detailStreamingScale && this.selectedDetailStreamingScale === null) {
-                this.selectedDetailStreamingScale = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingScale);
-            }
-            if (conf.id === streamingSettings.liveStreamingMaxFps && this.selectedLiveStreamingFps === null) {
-                this.selectedLiveStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.liveStreamingMaxFps);
-            }
-            if (conf.id === streamingSettings.detailStreamingMaxfps && this.selectedDetailStreamingFps === null) {
-                this.selectedDetailStreamingFps = conf.value ? parseInt(conf.value) : parseInt(this.zmService.conf.detailStreamingMaxfps);
-            }
+        result.forEach(conf => {
+            if (conf.id === streamingSettings.liveStreamingScale)
+                this.selectedLiveStreamingScale = parseInt(conf.value) ?? parseInt(this.zmService.conf.liveStreamingScale);
+
+            if (conf.id === streamingSettings.detailStreamingScale)
+                this.selectedDetailStreamingScale = parseInt(conf.value) ?? parseInt(this.zmService.conf.detailStreamingScale);
+
+            if (conf.id === streamingSettings.liveStreamingMaxFps)
+                this.selectedLiveStreamingFps = parseInt(conf.value) ?? parseInt(this.zmService.conf.liveStreamingMaxFps);
+
+            if (conf.id === streamingSettings.detailStreamingMaxfps)
+                this.selectedDetailStreamingFps = parseInt(conf.value) ?? parseInt(this.zmService.conf.detailStreamingMaxfps);
         });
     }
 

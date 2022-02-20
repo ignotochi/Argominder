@@ -31,8 +31,6 @@ export abstract class BaseIndexedDbConfigurationComponent {
     }
 
     loadIndexedDbSettings() {
-        //var mycomponet = this 
-        //lancia il complete.pipe(takeUntil() o takeWile(lamda => myComponet !== null))
         this.dbConf$ = this.dbService.getAll(this.database).subscribe((defaultSettingsDb: DbConfgigObject[]) => {
             if (defaultSettingsDb.length > 0) {
                 this.mapLoadedConf(defaultSettingsDb);
@@ -55,7 +53,7 @@ export abstract class BaseIndexedDbConfigurationComponent {
                         id: streamingSettings.detailStreamingMaxfps,
                         value: this.zmService.conf.detailStreamingMaxfps
                     }];
-                defaultSettingsDb.forEach(x => this.updateConfDB(x.id, x.value));
+                defaultSettingsDb.forEach(conf => this.updateConfDB(conf.id, conf.value));
                 this.mapLoadedConf(defaultSettingsDb);
             }
         });
@@ -78,7 +76,9 @@ export abstract class BaseIndexedDbConfigurationComponent {
     }
 
     updateConfDB(key: string, value: string) {
-        this.dbService.update(this.database, { id: key, value: value }).subscribe(() => { });
+        this.dbService.update(this.database, { id: key, value: value }).subscribe(() => {
+            console.log("Updated DB: " + key + " = " + value);
+        });
     }
 
 }

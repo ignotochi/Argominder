@@ -2,7 +2,7 @@
 
 <ng-template #showApp>
   <div>
-    <mat-tab-group *ngIf="loadStream" [selectedIndex]="selectedTab" (selectedTabChange)="tabNavigation($event.index)">
+    <mat-tab-group *ngIf="userAuthenticated" [selectedIndex]="selectedTab" (selectedTabChange)="tabNavigation($event.index)">
       <h3 class="info-h3">Loggato in zoneminder version: {{ this.authConf.login.version }}</h3>
 
       <mat-tab label="General">
@@ -61,7 +61,7 @@
         </mat-form-field>
       </form>
       <button mat-raised-button color="primary" (click)="this.authConf.logInZm()">{{ 'Login' }}</button>
-      <p *ngIf="errorLogin">{{ 'Errore di autenticazione' }}</p>
+      <p *ngIf="!userAuthenticated" id="loginFailed">{{ this.authConf.errorLogin }}</p>
     </div>
   </div>
 

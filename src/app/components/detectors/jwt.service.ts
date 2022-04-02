@@ -9,6 +9,7 @@ export class ChangeDetectorJwt extends DataStoreDetector<ILogin, authActions> {
     setAll(input: ILogin) {
         this.updateDataChanges({ action: authActions.All, payload: input });
     }
+    
     setToken(token: string) {
         this.updateDataChanges({ action: authActions.token, payload: { ...this.getClonedDataChange(), access_token: token } });
     }

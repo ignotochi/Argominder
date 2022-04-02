@@ -11,6 +11,7 @@ import { IStreamProperties } from './interfaces/IStreamProperties';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { authActions, Menu } from './enums/enums';
+import { isNullOrEmptyString } from './utils/helper';
 
 @Component({
   selector: 'argominder',
@@ -20,7 +21,7 @@ import { authActions, Menu } from './enums/enums';
 })
 export class ArgoMinderComponent implements OnInit, AfterViewInit {
   selectedTab: number = 0;
-  loadStream: boolean;
+  userAuthenticated: boolean;
   private auth$: Subscription;
 
   private configurationsList: IConfigurationsList = {
@@ -34,7 +35,7 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
     this.configurations.setAll(this.configurationsList);
 
     this.auth$ = this.jwt.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
-      this.loadStream = this.authConf.login.access_token.length > 0 ? true : false;
+      this.userAuthenticated = !isNullOrEmptyString(this.authConf.login.access_token) ? true : false;
       this.changeRef.markForCheck();
     })
   }
@@ -43,6 +44,10 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+  }
+
+  login() {
+    this.authConf.logInZm();
   }
 
   tabNavigation(tabIndex: number): void {

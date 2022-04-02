@@ -6,7 +6,7 @@
             <th mat-header-cell *matHeaderCellDef> EventID </th>
             <td mat-cell *matCellDef="let element">
                 <button class="evntPreview-btn" style="text-decoration: underline;" mat-flat-button href="#" 
-                (click)="setPreview(element.Id, element.MonitorId, element.StartTime, element.Length, element.MaxScore, $event.currentTarget);">{{ element.Id }} </button>
+                (click)="setPreview(element)">{{ element.Id }} </button>
             </td>
         </ng-container>
 

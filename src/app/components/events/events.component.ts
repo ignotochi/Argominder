@@ -34,6 +34,7 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   public dataGrid: MatTableDataSource<object>;
   private configurationList: IConfigurationsList = null;
   private configurationList$: Subscription;
+  public viewedEvents: string[] = [];
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -87,29 +88,29 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
     return this.zmService.getEventStreamDetail(eventId, this.configurationList.streamingProperties.eventStreamingMode, this.zmService.conf.detailStreamingMaxfps, this.selectedDetailStreamingScale.toString());
   }
 
-  setPreview(eventId: string, camId: string, startTime: string, length: string, maxScore: string, target: HTMLElement) {
+  setPreview(item: any) {
     const streamingProperties: IStreamProperties = {
       previewType: previewType.eventDetail,
-      streamUrl: this.getStreamPreview(eventId),
-      camId: camId,
+      streamUrl: this.getStreamPreview(item.Id),
+      camId: item.MonitorId,
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     }
     this.mainServices.configurations.setStreamingProperties(streamingProperties);
     
     this.configurationList.camDiapason.find(cam => {
-      if (cam.Id === camId) {
-        cam.StartTime = startTime;
-        cam.Length = length;
-        cam.MaxScore = maxScore;
+      if (cam.Id === item.MonitorId) {
+        cam.StartTime = item.StartTime;
+        cam.Length = item.Length;
+        cam.MaxScore = item.MaxScore;
       }
     })
-    this.loadPreview(target);
+    this.loadPreview(item.Id);
   }
 
-  loadPreview(target: HTMLElement): void {
+  loadPreview(eventId: string): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.markEvent(target);
+      this.markEvent(eventId)
     });
   }
 
@@ -119,10 +120,8 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
     }
   }
 
-  markEvent(target: HTMLElement) {
-    if (!target.className.includes("eventMarked")) { 
-      target.classList.add("eventMarked"); 
-    };
+  markEvent(eventId: string) {
+    this.viewedEvents.push(eventId);
   }
 
 }

@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ViewChild
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild
 }
   from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,22 +39,22 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(public mainServices: CoreMainServices, private dialog: MatDialog) {
+  constructor(public mainServices: CoreMainServices, private dialog: MatDialog, private changeRef: ChangeDetectorRef) {
     super(mainServices);
     this.showPreview = false;
   }
 
   ngOnInit() {
     this.configurationList$ = this.mainServices.configurations.getDataChanges().pipe(
-      filter(tt => tt.action === configurationsActions.CamDiapason || 
-        tt.action === configurationsActions.EventsFilter || 
+      filter(tt => tt.action === configurationsActions.CamDiapason ||
+        tt.action === configurationsActions.EventsFilter ||
         tt.action === configurationsActions.StreamingProperties || this.configurationList === null))
-        .subscribe(result => {
-      this.configurationList = result.payload;
-      const defaultModeToEnum = streamingEventMode[ Object.keys(streamingEventMode).find(mode => (mode === this.zmService.conf.defaultEventStreamingMode))];      
-      if (!result.payload.streamingProperties.eventStreamingMode) this.configurationList.streamingProperties.eventStreamingMode = defaultModeToEnum;      
-      if (result.payload.eventsFilter) this.getEvents();
-    });
+      .subscribe(result => {
+        this.configurationList = result.payload;
+        const defaultModeToEnum = streamingEventMode[Object.keys(streamingEventMode).find(mode => (mode === this.zmService.conf.defaultEventStreamingMode))];
+        if (!result.payload.streamingProperties.eventStreamingMode) this.configurationList.streamingProperties.eventStreamingMode = defaultModeToEnum;
+        if (result.payload.eventsFilter) this.getEvents();
+      });
   }
 
   ngAfterViewInit() {
@@ -96,7 +96,7 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     }
     this.mainServices.configurations.setStreamingProperties(streamingProperties);
-    
+
     this.configurationList.camDiapason.find(cam => {
       if (cam.Id === item.MonitorId) {
         cam.StartTime = item.StartTime;
@@ -110,7 +110,8 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   loadPreview(eventId: string): void {
     const dialogRef = this.dialog.open(StreamPreview);
     dialogRef.afterClosed().subscribe(() => {
-      this.markEvent(eventId)
+      this.markEvent(eventId);
+      this.changeRef.markForCheck();
     });
   }
 
@@ -122,6 +123,10 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
 
   markEvent(eventId: string) {
     this.viewedEvents.push(eventId);
+  }
+
+  isMarkedEvent(eventId: string): boolean {
+    return this.viewedEvents.includes(eventId);
   }
 
 }

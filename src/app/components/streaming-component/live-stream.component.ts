@@ -12,7 +12,7 @@ import { StreamStatus } from 'src/app/enums/stream-enum';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IMonitors } from 'src/app/interfaces/IMonitors';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { StreamPreview } from '../preview/stream-preview.component';
+import { ZoneminderStreamingPreview } from '../preview-component/streaming-preview.component';
 import { CoreMainServices } from 'src/app/core/core-main-services.service';
 
 
@@ -23,7 +23,7 @@ import { CoreMainServices } from 'src/app/core/core-main-services.service';
   changeDetection: ChangeDetectionStrategy.Default,
   providers: [CoreMainServices]
 })
-export class LiveStreamComponent extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
@@ -164,8 +164,8 @@ export class LiveStreamComponent extends BaseCoreUtilsComponent<IMonitors> imple
   }
 
   loadPreview(): void {
-    let dialogRef: MatDialogRef<StreamPreview>;
-    dialogRef = this.dialog.open(StreamPreview);
+    let dialogRef: MatDialogRef<ZoneminderStreamingPreview>;
+    dialogRef = this.dialog.open(ZoneminderStreamingPreview);
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
       this.mainServices.configurations.setStreamingStatus(false);
     });

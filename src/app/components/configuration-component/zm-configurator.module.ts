@@ -2,13 +2,13 @@ import { NgModule } from "@angular/core";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
 import { RouterModule, Routes } from "@angular/router";
-import { ConfigComponent } from "./config.component";
+import { ZoneminderConfigurator } from "./zm-configurator.component";
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonComponentModules } from "../components.module";
 
-const routes: Routes = [{ path: '', component: ConfigComponent }];
+const routes: Routes = [{ path: '', component: ZoneminderConfigurator }];
 
 @NgModule({
   imports: [
@@ -21,7 +21,7 @@ const routes: Routes = [{ path: '', component: ConfigComponent }];
     MatSliderModule,
   ],
   declarations: [
-    ConfigComponent
+    ZoneminderConfigurator
   ],
   providers: [RouterModule],
   exports: [RouterModule]

@@ -5,8 +5,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { ArgoMinderComponent } from './argominder.component';
 import { CommonComponentModules } from './components/components.module';
-import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
-import { ChangeDetectorJwt } from './components/detectors/jwt.service';
+import { ChangeDetectorConfigurations } from './core/detectors/configurations.service';
+import { ChangeDetectorJwt } from './core/detectors/jwt.service';
 import { AuthGuardService as AuthGuard, AuthGuardService } from './services/auth-guard.service';
 import { Auth } from './services/auth.service';
 import { CommoneInitializer } from './services/common-initializer.service';
@@ -21,17 +21,17 @@ import { ZmService } from './services/zm.service';
     RouterModule.forRoot([
       {
         path: 'live',
-        loadChildren: () => import('./components/streaming/live-steram.module').then(tt => tt.LiveStreamModule),
+        loadChildren: () => import('./components/streaming-component/live-steram.module').then(tt => tt.LiveStreamModule),
         canActivate: [AuthGuard]
       },
       {
         path: 'events',
-        loadChildren: () => import('./components/events/events.module').then(tt => tt.EventModule),
+        loadChildren: () => import('./components/events-component/zm-event.module').then(tt => tt.EventModule),
         canActivate: [AuthGuard]
       },
       {
         path: 'settings',
-        loadChildren: () => import('./components/config/settings.module').then(tt => tt.SettingsModule),
+        loadChildren: () => import('./components/configuration-component/zm-configurator.module').then(tt => tt.SettingsModule),
         canActivate: [AuthGuard]
       }
     ]),

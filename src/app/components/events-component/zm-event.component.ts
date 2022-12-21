@@ -16,17 +16,17 @@ import { previewType } from 'src/app/enums/preview-enum';
 import { ICamEvents } from 'src/app/interfaces/ICamEvent';
 import { IConfigurationsList } from 'src/app/interfaces/IConfigurationsList';
 import { IStreamProperties } from 'src/app/interfaces/IStreamProperties';
-import { StreamPreview } from '../preview/stream-preview.component';
+import { ZoneminderStreamingPreview } from '../preview-component/streaming-preview.component';
 
 @Component({
   selector: 'events',
-  templateUrl: './events.component.html',
-  styleUrls: ['./events.component.scss'],
+  templateUrl: './zm-event.component.html',
+  styleUrls: ['./zm-event.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
   providers: [CoreMainServices]
 })
 
-export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
+export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public showPreview: boolean;
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
@@ -108,7 +108,7 @@ export class EventsComponentDetail extends BaseCoreUtilsComponent<ICamEvents> im
   }
 
   loadPreview(eventId: string): void {
-    const dialogRef = this.dialog.open(StreamPreview);
+    const dialogRef = this.dialog.open(ZoneminderStreamingPreview);
     dialogRef.afterClosed().subscribe(() => {
       this.markEvent(eventId);
       this.changeRef.markForCheck();

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChangeDetectorJwt } from 'src/app/components/detectors/jwt.service';
-import { ChangeDetectorConfigurations } from 'src/app/components/detectors/configurations.service';
+import { ChangeDetectorJwt } from 'src/app/core/detectors/jwt.service';
+import { ChangeDetectorConfigurations } from 'src/app/core/detectors/configurations.service';
 import { ZmService } from 'src/app/services/zm.service';
 import { CommoneInitializer } from 'src/app/services/common-initializer.service';
 import { Menu } from 'src/app/enums/enums';
@@ -11,7 +11,6 @@ import { switchMap } from 'rxjs/operators';
 import { UrlsBuilder } from '../core/build-urls';
 import { HttpErrorResponse } from '@angular/common/http';
 import { isNullOrEmptyString } from '../utils/helper';
-import { Observable } from 'rxjs';
 
 @Injectable()
 
@@ -55,7 +54,9 @@ export class Auth {
     }
 
     public logInZm() {
+       
         var result: boolean = false;
+       
         return this.zmService.getConfigurationFile().pipe(
             switchMap((conf: IConf) => {
                 this.zmService.configurationFileMapping(conf);

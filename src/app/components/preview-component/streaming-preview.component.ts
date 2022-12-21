@@ -3,16 +3,16 @@ import { filter } from "rxjs/operators";
 import { configurationsActions, streamingEventMode } from "src/app/enums/enums";
 import { previewType } from "src/app/enums/preview-enum";
 import { ZmService } from '../../services/zm.service';
-import { ChangeDetectorConfigurations } from "../detectors/configurations.service";
+import { ChangeDetectorConfigurations } from "../../core/detectors/configurations.service";
 import { Subscription } from "rxjs";
 import { IConfigurationsList } from "src/app/interfaces/IConfigurationsList";
 
 @Component({
   selector: 'stream-preview',
-  templateUrl: 'stream-preview.component.html',
-  styleUrls: ['./stream-preview.component.scss'],
+  templateUrl: 'streaming-preview.component.html',
+  styleUrls: ['./streaming-preview.component.scss'],
 })
-export class StreamPreview implements OnInit, AfterViewInit, OnDestroy {
+export class ZoneminderStreamingPreview implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('streaming', { static: false }) streaming: ElementRef<HTMLImageElement>;
   @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
   @ViewChild('detailInfoPreview', { read: ElementRef }) detailInfoPreview: ElementRef<HTMLElement>;

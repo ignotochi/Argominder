@@ -1,12 +1,12 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { EventsComponentDetail } from "./events.component";
+import { ZoneminderEvents } from "./zm-event.component";
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from "@angular/material/sort";
 import { CommonComponentModules } from "../components.module";
 
-const routes: Routes = [ { path: '', component: EventsComponentDetail} ]; 
+const routes: Routes = [ { path: '', component: ZoneminderEvents} ]; 
 
 @NgModule({
   imports: [
@@ -17,7 +17,7 @@ const routes: Routes = [ { path: '', component: EventsComponentDetail} ];
       MatSortModule,
     ],
     declarations: [
-      EventsComponentDetail
+      ZoneminderEvents
     ],
   providers: [RouterModule],
   exports: [RouterModule]

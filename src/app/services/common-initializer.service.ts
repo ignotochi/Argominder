@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ZmService } from 'src/app/services/zm.service';
 import { ICamRegistry } from 'src/app/interfaces/ICamRegistry';
 import { Subscription } from 'rxjs';
-import { ChangeDetectorConfigurations } from '../components/detectors/configurations.service';
+import { ChangeDetectorConfigurations } from '../core/detectors/configurations.service';
 import { streamingEventMode } from '../enums/enums';
 import { IStreamProperties } from '../interfaces/IStreamProperties';
 import { IEventsFilter } from '../interfaces/IEventsFilter';

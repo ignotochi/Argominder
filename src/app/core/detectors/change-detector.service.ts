@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Enum} from '../enums/enums';
-import { hardObjectClone } from '../utils/helper';
+import { Enum} from '../../enums/enums';
+import { hardObjectClone } from '../../utils/helper';
 
 export abstract class DataStoreDetector<T, W extends Enum> {
 

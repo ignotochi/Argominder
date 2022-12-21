@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { authActions} from "src/app/enums/enums";
 import { ILogin } from "src/app/interfaces/ILogin";
-import { DataStoreDetector } from "src/app/services/change-detector.service";
+import { DataStoreDetector } from "src/app/core/detectors/change-detector.service";
 
 @Injectable()
 export class ChangeDetectorJwt extends DataStoreDetector<ILogin, authActions> {

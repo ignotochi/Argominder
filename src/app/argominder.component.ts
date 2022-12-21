@@ -2,8 +2,8 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChangeDetectorJwt } from './components/detectors/jwt.service';
-import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
+import { ChangeDetectorJwt } from './core/detectors/jwt.service';
+import { ChangeDetectorConfigurations } from './core/detectors/configurations.service';
 import { Auth } from './services/auth.service';
 import { IConfigurationsList } from './interfaces/IConfigurationsList';
 import { IEventsFilter } from './interfaces/IEventsFilter';
@@ -44,10 +44,6 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-  }
-
-  login() {
-    this.authConf.logInZm();
   }
 
   tabNavigation(tabIndex: number): void {

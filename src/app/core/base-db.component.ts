@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Subscription, takeUntil } from 'rxjs';
-import { DbConfgigObject } from '../components/config/config.component';
+import { DbConfgigObject } from '../components/configuration-component/zm-configurator.component';
 import { streamingSettings } from '../enums/enums';
 import { ZmService } from '../services/zm.service';
 import { isArray } from '../utils/helper';

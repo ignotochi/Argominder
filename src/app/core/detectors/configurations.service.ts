@@ -5,7 +5,7 @@ import { IConfigurationsList } from "src/app/interfaces/IConfigurationsList";
 import { IConfigStreaming } from "src/app/interfaces/IConfStreaming";
 import { IEventsFilter } from "src/app/interfaces/IEventsFilter";
 import { IStreamProperties } from "src/app/interfaces/IStreamProperties";
-import { DataStoreDetector } from "src/app/services/change-detector.service";
+import { DataStoreDetector } from "src/app/core/detectors/change-detector.service";
 
 @Injectable()
 export class ChangeDetectorConfigurations extends DataStoreDetector<IConfigurationsList, configurationsActions> {
@@ -13,15 +13,19 @@ export class ChangeDetectorConfigurations extends DataStoreDetector<IConfigurati
     setAll(input: IConfigurationsList) {
         this.updateDataChanges({ action: configurationsActions.All, payload: input });
     }
+
     setStreamingStatus(previewStatus: boolean) {
         this.updateDataChanges({ action: configurationsActions.PreviewStatus, payload: { ...this.getClonedDataChange(), previewStatus: previewStatus } });
     }
+
     setCamDiapason(incCamDiapason: ICamRegistry) {
         this.updateDataChanges({ action: configurationsActions.CamDiapason, payload: { ...this.getClonedDataChange(), camDiapason: [...this.getClonedDataChange()?.camDiapason, incCamDiapason] } });
     }
+
     setEventsFilters(eventsFilter: IEventsFilter) {
         this.updateDataChanges({ action: configurationsActions.EventsFilter, payload: { ...this.getClonedDataChange(), eventsFilter: eventsFilter } });
     }
+    
     setStreamingProperties(streamingProperties: IStreamProperties) {
         this.updateDataChanges({ action: configurationsActions.StreamingProperties, payload: { ...this.getClonedDataChange(), streamingProperties: streamingProperties } });
     }

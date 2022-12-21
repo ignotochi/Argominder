@@ -22,13 +22,13 @@ export interface DbConfgigObject {
 
 @Component({
   selector: 'config',
-  templateUrl: './config.component.html',
-  styleUrls: ['./config.component.scss'],
+  templateUrl: './zm-configurator.component.html',
+  styleUrls: ['./zm-configurator.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
   providers: [CoreMainServices]
 })
 
-export class ConfigComponent extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
   @Input()
   public panelOpenState = false;
   public showDateRangeSpinner: boolean = false;

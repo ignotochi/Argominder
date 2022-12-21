@@ -4,7 +4,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
-import { StreamPreview } from './preview/stream-preview.component';
+import { ZoneminderStreamingPreview } from './preview-component/streaming-preview.component';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -25,7 +25,7 @@ const dbConfig: DBConfig  = {
 
 @NgModule({
   declarations: [
-    StreamPreview
+    ZoneminderStreamingPreview
   ],
 
   imports: [

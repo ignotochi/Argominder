@@ -1,8 +1,5 @@
 # Argominder
-A simple and fast user interface for zoneminder In Angular12. 
-
-# Argominder development Status: 65%
-Current state of development
+A simple and fast user interface for zoneminder In Angular. 
 
 # What Argominder will do?
 - see up to 12 simultaneous streaming

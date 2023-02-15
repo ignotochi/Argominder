@@ -17,9 +17,15 @@
             </mat-select>
         </mat-form-field>
 
-        <div class="settingsFromJson">
-            <!-- <p>{{ 'Default settings loaded from json file' }}</p> -->
+        
+        <mat-form-field appearance="fill">
+            <mat-label>Languages</mat-label>
+            <mat-select [(value)]="this.zmService.conf.language">
+                <mat-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
 
+        <div class="settingsFromJson">
             <mat-form-field appearance="fill">
                 <mat-label>{{ 'Protocol' }}</mat-label>
                 <input [disabled]="true" matInput [value]="zmService.conf.protocol">
@@ -101,7 +107,7 @@
                 </div>
                 <mat-slider [disabled]="false" [max]="liveStreamingMaxScale" [min]="liveStreamingMinScale"
                     [(ngModel)]="selectedLiveStreamingScale" [thumbLabel]="true" [tickInterval]="5"
-                    (click)="applyNewStreamingConf(selectedLiveStreamingScale, 'liveStreaming');">
+                    (click)="setLiveStreamingScale(selectedLiveStreamingScale);">
                 </mat-slider>
             </div>
 
@@ -112,7 +118,7 @@
                 </div>
                 <mat-slider [disabled]="false" [max]="liveStreamingMaxFps" [min]="liveStreamingMinFps"
                     [(ngModel)]="selectedLiveStreamingFps" [thumbLabel]="true" [tickInterval]="1"
-                    (click)="applyNewStreamingConf(selectedLiveStreamingFps, 'maxLiveFps');">
+                    (click)="setLiveStreamingFps(selectedLiveStreamingFps);">
                 </mat-slider>
             </div>
         </div>
@@ -125,7 +131,7 @@
                 </div>
                 <mat-slider [disabled]="false" [max]="detailStreamingMaxScale" [min]="detailStreamingMinScale"
                     [(ngModel)]="selectedDetailStreamingScale" [thumbLabel]="true" [tickInterval]="5"
-                    (click)="applyNewStreamingConf(selectedDetailStreamingScale, 'detailStreaming');">
+                    (click)="setDetailStreamingScale(selectedDetailStreamingScale);">
                 </mat-slider>
             </div>
 
@@ -136,7 +142,7 @@
                 </div>
                 <mat-slider [disabled]="false" [max]="detailStreamingMaxFps" [min]="detailStreamingMinFps"
                     [(ngModel)]="selectedDetailStreamingFps" [thumbLabel]="true" [tickInterval]="1"
-                    (click)="applyNewStreamingConf(selectedDetailStreamingFps, 'maxDetailFps');">
+                    (click)="setDetailStreamingFps(selectedDetailStreamingFps);">
                 </mat-slider>
             </div>
         </div>
@@ -149,7 +155,7 @@
 
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Filtro eventi
+                  Filtro eventi 
             </mat-panel-title>
             <mat-panel-description>
                 {{ 'Filtra eventi per data e orario' }}
@@ -159,13 +165,12 @@
         <form class="example-form">
             <mat-form-field appearance="fill" class="example-form-field">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="datepicker" placeholder="Start date" [(ngModel)]="startDateFilter"
-                    name="startDate">
+                <input matInput [matDatepicker]="datepicker" placeholder="Start date" [(ngModel)]="startDate" name="startDate">
                 <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
                 <mat-datepicker #datepicker>
                     <mat-datepicker-actions>
-                        <button mat-button matDatepickerCancel>Cancel</button>
-                        <button mat-raised-button color="primary" matDatepickerApply>Search</button>
+                        <button mat-button matDatepickerCancel>cancella</button>
+                        <button mat-raised-button color="primary" matDatepickerApply>Imposta</button>
                     </mat-datepicker-actions>
                 </mat-datepicker>
             </mat-form-field>
@@ -173,13 +178,13 @@
             <mat-form-field class="filter-start-time" appearance="fill">
                 <mat-label>Select Start time</mat-label>
                 <input matInput placeholder="00:00:00" value="00:00:00" type="time" name="startTime"
-                    [(ngModel)]="dateRange.startTime">
+                    [(ngModel)]="startTime">
             </mat-form-field>
 
             <mat-form-field class="filter-end-time" appearance="fill">
                 <mat-label>Select End time</mat-label>
                 <input matInput placeholder="23:59:00" value="00:00:00" type="time" name="endTime"
-                    [(ngModel)]="dateRange.endTime">
+                    [(ngModel)]="endTime">
             </mat-form-field>
 
             <mat-form-field appearance="fill">
@@ -190,17 +195,11 @@
                 </mat-select>
             </mat-form-field>
 
-            <div class="row-btn">
-                <button id="EventsFilters-btn" mat-raised-button color="primary"
-                    (click)="setEventsFilters(false)">{{'Filtra' }}</button>
+            <div class="row-btn" id="filterActions">
+                <button id="EventsFilters-btn" mat-raised-button color="primary" (click)="setEventsFilters()">{{'Filtra' }}</button>
                 <button id="EventsFilters-btn" mat-raised-button color="accent" (click)="resetFilters()">{{'Reset filters' }}</button>
             </div>
         </form>
     </mat-expansion-panel>
-
-    <!-- <div *ngIf="isLoadedFromDb === true" id="settings-actions">
-        <p id="settings-loaded-from">{{ (isLoadedFromDb === true) ? 'Settings loaded from: DB' : 'Settings loaded from: JSON' }}</p>
-        <button  mat-raised-button color="accent" (click)="restetDbConf()">{{'Reset DB Config' }}</button>
-    </div> -->
 
 </mat-accordion>

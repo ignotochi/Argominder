@@ -42,7 +42,7 @@ export function hardObjectClone<T>(objectToClone: T) : T {
   return result;
 }
 
-export function DateToTimeString(date: Date) {
+export function convertDateToStringHHmmss(date: Date) {
   const dt = new Date(date);
   const [hours, minutes, seconds] = [dt.getHours(), dt.getMinutes(), dt.getSeconds()]
   const formattedHours = hours < 10 ? '0' + hours.toString() : hours.toString();
@@ -52,11 +52,24 @@ export function DateToTimeString(date: Date) {
   return time;
 }
 
-export function timeStringToDate(date: string) {
-  const [hours, minutes, seconds] = date.split(':');
-  let dt = new Date();
-  dt.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds));
-  return dt;
+export function convertTimeStringToHHmm(time: string) {
+  const [hours, minutes] = time.split(':');
+  const formattedHours = parseInt(hours) < 10 && !hours.includes("0") ? '0' + hours.toString() : hours.toString();
+  const formattedMinutes = parseInt(minutes) < 10  && !minutes.includes("0") ? '0' + minutes.toString() : minutes.toString();
+  const formattedTime = formattedHours + ':' + formattedMinutes;
+  return formattedTime;
+}
+
+export function convertDateToString(date: Date) {
+  let d = date, month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+  return [year, month, day].join('-');
+}
+
+export function convertStringToDate(date: string) {
+  const [year, month, day] = date.split('-');
+  return new Date(parseInt(year), parseInt(month)-1, parseInt(day));
 }
 
 

@@ -2,8 +2,8 @@ import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChangeDetectorJwt } from './components/detectors/jwt.service';
-import { ChangeDetectorConfigurations } from './components/detectors/configurations.service';
+import { ChangeDetectorJwt } from './core/detectors/jwt.service';
+import { ChangeDetectorConfigurations } from './core/detectors/configurations.service';
 import { Auth } from './services/auth.service';
 import { IConfigurationsList } from './interfaces/IConfigurationsList';
 import { IEventsFilter } from './interfaces/IEventsFilter';
@@ -11,6 +11,7 @@ import { IStreamProperties } from './interfaces/IStreamProperties';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { authActions, Menu } from './enums/enums';
+import { isNullOrEmptyString } from './utils/helper';
 
 @Component({
   selector: 'argominder',
@@ -20,21 +21,21 @@ import { authActions, Menu } from './enums/enums';
 })
 export class ArgoMinderComponent implements OnInit, AfterViewInit {
   selectedTab: number = 0;
-  loadStream: boolean;
+  userAuthenticated: boolean;
   private auth$: Subscription;
 
   private configurationsList: IConfigurationsList = {
-    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingConfChanges: [], streamingProperties: {} as IStreamProperties
+    camDiapason: [], eventsFilter: {} as IEventsFilter, previewStatus: false, streamingProperties: {} as IStreamProperties
   };
 
   constructor(private changeRef: ChangeDetectorRef, private configurations: ChangeDetectorConfigurations,
-    private auth: ChangeDetectorJwt, public router: Router, public authConf: Auth) {
+    private jwt: ChangeDetectorJwt, public router: Router, public authConf: Auth) {
     this.configurations.initializeDataChanges();
-    this.auth.initializeDataChanges();
+    this.jwt.initializeDataChanges();
     this.configurations.setAll(this.configurationsList);
 
-    this.auth$ = this.auth.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
-      this.loadStream = this.authConf.login.access_token.length > 0 ? true : false;
+    this.auth$ = this.jwt.getDataChanges().pipe(filter(tt => tt.action === authActions.token)).subscribe(() => {
+      this.userAuthenticated = !isNullOrEmptyString(this.authConf.login.access_token) ? true : false;
       this.changeRef.markForCheck();
     })
   }
@@ -56,7 +57,9 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
       case 2:
         this.navigationPath(Menu.Events);
         break;
-
+      case 3:
+        this.navigationPath(Menu.Settings);
+        break;
       default:
         break;
     }
@@ -74,7 +77,9 @@ export class ArgoMinderComponent implements OnInit, AfterViewInit {
       case Menu.Events:
         path = Menu.Events;
         break;
-
+      case Menu.Settings:
+        path = Menu.Settings;
+        break;
       default:
         break;
     }

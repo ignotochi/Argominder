@@ -56,7 +56,6 @@ export enum configurationsActions {
     PreviewStatus = "PreviewStatus",
     CamDiapason = "CamDiapason",
     EventsFilter = "EventsFilter",
-    StreamingConfChanges = "StreamingConfChanges",
     StreamingProperties = "StreamingProperties",
 }
 

@@ -1,14 +1,15 @@
 {
+    "language" : "it-IT",
     "protocol": "https://",
     "baseUrl": "",
     "streamUrl1": "",
     "streamUrl2": "",
     "streamUrl3": "",
     "streamUrl4": "",
-    "liveStreamingScale": "30",
+    "liveStreamingScale": "25",
     "liveStreamingMaxFps": "3",
     "buffer": "1000",
-    "detailStreamingScale": "100",
-    "detailStreamingMaxfps": "5",
+    "detailStreamingScale": "50",
+    "detailStreamingMaxfps": "2",
     "defaultEventStreamingMode": "video" 
 }

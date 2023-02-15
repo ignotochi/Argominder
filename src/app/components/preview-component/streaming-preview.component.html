@@ -2,7 +2,7 @@
 
     <div *ngIf="!showInVideoElement">
         <mat-spinner class="spinnerCam" diameter="50" #spinner></mat-spinner>
-        <img id="preview" style="width:100%;" [src]="streamUrl" (load)="onImageLoad($event);" #streaming>
+        <img id="preview" style="min-width:100vh; min-height: 50vh;" [src]="streamUrl" (load)="onImageLoad($event);" #streaming>
     </div>
 
     <video id="videoEvent" *ngIf="showInVideoElement" controls autoplay muted>

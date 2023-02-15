@@ -2,9 +2,9 @@ import { NgModule } from "@angular/core";
 import { MatGridListModule } from "@angular/material/grid-list";
 import { RouterModule, Routes } from "@angular/router";
 import { CommonComponentModules } from "../components.module";
-import { LiveStreamComponent } from "./live-stream.component";
+import { ZoneminderLiveStreaming } from "./live-stream.component";
 
-const routes: Routes = [ { path: '', component: LiveStreamComponent} ]; 
+const routes: Routes = [ { path: '', component: ZoneminderLiveStreaming} ]; 
 
 @NgModule({
   imports: [
@@ -13,7 +13,7 @@ const routes: Routes = [ { path: '', component: LiveStreamComponent} ];
       MatGridListModule,
     ],
     declarations: [
-      LiveStreamComponent
+      ZoneminderLiveStreaming
     ],
   providers: [RouterModule],
   exports: [RouterModule]

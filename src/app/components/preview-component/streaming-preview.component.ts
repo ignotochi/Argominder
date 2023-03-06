@@ -12,7 +12,9 @@ import { IConfigurationsList } from "src/app/interfaces/IConfigurationsList";
   templateUrl: 'streaming-preview.component.html',
   styleUrls: ['./streaming-preview.component.scss'],
 })
+
 export class ZoneminderStreamingPreview implements OnInit, AfterViewInit, OnDestroy {
+ 
   @ViewChild('streaming', { static: false }) streaming: ElementRef<HTMLImageElement>;
   @ViewChild('spinner', { read: ElementRef }) spinner: ElementRef<HTMLElement>;
   @ViewChild('detailInfoPreview', { read: ElementRef }) detailInfoPreview: ElementRef<HTMLElement>;
@@ -23,6 +25,7 @@ export class ZoneminderStreamingPreview implements OnInit, AfterViewInit, OnDest
   public configurationsList: IConfigurationsList;
 
   constructor(private configurations: ChangeDetectorConfigurations, private zmService: ZmService) {
+   
     this.dataChange$ = this.configurations.getDataChanges().pipe(
       filter(tt => (tt.action === configurationsActions.StreamingProperties || tt.action === configurationsActions.CamDiapason))).subscribe(result => {
         this.configurationsList = result.payload;
@@ -59,6 +62,7 @@ export class ZoneminderStreamingPreview implements OnInit, AfterViewInit, OnDest
       const height = evt.target.naturalHeight;
       const status = evt.target.complete;
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
+     
       this.hideSpinners(isLoaded);
       this.loadDetailStreamInfo();
     }
@@ -75,5 +79,4 @@ export class ZoneminderStreamingPreview implements OnInit, AfterViewInit, OnDest
       this.configurationsList.streamingProperties.previewType
     );
   }
-
 }

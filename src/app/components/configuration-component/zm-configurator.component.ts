@@ -29,8 +29,9 @@ export interface DbConfgigObject {
 })
 
 export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
-  @Input()
-  public panelOpenState = false;
+ 
+  @Input() panelOpenState = false;
+  
   public showDateRangeSpinner: boolean = false;
   public startDate: Date = new Date();
   public startTime: string;
@@ -45,11 +46,15 @@ export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> im
 
   constructor(public mainServices: CoreMainServices, private changeRef: ChangeDetectorRef, private dateAdapter: DateAdapter<Date>) {
     super(mainServices);
+    
     Object.keys(streamingEventMode).forEach(mode => { this.eventStreamMode.push({ name: mode, value: streamingEventMode[mode] }) });
 
     this.configurationList$ = this.mainServices.configurations.getDataChanges().pipe(
+      
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.EventsFilter || !this.configurationsList))
+      
       .subscribe(result => {
+       
         if (result.payload.camDiapason.length > 0) {
           this.mapCamsNames(result.payload.camDiapason);
           this.selectedCam.id = result.payload.eventsFilter?.cam;
@@ -59,6 +64,7 @@ export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> im
           this.showDateRangeSpinner = false;
           this.changeRef.markForCheck();
         }
+
         this.configurationsList = result.payload;
         this.startDate = convertStringToDate(result.payload.eventsFilter.startDate);
         this.startTime = convertTimeStringToHHmm(result.payload.eventsFilter.startTime);
@@ -85,13 +91,16 @@ export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> im
 
   setEventsFilters() {
     this.showDateRangeSpinner = true;
-    const filters: IEventsFilter = {
+   
+    const filters: IEventsFilter = 
+    {
       startDate: convertDateToString(this.startDate),
       endDate: convertDateToString(this.startDate),
       startTime: this.startTime,
       endTime: this.endTime,
       cam: this.selectedCam.id
-    }
+    };
+
     setTimeout(() => {
       this.mainServices.configurations.setEventsFilters(filters);
     }, 1500);
@@ -99,14 +108,17 @@ export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> im
 
   resetFilters() {
     this.mainServices.commonInitializer.setDefaultTime();
+    
     const currentDate = new Date();
-    const resettedfilters: IEventsFilter = {
+    const resettedfilters: IEventsFilter = 
+    {
       startDate: convertDateToString(currentDate),
       endDate: convertDateToString(currentDate),
       startTime: (currentDate.getHours() - 1).toString() + ":" + currentDate.getMinutes().toString(),
       endTime: currentDate.getHours().toString() + ":" + currentDate.getMinutes().toString(),
       cam: null
-    }
+    };
+
     this.mainServices.configurations.setEventsFilters(resettedfilters);
     this.startDate = currentDate;
     this.selectedCam = { name: null, id: null };
@@ -131,5 +143,4 @@ export class ZoneminderConfigurator extends BaseCoreUtilsComponent<IMonitors> im
   setDetailStreamingFps(value: number) {
     this.updateConfDB(streamingSettings.detailStreamingMaxfps, value.toString());
   }
-
 }

@@ -5,7 +5,7 @@ import {
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
+import { BaseCoreUtilsComponent as BaseArgominderComponent } from 'src/app/core/base-arg-component.component';
 import { configurationsActions } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
 import { StreamStatus } from 'src/app/enums/stream-enum';
@@ -23,7 +23,7 @@ import { CoreMainServices } from 'src/app/core/core-main-services.service';
   changeDetection: ChangeDetectionStrategy.Default,
   providers: [CoreMainServices]
 })
-export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
+export class ZoneminderLiveStreaming extends BaseArgominderComponent<IMonitors> implements OnInit, OnDestroy, AfterViewInit {
 
   @ViewChildren('spinners', { read: ElementRef }) spinners: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('streams', { read: ElementRef }) streams: QueryList<ElementRef<HTMLImageElement>>;
@@ -31,8 +31,10 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
   @ViewChildren('detailInfo', { read: ElementRef }) detailInfo: QueryList<ElementRef<HTMLElement>>;
 
   private detail: { enabled: boolean, stream: string } = { enabled: false, stream: null };
+
   public showInfoDetail: boolean = false;
   private configurationList: IConfigurationsList = null;
+
   private dataChange$: Subscription;
   private streamChanges$: Subscription;
   private camInfo$: Subscription;
@@ -40,6 +42,7 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
 
   constructor(public mainServices: CoreMainServices, private dialog: MatDialog, private elementRef: ElementRef<HTMLElement>) {
     super(mainServices);
+
     this.dataChange$ = this.mainServices.configurations.getDataChanges()?.pipe(
       filter(tt => tt.action === configurationsActions.CamDiapason || tt.action === configurationsActions.PreviewStatus || this.configurationList === null))
       .subscribe(result => {
@@ -83,12 +86,15 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
 
   ShowOrhideSpinners(camId: string, loadStatus: boolean) {
     const matchedEle = this.spinners.find(spinner => spinner.nativeElement.id.includes(camId));
+
     if (loadStatus === true) matchedEle.nativeElement.classList.add('hidden');
     if (loadStatus === false) matchedEle.nativeElement.classList.remove('hidden');
   }
 
   loadDetailStreamInfo(camId: string) {
+
     this.detailInfo.forEach(detail => {
+
       if (detail.nativeElement.getAttribute('id') === camId) {
         detail.nativeElement.innerText = this.getPreviewInfo(camId);
       }
@@ -96,8 +102,12 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
   }
 
   getStream(cam: string, index: number, status: string) {
-    if (status !== StreamStatus.Connected) return 'assets/img/broken.jpg';
-    if (status === StreamStatus.Connected) return this.zmService.getLiveStream(cam, index, this.selectedLiveStreamingScale.toString(), this.selectedLiveStreamingFps.toString());
+
+    if (status !== StreamStatus.Connected)
+      return 'assets/img/broken.jpg';
+
+    else if (status === StreamStatus.Connected)
+      return this.zmService.getLiveStream(cam, index, this.selectedLiveStreamingScale.toString(), this.selectedLiveStreamingFps.toString());
   }
 
   getStreamPreview(cam: string) {
@@ -117,11 +127,13 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
   }
 
   onImageLoad(evt: any, camId: string) {
+
     if (evt && evt.target) {
       const width = evt.target.naturalWidth;
       const height = evt.target.naturalHeight;
       const status = evt.target.complete;
       const isLoaded = (width !== 0 && height !== 0 && status === true) ? true : false;
+      
       this.showExpands(camId, isLoaded);
       this.ShowOrhideSpinners(camId, isLoaded);
       this.loadDetailStreamInfo(camId);
@@ -129,19 +141,25 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
   }
 
   stopStream() {
+
     this.streams.forEach(stream => {
       stream.nativeElement.classList.add('hidden');
       stream.nativeElement.src = null;
     })
+
     this.hideExpands();
   }
 
   startStream() {
+
     this.streams.forEach((stream, index) => {
+
       const camId = stream.nativeElement.getAttribute('camId');
       const camObject = this.datasource.monitors.find(cam => (cam.Monitor.Id === camId));
       const hideSpinner = camObject.Monitor_Status.Status === StreamStatus.Connected ? false : true;
+
       this.ShowOrhideSpinners(camId, hideSpinner);
+
       const streamUrl = this.getStream(camId, index + 1, camObject.Monitor_Status.Status);
       stream.nativeElement.src = streamUrl;
       stream.nativeElement.classList.remove('hidden');
@@ -150,30 +168,38 @@ export class ZoneminderLiveStreaming extends BaseCoreUtilsComponent<IMonitors> i
   }
 
   setPreview(value: boolean, stream: string, camId: string) {
+
     this.showInfoDetail = false;
     this.detail = { enabled: value, stream: stream };
-    const streamingProperties: IStreamProperties = {
+
+    const streamingProperties: IStreamProperties = 
+    {
       previewType: previewType.streamingDetail,
       streamUrl: this.detail.stream,
       camId: camId,
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     } as IStreamProperties;
+
     this.mainServices.configurations.setStreamingProperties(streamingProperties);
     this.mainServices.configurations.setStreamingStatus(true);
     this.loadPreview();
   }
 
   loadPreview(): void {
+
     let dialogRef: MatDialogRef<ZoneminderStreamingPreview>;
     dialogRef = this.dialog.open(ZoneminderStreamingPreview);
+
     this.dialog$ = dialogRef.afterClosed().subscribe(() => {
       this.mainServices.configurations.setStreamingStatus(false);
     });
   }
 
   previewStatus(previewStatus: boolean) {
+
     if (previewStatus === true) {
-      if (this.streams && this.streams.length > 0) this.stopStream();
+      if (this.streams && this.streams.length > 0)
+        this.stopStream();
     }
     else if (previewStatus === false) {
       if (this.streams && this.streams.length > 0) this.startStream();

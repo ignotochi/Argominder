@@ -9,7 +9,7 @@ import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseCoreUtilsComponent } from 'src/app/core/base-arg-component.component';
+import { BaseCoreUtilsComponent as BaseArgominderComponent } from 'src/app/core/base-arg-component.component';
 import { CoreMainServices } from 'src/app/core/core-main-services.service';
 import { configurationsActions, streamingEventMode } from 'src/app/enums/enums';
 import { previewType } from 'src/app/enums/preview-enum';
@@ -26,9 +26,10 @@ import { ZoneminderStreamingPreview } from '../preview-component/streaming-previ
   providers: [CoreMainServices]
 })
 
-export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
-  @Input()
-  public showPreview: boolean;
+export class ZoneminderEvents extends BaseArgominderComponent<ICamEvents> implements OnInit, AfterViewInit, OnDestroy {
+
+  @Input() showPreview: boolean;
+
   public displayedColumns: string[] = ['EventID', 'Name', 'Cause', 'MonitorId', 'StartTime', 'EndTime', 'Length', 'Frames', 'MaxScore'];
   public streamUrl: string;
   public dataGrid: MatTableDataSource<object>;
@@ -46,12 +47,16 @@ export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> impleme
 
   ngOnInit() {
     this.configurationList$ = this.mainServices.configurations.getDataChanges().pipe(
+      
       filter(tt => tt.action === configurationsActions.CamDiapason ||
         tt.action === configurationsActions.EventsFilter ||
         tt.action === configurationsActions.StreamingProperties || this.configurationList === null))
+
       .subscribe(result => {
         this.configurationList = result.payload;
+
         const defaultModeToEnum = streamingEventMode[Object.keys(streamingEventMode).find(mode => (mode === this.zmService.conf.defaultEventStreamingMode))];
+
         if (!result.payload.streamingProperties.eventStreamingMode) this.configurationList.streamingProperties.eventStreamingMode = defaultModeToEnum;
         if (result.payload.eventsFilter) this.getEvents();
       });
@@ -73,11 +78,15 @@ export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> impleme
       this.configurationList.eventsFilter.startTime,
       this.configurationList.eventsFilter.endTime,
       this.configurationList.eventsFilter.cam
-    ).subscribe(result => {
+    )
+    
+    .subscribe(result => {
+    
       this.dataGrid = new MatTableDataSource(result.events.map(data => {
         data.Event.Name = this.getCamName(data.Event.MonitorId);
         return data.Event;
       }));
+
       this.dataGrid.sort = this.sort;
       this.dataGrid.paginator = this.paginator;
       this.datasource = result;
@@ -89,12 +98,15 @@ export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> impleme
   }
 
   setPreview(item: any) {
-    const streamingProperties: IStreamProperties = {
+   
+    const streamingProperties: IStreamProperties = 
+    {
       previewType: previewType.eventDetail,
       streamUrl: this.getStreamPreview(item.Id),
       camId: item.MonitorId,
       eventStreamingMode: this.configurationList.streamingProperties.eventStreamingMode
     }
+
     this.mainServices.configurations.setStreamingProperties(streamingProperties);
 
     this.configurationList.camDiapason.find(cam => {
@@ -108,7 +120,9 @@ export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> impleme
   }
 
   loadPreview(eventId: string): void {
+    
     const dialogRef = this.dialog.open(ZoneminderStreamingPreview);
+    
     dialogRef.afterClosed().subscribe(() => {
       this.markEvent(eventId);
       this.changeRef.markForCheck();
@@ -128,5 +142,4 @@ export class ZoneminderEvents extends BaseCoreUtilsComponent<ICamEvents> impleme
   isMarkedEvent(eventId: string): boolean {
     return this.viewedEvents.includes(eventId);
   }
-
 }

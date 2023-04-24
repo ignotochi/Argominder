@@ -6,11 +6,11 @@ import { ZmService } from 'src/app/services/zm.service';
 import { CommoneInitializer } from 'src/app/services/common-initializer.service';
 import { Menu } from 'src/app/enums/enums';
 import { ILogin } from 'src/app/interfaces/ILogin';
-import { IConf } from '../interfaces/Iconf';
 import { switchMap } from 'rxjs/operators';
 import { UrlsBuilder } from '../core/build-urls';
 import { HttpErrorResponse } from '@angular/common/http';
 import { isNullOrEmptyString } from '../utils/helper';
+import { IConf } from '../interfaces/IConf';
 
 @Injectable()
 
@@ -54,8 +54,6 @@ export class Auth {
     }
 
     public logInZm() {
-       
-        var result: boolean = false;
        
         return this.zmService.getConfigurationFile().pipe(
             switchMap((conf: IConf) => {

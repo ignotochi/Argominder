@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ILogin } from '../interfaces/ILogin';
 import { IMonitors } from '../interfaces/IMonitors';
-import { IConf } from '../interfaces/IConf';
 import { ICamEvents } from '../interfaces/ICamEvent';
 import { UrlsBuilder } from '../core/build-urls';
 import { previewType } from '../enums/preview-enum';
 import { ICamRegistry } from '../interfaces/ICamRegistry';
+import { IConf } from '../interfaces/IConf';
 
 @Injectable()
 
@@ -49,7 +49,7 @@ export class ZmService {
 
   zmLogin(username: string, password: string) {
     const url = this.urlsBuilder.login(username, password, this.conf);
-    return this.http.get<ILogin>(url);
+    return this.http.get<any>(url);
   }
 
   getCamListInfo() {

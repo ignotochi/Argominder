@@ -1,7 +1,7 @@
 {
     "language" : "it-IT",
     "protocol": "https://",
-    "baseUrl": "",
+    "baseUrl": "zm.fetchtec.com/zm/api/",
     "streamUrl1": "",
     "streamUrl2": "",
     "streamUrl3": "",

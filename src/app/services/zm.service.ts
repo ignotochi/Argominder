@@ -49,7 +49,7 @@ export class ZmService {
 
   zmLogin(username: string, password: string) {
     const url = this.urlsBuilder.login(username, password, this.conf);
-    return this.http.get<any>(url);
+    return this.http.get<ILogin>(url);
   }
 
   getCamListInfo() {
